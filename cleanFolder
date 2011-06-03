@@ -1,0 +1,17 @@
+rm *.ti
+rm *.o
+rm *.js
+rm COCOA.c
+rm COCOA.h
+rm CTApplication.h
+rm CTApplication.c
+rm CTButton.c
+rm CTButton.h
+rm CTCommon.c
+rm CTCommon.h
+rm CTContainer.c
+rm CTContainer.h
+rm CTWindow.c
+rm CTWindow.h
+rm NewTest.h
+rm NewTest.c

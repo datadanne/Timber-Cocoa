@@ -1,0 +1,4 @@
+#ifndef _COCOA_CTWINDOW_TIMBER_
+#define _COCOA_CTWINDOW_TIMBER_
+
+#endif

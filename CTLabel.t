@@ -9,32 +9,27 @@ struct Label < Component, HandlesMouseEvents where
     getTextColor :: Request Color
 
 mkCocoaLabel = class
-    myState := Inactive
     position := {x=0; y=0}
     size := {width=0; height=0}
     mouseEventHandler := Nothing          
     textColor := {r=0;g=0;b=0}
     text := "Default Label"
-    
-    id = new mkCocoaID
 
-    focus = new focusWrapper this False
-    setNextFocusTarget = focus.setNextFocusTarget
-    getNextFocusTarget = focus.getNextFocusTarget
-    setPreviousFocusTarget = focus.setPreviousFocusTarget
-    getPreviousFocusTarget = focus.getPreviousFocusTarget
-    setIsFocusable =  focus.setIsFocusable
-    getIsFocusable = focus.getIsFocusable
+    id = new mkCocoaID
+    base = new basicComponent False Nothing "Label"
+    setParent = base.setParent
+    getParent = base.getParent
+    setIsFocusable = base.setIsFocusable
+    getIsFocusable = base.getIsFocusable
+    setName = base.setName
+    getName = base.getName
+    getState = base.getState
+    setState = base.setState
+    getAllComponents = base.getAllComponents
     
-    name := "label"
-    setName s = request
-        name := s
-    getName = request
-        result name   
-            
     setText s = action
         text := s
-        case (myState) of
+        case (<- base.getState) of
             Active -> labelSetText id s
             _ ->
 
@@ -43,7 +38,7 @@ mkCocoaLabel = class
 
     
     setTextColor c = action
-        case (myState) of
+        case (<- base.getState) of
             Active -> labelSetTextColor id c
             _ ->
             
@@ -52,8 +47,8 @@ mkCocoaLabel = class
     getTextColor = request
         result textColor
     
-    setPosition p = action  
-        case (myState) of
+    setPosition p = request  
+        case (<- base.getState) of
             Active -> labelSetPosition id p
             _ -> 
             
@@ -62,14 +57,14 @@ mkCocoaLabel = class
     getPosition = request
         result position
 
-    setSize s = action
+    setSize s = request
         size := s
 
     getSize = request
         result size
         
     destroy = request
-        myState := Destroyed
+        base.setState Destroyed
                             
     -- handles mouse events
     installMouseListener ml = request
@@ -83,7 +78,7 @@ mkCocoaLabel = class
 
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request
-            myState := Active
+            base.setState Active
             initLabel this app
             
             inithelper

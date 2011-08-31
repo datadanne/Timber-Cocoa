@@ -6,7 +6,7 @@
  
  
  
-CLOS root_FocusTest (World w_2, Int d_1845);
+CLOS root_FocusTest (World w_2, Int d_2087);
  
 void _init_FocusTest ();
  

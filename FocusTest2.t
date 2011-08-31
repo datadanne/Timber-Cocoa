@@ -15,7 +15,7 @@ root w = class
        
     greenclicked app wid event = request
         env.stdout.write ("green clicked!!!: " ++ (show wid) ++ "\n")
-        superTest = KeyEvent (KeyPressed "S")
+        superTest = KeyEvent (KeyPressed S)
         app.eventDispatcher superTest wid
             
         result True

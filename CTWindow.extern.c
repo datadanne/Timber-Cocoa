@@ -6,15 +6,12 @@ CocoaEvent_CTCommon receivedEvent;
 
 pthread_mutex_t eventMutex;
 
-int p = 0;
 void dispatchEventToTimber(NSEvent* event) { 
 	App_CTCommon app = getApp();
 	DEBUG("C: Event received in dispatchEventToTimber\n");
 	/* figure out event
 		flag 0,1,2 0 = windowEvent, etc. */
 	if ([event type] == NSLeftMouseDown || [event type] == NSLeftMouseDragged) {
-	    if (p++ % 2 != 0)
-            return;
         
  		Position_CTCommon x_5110;
 	    NEW (Position_CTCommon, x_5110, WORDS(sizeof(struct Position_CTCommon)));

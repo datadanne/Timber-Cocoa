@@ -10,19 +10,29 @@ struct Button < Component, HandlesMouseEvents, HandlesKeyEvents where
 --------------------------------------------------------------------------------------------------
 ------          ** BUTTON **            ----------------------------------------------------------
 mkCocoaButton env = class
-    myState := Inactive
-    position := {x=0; y=0}
     size := {width=108; height=17}
-    mouseEventHandler := Nothing
+    title := ""
+    position := {x=0; y=0}
     keyEventHandler := Nothing
+    mouseEventHandler := Nothing
     
     id = new mkCocoaID
-    title := "TestButton"
+    base = new basicComponent True Nothing "BUTTON"
+    setParent = base.setParent
+    getParent = base.getParent
+    setIsFocusable = base.setIsFocusable
+    getIsFocusable = base.getIsFocusable
+    setName = base.setName
+    getName = base.getName
+    getState = base.getState
+    setState = base.setState
+    getAllComponents = base.getAllComponents
     
     -- setTitle
     setTitle s = action
         title := s
-        case (myState) of
+        setName s
+        case (<- base.getState) of
             Active -> buttonSetTitle id s
             _ ->
    
@@ -31,8 +41,8 @@ mkCocoaButton env = class
         result title   
     
     -- setPosition
-    setPosition p = action
-        case (myState) of
+    setPosition p = request
+        case (<- base.getState) of
             Active -> buttonSetPosition id p
             _ -> 
         position := p       
@@ -41,42 +51,14 @@ mkCocoaButton env = class
     getPosition = request
         result position
 
-    setSize s = action
+    setSize s = request
         size := s
 
     getSize = request
         result size
         
     destroy = request
-        myState := Destroyed
-
-    focus = new focusWrapper this True
-    
-    setNextFocusTarget c = request
-        if (isJust c) then
-            env.stdout.write (name ++ " is changing focus to " ++ (<- showName c))
-        else
-            env.stdout.write (name ++ " is changing focus to NOTHING\n")
-        res <- focus.setNextFocusTarget c
-        
-    getNextFocusTarget = request
-        res <- focus.getNextFocusTarget                                       
-        if (isJust res) then
-            env.stdout.write (name ++ " is asked for getNextFocusTarget, returning TRUE\n")
-        else
-            env.stdout.write (name ++ " is asked for getNextFocusTarget, returing FALSE\n")
-        result res
-        
-    setPreviousFocusTarget = focus.setPreviousFocusTarget
-    getPreviousFocusTarget = focus.getPreviousFocusTarget
-    setIsFocusable =  focus.setIsFocusable
-    getIsFocusable = focus.getIsFocusable 
-
-    name := "button"
-    setName s = request
-        name := s
-    getName = request
-        result name    
+        base.setState Destroyed
         
     installKeyListener kl = request
         keyEventHandler := Just kl
@@ -95,7 +77,7 @@ mkCocoaButton env = class
 
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request
-            myState := Active
+            base.setState Active
             initButton this app
             
             inithelper

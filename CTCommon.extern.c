@@ -24,6 +24,17 @@ Bool compareCocoaIDs_CTCommon (CocoaID_CTCommon a, CocoaID_CTCommon b) {
     return (ia->this == ib->this);
 }
 
+Bool compareComponents_CTCommon (Component_CTCommon a, Component_CTCommon b) {
+    internal_CocoaID_CTCommon ia = (internal_CocoaID_CTCommon)(a->id_CTCommon);
+    internal_CocoaID_CTCommon ib = (internal_CocoaID_CTCommon)(b->id_CTCommon);   
+    printf("comparing ids. #1: %p, #2:%p \n", ia->this, ib->this);  
+    if(ia->this == ib->this)
+        printf("gonna return true\n");
+    else
+        printf("gonna return false\n");
+    return (ia->this == ib->this);
+}
+
 Bool compareKeys_CTCommon(CocoaKey_CTCommon aKey, CocoaKey_CTCommon anotherKey) {
     return ((int)aKey == (int)anotherKey);
 }

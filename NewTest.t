@@ -56,6 +56,7 @@ root w = class
             c1.setSize ({width=50;height=50})
             c1.setPosition ({x=0;y=100})
             button.setTitle "Move"
+            button.setName "Move"
             button.setPosition ({x=20;y=20}) 
                                        
             after (sec 3) send action
@@ -74,9 +75,10 @@ root w = class
                 newbutton = new mkCocoaButton env
                 newbutton.setPosition ({x=0;y=55})
                 newbutton.setTitle "sec7add"
+                newbutton.setName "sec7add"
                 w1.addComponent newbutton 
                 teest.setPosition ({x=40;y=150})
-                w1.setFocus button
+                --w1.setFocus button
                 --w1.destroyWindow
 
     loopIt cmp = action

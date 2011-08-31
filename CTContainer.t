@@ -7,7 +7,7 @@ struct Container < Component, ContainsComponents, HandlesMouseEvents, HandlesKey
 
 --------------------------------------------------------------------------------------------------
 ------          ** CONTAINER **         ----------------------------------------------------------
-mkContainer e = class
+mkContainer env = class
     myState := Inactive
     myComponents := []        
     position := {x=0; y=0}
@@ -20,10 +20,9 @@ mkContainer e = class
     currentEventHasBeenConsumedBy := Nothing
     
     nextFocusTarget := Nothing
+    previousFocusTarget := Nothing
 
-    id = new mkCocoaID
-
-    setPosition p = action
+    setPosition p = request
         case (myState) of
             Active -> containerSetPosition id p
             _ ->
@@ -32,7 +31,7 @@ mkContainer e = class
     getPosition = request
         result position
 
-    setSize s = action
+    setSize s = request
         case (myState) of
             Active -> containerSetSize id s
             _ ->
@@ -41,58 +40,45 @@ mkContainer e = class
     getSize = request
         result size
 
-    setBackgroundColor c = action
+    setBackgroundColor c = request
         case (myState) of
             Active -> containerSetBackgroundColor id c
             _ ->
         color := c
 
     getBackgroundColor = request
-        result color    
+        result color
+        
+    empty [] = True
+    empty _ = False
 
-    focus = new focusWrapper this False
-
-    setNextFocusTarget nxt = request
-        nextFocusTarget := nxt
-        if (length myComponents > 0) then
-            (head myComponents).setNextFocusTarget nextFocusTarget
-            if (isJust nextFocusTarget) then
-                (fromJust nextFocusTarget).setPreviousFocusTarget (Just (head myComponents))
-
-    getNextFocusTarget = request
-        if (length myComponents > 0) then
-             result (Just (last myComponents))
-         else
-             result nextFocusTarget
-             
-    setPreviousFocusTarget = focus.setPreviousFocusTarget
-    getPreviousFocusTarget = focus.getPreviousFocusTarget
-    setIsFocusable =  focus.setIsFocusable
-    getIsFocusable = focus.getIsFocusable
+    id = new mkCocoaID
+    base = new basicComponent False Nothing "ContainerWHAT"
+    setParent = base.setParent
+    getParent = base.getParent
+    setIsFocusable = base.setIsFocusable
+    getIsFocusable = base.getIsFocusable
+    setName s = request 
+        env.stdout.write "in setName\n"
+        base.setName s
+    getName = base.getName
+    getState = base.getState
+    setState = base.setState
     
-    name := "Container"
-    setName s = request
-        name := s
-    getName = request
-        result name
-
-    addComponent c = request
-        if (length myComponents > 0) then
-            newestCmp = (head myComponents)
-            c.setNextFocusTarget (<- newestCmp.getNextFocusTarget)
-            newestCmp.setNextFocusTarget (Just c)
-            c.setPreviousFocusTarget (Just newestCmp)
-        else
-            c.setNextFocusTarget nextFocusTarget
-            c.setPreviousFocusTarget (<- focus.getPreviousFocusTarget)
-            if (isJust nextFocusTarget) then
-                (fromJust nextFocusTarget).setPreviousFocusTarget (Just c)
-            nextFocusTarget := (Just c)
-
-        myComponents := c : myComponents
+    children := []
+    getAllComponents = request
+        children := []
+        
+        forall c <- myComponents do
+            children := (children ++ (<- c.getAllComponents) ++ [c])
+        result children
+    
+    addComponent cmp = request
+        myComponents := cmp : myComponents
+        cmp.setParent (Just this)
         if (myState == Active && isJust appRef) then
-            c.init (fromJust appRef)
-            containerAddComponent id c.id
+            cmp.init (fromJust appRef)
+            containerAddComponent id cmp.id      
 
     getComponents = request
         result myComponents
@@ -107,9 +93,13 @@ mkContainer e = class
         keyEventHandler := Just kl
 
     handleEvent (MouseEvent t) modifiers = request
-        result <- mouseEventDispatcher t modifiers
-        
-    mouseEventDispatcher event modifiers = do
+        result (boolToMaybe (Just this) (<- dynamicHandleEvent t mouseEventHandler))
+        --result <- mouseEventDispatcher t modifiers
+    
+    handleEvent _ modifiers = request
+        result Nothing
+                  
+{-    mouseEventDispatcher event modifiers = do
         currentEventHasBeenConsumedBy := Nothing
 
         pos = posget event
@@ -131,10 +121,7 @@ mkContainer e = class
         
         --e.stdout.write ("CONSUMED: " ++ (show (isJust currentEventHasBeenConsumedBy)) ++ "\n")
         
-        result currentEventHasBeenConsumedBy
-        
-    handleEvent _ modifiers = request
-        result Nothing
+        result currentEventHasBeenConsumedBy -}
 
     getType (MousePressed _) = MousePressed
     getType (MouseReleased _) = MouseReleased

@@ -25,6 +25,9 @@ mkWindow env = class
     initWindow app = request
         nr := <- initCocoaWindow this app
         rootContainer.init app
+        rootContainer.setName "rootContainer"
+        env.stdout.write ("ROOT Container name set to: " ++ (<- rootContainer.getName))
+        
         state := Active
         isVisible := True
         setContentViewForWindow this rootContainer.id
@@ -35,78 +38,47 @@ mkWindow env = class
             rootContainer.destroy
             destroyCocoaWindow windowId
 
-    setFocus cmp = action 
-        currentFocus := Just cmp
-        if (state == Active) then
-            windowSetFocus windowId cmp.id
-
-
-    currentFocus := Nothing
-    nextFocus := Nothing
-    previousFocus := Nothing
     
+    getKey (KeyPressed theKey) = theKey
+    getKey _ = raise 9
     
+    currentFocus := rootContainer
+    newFocus := Nothing
+    
+    getType (MousePressed _) = MousePressed
+    getType (MouseReleased _) = MouseReleased
+    getType (MouseClicked _) = MouseClicked
+
+    posget (MousePressed p) = p 
+    posget (MouseReleased p) = p 
+    posget (MouseClicked p) = p 
+        
     consumed := False
-    handleEvent (KeyEvent a) modifiers = request
-    
-        (KeyPressed theStr) = a
+    focusables := []
+    handleEvent (KeyEvent keyEventType) modifiers = request
+        newFocus := Nothing
+        consumed := isJust (<- currentFocus.handleEvent (KeyEvent keyEventType) modifiers)
         
-        --env.stdout.write ("------ Key Event received in " ++ (show nr) ++ "-----------\n")
-        --env.stdout.write ("Key received: " ++ theStr ++ "\n")
-        
-        consumed := False
-        if (isJust currentFocus) then
-            consumed := isJust (<- (fromJust currentFocus).handleEvent (KeyEvent a) modifiers)
-        
+        theKey = getKey keyEventType
+
         if (consumed == False) then
-            if (theStr == Tab) then
-                --env.stdout.write "Key received: Tab\n"
-                if (isNothing currentFocus) then
-                    currentFocus := (<- rootContainer.getNextFocusTarget)
+            if (theKey == Tab) then
+                foundFocus := False
+                focusables := []
+                forall c <- (<-rootContainer.getAllComponents) do
+                    if (<- c.getIsFocusable) then
+                        focusables := c : focusables
 
-                if (isJust currentFocus) then
-                    nextFocus := <- (fromJust currentFocus).getNextFocusTarget
-        
-                if (isNothing nextFocus) then
-                    --env.stdout.write "No focus target found. Resetting focus.\n"
-                    currentFocus := (<- rootContainer.getNextFocusTarget)
-
-                    if (isJust currentFocus) then
-                        nextFocus := <- (fromJust currentFocus).getNextFocusTarget
+                if (elem Shift modifiers) then
+                    focusables := reverse focusables
                 
-                if (isJust nextFocus) then
-                    --env.stdout.write ("Focus target: " ++ (<-showName nextFocus) ++ "\n")
-                    next <- (fromJust nextFocus).getNextFocusTarget
-                    --env.stdout.write ("Next Focus target: " ++ (<-showName next) ++ "\n")
-            
-                    currentFocus := nextFocus
-                    setFocus (fromJust nextFocus)
+                scanList focusables findKeyFocus
                 
-            elsif (theStr == CapsLock) then    
-                if (isNothing currentFocus) then
-                    currentFocus := (<- rootContainer.getPreviousFocusTarget)
+                if (currentFocus == rootContainer) then
+                    setFocus (head focusables)
 
-                if (isJust currentFocus) then
-                    previousFocus := <- (fromJust currentFocus).getPreviousFocusTarget
-    
-                if (isNothing previousFocus) then
-                    --env.stdout.write "No focus target found. Resetting focus.\n"
-                    currentFocus := (<- rootContainer.getPreviousFocusTarget)
-
-                    if (isJust currentFocus) then
-                        previousFocus := <- (fromJust currentFocus).getPreviousFocusTarget
-            
-                if (isJust previousFocus) then
-                    --env.stdout.write ("Focus target: " ++ (<-showName previousFocus) ++ "\n")
-                    next <- (fromJust previousFocus).getPreviousFocusTarget
-                    --env.stdout.write ("Previous Focus target: " ++ (<-showName next) ++ "\n")
-        
-                    currentFocus := previousFocus
-                    setFocus (fromJust previousFocus)            
-            
-       --env.stdout.write "=== handleEvent finished\n\n"
-
-        result (boolToMaybe Nothing (<- dynamicHandleEvent a keyListener))
+        -- TODO: Resolve menu key event capture. No listener if consumed.    
+        result (boolToMaybe Nothing (<- dynamicHandleEvent keyEventType keyListener))
         
     handleEvent (WindowEvent a) modifiers = request
         case a of
@@ -114,13 +86,92 @@ mkWindow env = class
             _ ->
         result (boolToMaybe Nothing (<- dynamicHandleEvent a windowListener))
         
-    handleEvent (MouseEvent a) modifiers = request
-        cmp <- rootContainer.handleEvent (MouseEvent a) modifiers
-        if (isJust cmp) then
-            if (<-(fromJust cmp).getIsFocusable) then
-                setFocus (fromJust cmp)
-        result cmp
+    handleEvent (MouseEvent me) modifiers = request
+        env.stdout.write "HELLO\n"
+        cmps <- rootContainer.getAllComponents
+        forall c <- cmps do
+            env.stdout.write ((<-c.getName) ++ "\n")
         
+        env.stdout.write "------\n"
+        scanList cmps (findMouseFocus me modifiers)
+        env.stdout.write "GOODBYE\n"
+        result Nothing
+        
+    scanList [] _ = do 
+        env.stdout.write "end of list.\n"
+        result False 
+        
+    scanList x func = do
+        if (<- func (head x)) then
+            result True
+        else
+            env.stdout.write "not it. trying next node.\n"
+            result (<- (scanList (tail x) func))
+            
+    foundFocus := False
+    findKeyFocus cmp = do
+        if (foundFocus) then
+            currentFocus := cmp
+            setFocus cmp
+            result True
+        elsif (cmp == currentFocus) then
+            currentFocus := rootContainer
+            foundFocus := True
+            result False
+        else
+            result False
+        
+    consume := False
+    findMouseFocus event modifiers cmp = do
+        consume := False
+
+        pos = posget event
+        et = getType event
+
+        parent <- cmp.getParent
+
+        env.stdout.write ("child name: " ++ (<-cmp.getName) ++ "\n")
+        if (isJust parent) then
+            env.stdout.write ("parent name: " ++ (<-(fromJust parent).getName) ++ "\n")
+        position <- if (isJust parent) then ((fromJust parent).getPosition) else (do result {x=0;y=0})    
+        --position = {x=0;y=0}
+        pos2 = ({x=pos.x-position.x;y=pos.y-position.y})
+        
+        env.stdout.write ("")
+
+        -- "create" new event to the containers coordsystem
+        eventInNewCoordsystem = ((getType event) pos)
+        cmpPos <- cmp.getPosition
+        cmpSize <- cmp.getSize               
+
+        env.stdout.write "herp\n"
+        if (inInterval pos2.x cmpPos.x cmpSize.width && inInterval pos2.y cmpPos.y cmpSize.height) then
+            consumer <- cmp.handleEvent (MouseEvent eventInNewCoordsystem) modifiers
+            consume := isJust consumer
+
+            if (consume) then
+                env.stdout.write ("Sending event to " ++ (<- (fromJust consumer).getName) ++ "\n")
+                focusable <- (fromJust consumer).getIsFocusable
+                if (focusable) then
+                    setFocus (fromJust consumer)
+        result consume 
+                 
+{-        cmp <- rootContainer.handleEvent (MouseEvent a) modifiers
+        if (isJust cmp) then
+            jcmp = fromJust cmp
+            if (<-jcmp.getIsFocusable) then
+                env.stdout.write ("Mouse Click set focus to: " ++ (<- jcmp.getName) ++ "\n")
+                setFocus jcmp
+        result cmp-}
+ 
+    setFocus cmp = action
+        currentFocus := cmp
+        if (state == Active) then
+            windowSetFocus windowId cmp.id
+            
+        env.stdout.write ("FOCUS SET TO: " ++ (<- currentFocus.getName) ++ "\n")
+            
+       
  {-   handleEvent a modifiers = request
         cmp <- rootContainer.handleEvent a modifiers
         case a of
@@ -171,6 +222,9 @@ mkWindow env = class
     this := CocoaWindow {..}
     
     result this
+
+
+inInterval x startPos width = (x >= startPos && x <= (startPos+width))
 
 --------------------------------------------------------------------------------------------------
 ------          ** EXTERN **            ----------------------------------------------------------  

@@ -26,26 +26,42 @@ cocoaApplication = class
         case (name) of
             Tab -> 
               --  (fromJust env).stdout.write "TAB\n"
-                updateList name
-            Shift ->   updateList name
+                       updateList name
+            Shift ->
+                    if (isJust env) then 
+                        (fromJust env).stdout.write ("shift " ++ (if (elem Shift modifiers) then "down" else "up") ++ "\n")
+                    updateList name
             Control -> updateList name
             Command -> updateList name
             _ ->
             
         sendToWindow (KeyEvent k) windowId
+
+    eventDispatcher (MouseEvent m) windowId = action
+        if (isJust env) then
+            (fromJust env).stdout.write ("got a new mouse event to window" ++ (show windowId) ++ "!\n")
+        
+        sendToWindow (MouseEvent m) windowId
         
     eventDispatcher recv windowId = action
-     --   (fromJust env).stdout.write "KEYPRESSED IGNORED\n"
         sendToWindow recv windowId
-              
+
+    
     updateList key = do
         if (elem key modifiers) then
-            modifiers := [d | d <- modifiers, d /= key]
+            modifiers := [d | d <- modifiers, not (d == key) ]
         else 
             modifiers := key : modifiers
 
-        --if (isJust env) then 
-         --   (fromJust env).stdout.write ("Modifiers: " ++ (show (length modifiers)) ++ "\n")
+        if (isJust env) then 
+            (fromJust env).stdout.write ("Modifiers: ")
+            if (elem Shift modifiers) then
+                (fromJust env).stdout.write "SHIFT"
+            if (elem Control modifiers) then
+                (fromJust env).stdout.write " CONTROL "
+            if (elem Command modifiers) then
+                (fromJust env).stdout.write " COMMAND"
+            (fromJust env).stdout.write "\n"
         
     sendToWindow recvEvent windowId = action
        -- (fromJust env).stdout.write "hello\n"

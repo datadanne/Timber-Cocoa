@@ -21,15 +21,17 @@ root w = class
     
     block := False
     tabStop event = request
+        after (millisec 100) send action 
+            button.setTitle ("Consume: " ++ (show (not block)))
         block := not block
         env.stdout.write (if (block) then
                                 "Tab shall not pass!\n"
                             else
                                 "It's ok. Tab may continue.\n")
-            
         result block
     
     doNothing event = request
+        env.stdout.write "MOUSE CLICK"
         result True
         
   {-  redclicked app wid event = request
@@ -42,44 +44,44 @@ root w = class
         app.showWindow w1
         app.setEnv env
         tabButton = new mkCocoaButton env
-        tabButton.setTitle "TAB"
+        tabButton.setTitle "Tab (nofocus)"
         tabButton.setPosition ({x=20;y=200})
-        tabButton.installMouseListener (tabClick app (<- w1.getId))
+        tabButton.installMouseListener doNothing --(tabClick app (<- w1.getId))
         tabButton.setIsFocusable False
         button.installMouseListener doNothing
         button2.installMouseListener doNothing
         
-        
         w1.addComponent tabButton
 
-        button.setTitle "Move"     
+        button.setTitle "First"     
         button.setPosition ({x=20;y=20}) 
         button2.setPosition ({x=0;y=55})
-        button2.setTitle "sec7add" 
+        button2.setTitle "Second" 
         
-        after (sec 2) send action
+        after (sec 7) send action
             button3 = new mkCocoaButton env
+            button3.setTitle "Three?"
+            button3.installMouseListener doNothing
             c3 = new mkContainer env
             c3.addComponent button3
             c3.setSize ({width=180;height=50})
+            c3.setName "Container:C3"
             c3.setPosition ({x=0;y=100})
             c3.setBackgroundColor({r=240;g=66;b=33})
             --c3.installMouseListener (redclicked app (<-w1.getId))
-            c2.addComponent c3
+            w1.addComponent c3 
     
     result action
         button.setSize ({width=108;height=17}) 
-        button2.setName "sec7add"
-        button.setName "Move"
+        button2.setName "Second"
+        button.setName "First"
         button.installKeyListener tabStop
-        c2.setName "greenContainer "
+        c2.setName "greenContainer"
         
         c2.setSize ({width=180;height=140})
         c2.setPosition ({x=0;y=0})
         c2.setBackgroundColor({r=0;g=255;b=0}) 
-        --send request c2.addComponent button    :: obv. does not work but very cryptic error :D
-        c2.addComponent button2  
         c2.addComponent button
-       -- c2.setIsFocusable True
+        c2.addComponent button2
         w1.addComponent c2
         osx.startApplication applicationDidFinishLaunching

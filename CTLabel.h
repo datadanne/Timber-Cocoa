@@ -20,13 +20,14 @@ struct Label_CTLabel {
 };
  
 extern WORD __GC__Label_CTLabel[];
-Component_CTCommon c_391_CTLabel (Label_CTLabel v_393);
-HandlesMouseEvents_CTCommon c_394_CTLabel (Label_CTLabel v_396);
-IsFocusable_CTCommon c_398_CTLabel (Label_CTLabel a_397);
-HasSize_CTCommon c_400_CTLabel (Label_CTLabel a_399);
-HandlesEvents_CTCommon c_402_CTLabel (Label_CTLabel a_401);
-HasPosition_CTCommon c_404_CTLabel (Label_CTLabel a_403);
-Label_CTLabel mkCocoaLabel_CTLabel (Int d_1831);
+Component_CTCommon c_397_CTLabel (Label_CTLabel v_399);
+HandlesMouseEvents_CTCommon c_400_CTLabel (Label_CTLabel v_402);
+AbstractComponent_CTCommon c_404_CTLabel (Label_CTLabel a_403);
+HandlesEvents_CTCommon c_406_CTLabel (Label_CTLabel a_405);
+IsFocusable_CTCommon c_408_CTLabel (Label_CTLabel a_407);
+HasSize_CTCommon c_410_CTLabel (Label_CTLabel a_409);
+HasPosition_CTCommon c_412_CTLabel (Label_CTLabel a_411);
+Label_CTLabel mkCocoaLabel_CTLabel (Int d_1901);
  
 void _init_CTLabel ();
  

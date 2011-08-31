@@ -29,6 +29,11 @@ data CocoaKey = A | S | D | F | H | G | Z | X | C | V | Dummy1 |
                 ForwardDelete | F4 | End | F2 | PageDown | F1 |
                 LeftArrow | RightArrow | DownArrow | UpArrow
 
+-- Note: flip inequality
+instance eqComponent :: Eq Component where
+  (==) = compareComponents
+  (/=) = compareComponents
+  
 instance eqCocoaKey :: Eq CocoaKey where
   (==) = compareKeys
   (/=) = compareKeys
@@ -52,15 +57,16 @@ struct Color where
     b :: Int
                                               
 struct HasPosition where
-    setPosition :: Position -> Action
-    getPosition :: Request Position
+    setPosition :: Position -> Request ()
+    getPosition :: Request Position 
+    --getRelativePosition :: Request Position
     
 struct HasSize < HasPosition where
-    setSize :: Size -> Action
+    setSize :: Size -> Request ()
     getSize :: Request Size
 
 struct HasBackgroundColor where
-    setBackgroundColor :: Color -> Action
+    setBackgroundColor :: Color -> Request ()
     getBackgroundColor :: Request Color
     
 struct HandlesEvents where
@@ -76,10 +82,6 @@ struct HandlesMouseEvents where
     installMouseListener :: (MouseEventType -> Request Bool) -> Request ()
 
 struct IsFocusable where
-    setNextFocusTarget :: (Maybe Component) -> Request ()
-    getNextFocusTarget :: Request (Maybe Component)
-    setPreviousFocusTarget :: (Maybe Component) -> Request ()
-    getPreviousFocusTarget :: Request (Maybe Component)
     setIsFocusable :: Bool -> Request ()
     getIsFocusable :: Request Bool
     
@@ -87,13 +89,20 @@ struct CocoaID where
     dummy :: Int
 
 {- This is a hack. We expose id to be able to access the id on each component because this
-   is where we hide the pointer into Cocoa! Not used as a "static variable" -}                 
-struct Component < IsFocusable, HasSize, HandlesEvents where   
+   is where we hide the pointer into Cocoa! Not used as a "static variable" -}
+struct AbstractComponent < IsFocusable, HasSize where
+    setName :: String -> Request ()
+    getName :: Request String
+    setParent :: (Maybe Component) -> Request ()
+    getParent :: Request (Maybe Component)
+    setState :: CocoaState -> Request ()
+    getState :: Request CocoaState
+    getAllComponents :: Request [Component]
+    
+struct Component < AbstractComponent, HandlesEvents where   
     id :: CocoaID          
     init :: App -> Request ()
     destroy :: Request ()
-    setName :: String -> Request ()
-    getName :: Request String
 
 struct ContainsComponents where
     addComponent :: Component -> Request ()
@@ -114,37 +123,52 @@ struct App where
     eventDispatcher     :: CocoaEvent -> Int -> Action
     setEnv  :: Env -> Request ()
 
-focusWrapper this focusable = class
-    next := (Just this)
-    previous := (Just this)
-    isFocusable := focusable
+basicComponent f p n = class
+
+    nameWrap = new wrapper n
+    getName = nameWrap.get
+    setName = nameWrap.set
     
-    setNextFocusTarget target = request
-        next := target
+    parentWrap = new wrapper p
+    getParent = parentWrap.get
+    setParent = parentWrap.set
 
-    focusResult Nothing = do result Nothing
-    focusResult (Just a) = do
-        if (<- a.getIsFocusable) then
-            result (Just a)
-        else
-            result (<- a.getNextFocusTarget)
+    focusWrap = new wrapper f
+    getIsFocusable = focusWrap.get
+    setIsFocusable = focusWrap.set
     
-    getNextFocusTarget = request
-        result (<- focusResult next)
+    positionWrap = new wrapper ({x=0; y=0})
+    getPosition = positionWrap.get
+    setPosition = positionWrap.set
+    
+    sizeWrap = new wrapper ({width=100; height=100})
+    getSize = sizeWrap.get
+    setSize = sizeWrap.set
+    
+    stateWrap = new wrapper Inactive
+    getState = stateWrap.get
+    setState = stateWrap.set
+    
+    getAllComponents = request
+        result []
+    
+    result AbstractComponent {..}
 
-    setPreviousFocusTarget target = request
-        previous := target
+struct Wrapper a where
+    set :: a -> Request ()
+    get :: Request a
+    
+wrapper s = class
+    a := s
+    
+    set b = request
+        a := b
+        
+    get = request
+        result a
+        
+    result Wrapper {..}
 
-    getPreviousFocusTarget = request
-        result previous
-
-    setIsFocusable isIt = request
-        isFocusable := isIt
-
-    getIsFocusable = request
-        result isFocusable  
-
-    result IsFocusable{..}
 
 dynamicHandleEvent :: a -> Maybe (a -> Request Bool) -> Cmd _ Bool
 dynamicHandleEvent event (Just handler) = do
@@ -163,5 +187,6 @@ showName (Just c) = do result <- c.getName
 --other stuff
 extern mkCocoaID :: Class CocoaID
 extern compareCocoaIDs :: CocoaID -> CocoaID -> Bool
+extern compareComponents :: Component -> Component -> Bool
 extern compareKeys :: CocoaKey -> CocoaKey -> Bool
 extern compareState :: CocoaState -> CocoaState -> Bool

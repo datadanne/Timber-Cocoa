@@ -1,23 +1,25 @@
-module CTButton where
+module CTTextField where
 
 import CTCommon   
 import POSIX
 
-struct Button < Component, HandlesMouseEvents, HandlesKeyEvents where
-    setTitle :: String -> Action
-    getTitle :: Request String
+struct TextField < Component, HandlesMouseEvents, HandlesKeyEvents where
+    appendText :: String -> Action
+    setText :: String -> Action
+    getText :: Request String
+    
 
 --------------------------------------------------------------------------------------------------
-------          ** BUTTON **            ----------------------------------------------------------
-mkCocoaButton env = class
-    size := {width=108; height=21}
-    title := ""
+------          ** TextField **            ----------------------------------------------------------
+mkCocoaTextField env = class
+    size := {width=200; height=17}
+    text := ""
     position := {x=0; y=0}
     keyEventHandler := Nothing
     mouseEventHandler := Nothing
     
     id = new mkCocoaID
-    base = new basicComponent True Nothing "BUTTON"
+    base = new basicComponent True Nothing "TEXT_AREA"
     setParent = base.setParent
     getParent = base.getParent
     setIsFocusable = base.setIsFocusable
@@ -27,23 +29,25 @@ mkCocoaButton env = class
     getState = base.getState
     setState = base.setState
     getAllComponents = base.getAllComponents
-    
-    -- setTitle
-    setTitle s = action
-        title := s
+
+
+    appendText s = action
+        text := text ++ s
+        
+    setText s = action
+        text := s
         setName s
         case (<- base.getState) of
-            Active -> buttonSetTitle id s
+            Active -> textFieldSetText id s
             _ ->
    
-    -- getTitle
-    getTitle = request
-        result title   
+    getText = request
+        result text
     
     -- setPosition
     setPosition p = request
         case (<- base.getState) of
-            Active -> buttonSetPosition id p
+            Active -> textFieldSetPosition id p
             _ -> 
         position := p       
     
@@ -70,31 +74,30 @@ mkCocoaButton env = class
         result (boolToMaybe (Just this) (<- dynamicHandleEvent t keyEventHandler))
 
     handleEvent (MouseEvent t) modifiers = request
-        buttonHighlight id
         result (boolToMaybe (Just this) (<- dynamicHandleEvent t mouseEventHandler))
     
     handleEvent _ modifiers = request
         result Nothing
 
-    -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
+    -- undocumented feature in Timber, init must be placed above 'this' else we have some nice raise(2); :-)
     init app = request
             base.setState Active
-            initButton this app
+            initTextField this app
+            
             inithelper
     
     inithelper = do
-        buttonSetTitle id title
-        buttonSetPosition id position
+        textFieldSetText id text
+        textFieldSetPosition id position
             
-    this = Button{..}
+    this = TextField{..}
 
     result this
 
 --------------------------------------------------------------------------------------------------
 ------          ** EXTERN **            ----------------------------------------------------------  
 
---button      
-extern initButton :: Button -> App -> Request ()
-extern buttonSetTitle :: CocoaID -> String -> Action
-extern buttonSetPosition :: CocoaID -> Position -> Action
-extern buttonHighlight:: CocoaID -> Action
+--textField      
+extern initTextField :: TextField -> App -> Request ()
+extern textFieldSetText :: CocoaID -> String -> Action
+extern textFieldSetPosition :: CocoaID -> Position -> Action

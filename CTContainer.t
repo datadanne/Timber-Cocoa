@@ -7,41 +7,48 @@ struct Container < Component, ContainsComponents, HandlesMouseEvents, HandlesKey
 
 --------------------------------------------------------------------------------------------------
 ------          ** CONTAINER **         ----------------------------------------------------------
-mkContainer env = class
-    myState := Inactive
+mkCocoaContainer env = class
     myComponents := []        
-    position := {x=0; y=0}
-    size := {width=0; height=0}
     color := {r=255; g=255; b=255}
-    keyEventHandler := Nothing
 
     appRef := Nothing
     mouseEventHandler := Nothing
+    keyEventHandler := Nothing
+
     currentEventHasBeenConsumedBy := Nothing
     
     nextFocusTarget := Nothing
     previousFocusTarget := Nothing
 
+    id = new mkCocoaID
+    base = new basicComponent False Nothing "ContainerWHAT"
+    setParent = base.setParent
+    getParent = base.getParent
+    setIsFocusable = base.setIsFocusable
+    getIsFocusable = base.getIsFocusable
+    setName s = base.setName s
+    getName = base.getName
+    getState = base.getState
+    setState = base.setState
+
     setPosition p = request
-        case (myState) of
+        case (<- base.getState) of
             Active -> containerSetPosition id p
             _ ->
-        position := p
+        base.setPosition p
 
-    getPosition = request
-        result position
+    getPosition = base.getPosition
 
     setSize s = request
-        case (myState) of
+        case (<- base.getState) of
             Active -> containerSetSize id s
             _ ->
-        size := s
+        base.setSize s
 
-    getSize = request
-        result size
+    getSize = base.getSize
 
     setBackgroundColor c = request
-        case (myState) of
+        case (<- base.getState) of
             Active -> containerSetBackgroundColor id c
             _ ->
         color := c
@@ -51,40 +58,46 @@ mkContainer env = class
         
     empty [] = True
     empty _ = False
-
-    id = new mkCocoaID
-    base = new basicComponent False Nothing "ContainerWHAT"
-    setParent = base.setParent
-    getParent = base.getParent
-    setIsFocusable = base.setIsFocusable
-    getIsFocusable = base.getIsFocusable
-    setName s = request 
-        env.stdout.write "in setName\n"
-        base.setName s
-    getName = base.getName
-    getState = base.getState
-    setState = base.setState
     
     children := []
     getAllComponents = request
         children := []
-        
+
         forall c <- myComponents do
             children := (children ++ (<- c.getAllComponents) ++ [c])
+            
         result children
     
-    addComponent cmp = request
-        myComponents := cmp : myComponents
-        cmp.setParent (Just this)
-        if (myState == Active && isJust appRef) then
-            cmp.init (fromJust appRef)
-            containerAddComponent id cmp.id      
+    addComponent c = request
+        myComponents := c : myComponents
+        c.setParent (Just this)
+        if ((<- base.getState) == Active && isJust appRef) then
+            c.init (fromJust appRef)
+            containerAddComponent id c.id    
+            
+    removeComponent c = request
+        myComponents := [x | x <- myComponents, not (x == c)]
+        containerRemoveComponent id c.id
+        c.destroy
+    
+    internalRemoveAllComponents = do
+        forall c <- myComponents do
+            containerRemoveComponent id c.id
+            c.destroy
+        myComponents := []
+            
+    removeAllComponents = request
+        internalRemoveAllComponents
 
+    destroy = request
+        if ((<- base.getState) == Active) then
+            internalRemoveAllComponents
+            destroyContainer id
+            base.setState Destroyed
+        
     getComponents = request
         result myComponents
 
-    destroy = request
-        myState := Destroyed
 
     installMouseListener ml = request
         mouseEventHandler := Just ml
@@ -98,30 +111,6 @@ mkContainer env = class
     
     handleEvent _ modifiers = request
         result Nothing
-                  
-{-    mouseEventDispatcher event modifiers = do
-        currentEventHasBeenConsumedBy := Nothing
-
-        pos = posget event
-        et = getType event                                
-        pos2 = ({x=pos.x-position.x;y=pos.y-position.y})
-
-        -- "create" new event to the containers coordsystem
-        eventInNewCoordsystem = ((getType event) pos)
-
-        forall cmp <- myComponents do
-            if (isNothing currentEventHasBeenConsumedBy) then
-                cmpPos <- cmp.getPosition
-                cmpSize <- cmp.getSize               
-                if (inInterval pos2.x cmpPos.x cmpSize.width && inInterval pos2.y cmpPos.y cmpSize.height) then
-                    currentEventHasBeenConsumedBy := (<- cmp.handleEvent (MouseEvent eventInNewCoordsystem)  modifiers)
-
-        if (isNothing currentEventHasBeenConsumedBy) then
-            currentEventHasBeenConsumedBy := (boolToMaybe (Just this) (<- dynamicHandleEvent event mouseEventHandler))
-        
-        --e.stdout.write ("CONSUMED: " ++ (show (isJust currentEventHasBeenConsumedBy)) ++ "\n")
-        
-        result currentEventHasBeenConsumedBy -}
 
     getType (MousePressed _) = MousePressed
     getType (MouseReleased _) = MouseReleased
@@ -133,10 +122,9 @@ mkContainer env = class
 
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request
-            myState := Active
             appRef := Just app
+            base.setState Active
             initContainer this app
-
             inithelper
 
             forall cmp <- myComponents do
@@ -146,9 +134,9 @@ mkContainer env = class
     this = Container{..}  
 
     inithelper = do
-        containerSetSize id size
+        containerSetSize id (<- base.getSize)
         containerSetBackgroundColor id color
-        containerSetPosition id position
+        containerSetPosition id (<- base.getPosition)
 
 
     result this
@@ -160,7 +148,9 @@ inInterval x startPos width = (x >= startPos && x <= (startPos+width))
 
 --container
 extern initContainer :: Container -> App -> Request ()
+extern destroyContainer :: CocoaID -> Action
 extern containerSetBackgroundColor :: CocoaID -> Color -> Action
 extern containerSetSize :: CocoaID -> Size -> Action
 extern containerSetPosition :: CocoaID -> Position -> Action
 extern containerAddComponent :: CocoaID -> CocoaID -> Action                    -- external method for doing the actual cocoa add-call!
+extern containerRemoveComponent :: CocoaID -> CocoaID -> Action

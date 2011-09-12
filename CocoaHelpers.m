@@ -14,7 +14,7 @@ extern App_CTCommon getApp(void);
     ((_WindowEvent_CTCommon)superTest_107)->a = (WindowEventType_CTCommon)1;
 
 	printf("CLOSIN TIME for window nr %d \n", [sender windowNumber]);
-	app->eventDispatcher_CTCommon(app, (CocoaEvent_CTCommon)superTest_107, [sender windowNumber], 0, 0);
+	app->eventDispatcher_CTCommon(app, (CocoaEvent_CTCommon)superTest_107, [sender windowNumber], 0);
 	return 1;
 }
 @end
@@ -57,13 +57,12 @@ extern App_CTCommon getApp(void);
 
 // ------------- CocoaWindow ----------------------------
 @implementation CocoaWindow
-- (void) setEventDispatcher:(void(*)(NSEvent*))dispatcher {
+- (void) setEventDispatcher:(bool(*)(NSEvent*))dispatcher {
 	dispatch = dispatcher;
 }
-- (void) sendEvent:(NSEvent*) event {
-	[super sendEvent:event];
-	
-	if (dispatch)
-		dispatch(event);
+- (void) sendEvent:(NSEvent*) event {	
+	if (!dispatch || !dispatch(event)) {
+	    [super sendEvent:event];
+	}
 }
 @end

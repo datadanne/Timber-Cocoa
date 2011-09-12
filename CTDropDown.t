@@ -1,23 +1,25 @@
-module CTButton where
+module CTDropDown where
 
 import CTCommon   
 import POSIX
 
-struct Button < Component, HandlesMouseEvents, HandlesKeyEvents where
-    setTitle :: String -> Action
-    getTitle :: Request String
+struct DropDown < Component, HandlesMouseEvents, HandlesKeyEvents where
+    addOption :: String -> Action
+    setOptions :: [String] -> Action
+    getOptions :: Request [String]
+    getCurrentOption :: Request String
 
 --------------------------------------------------------------------------------------------------
 ------          ** BUTTON **            ----------------------------------------------------------
-mkCocoaButton env = class
-    size := {width=108; height=21}
+mkCocoaDropDown env = class
+    size := {width=108; height=17}
     title := ""
     position := {x=0; y=0}
     keyEventHandler := Nothing
     mouseEventHandler := Nothing
     
     id = new mkCocoaID
-    base = new basicComponent True Nothing "BUTTON"
+    base = new basicComponent True Nothing "DropDown"
     setParent = base.setParent
     getParent = base.getParent
     setIsFocusable = base.setIsFocusable
@@ -28,22 +30,32 @@ mkCocoaButton env = class
     setState = base.setState
     getAllComponents = base.getAllComponents
     
-    -- setTitle
-    setTitle s = action
-        title := s
-        setName s
-        case (<- base.getState) of
-            Active -> buttonSetTitle id s
-            _ ->
-   
-    -- getTitle
-    getTitle = request
-        result title   
+    options := []
     
+    addOption o = action
+        --options := o : options
+        case (<- base.getState) of
+            Active ->  dropDownAddOption id o
+            _ ->
+        
+    setOptions os = action
+        options := os
+        forall o <- os do
+            addOption o
+        
+    getOptions = request
+        result options
+    
+    currentOption := ""
+    getCurrentOption = request
+        currentOption := "hello"
+        --opt <- cocoaGetCurrentOption id
+        result currentOption
+
     -- setPosition
     setPosition p = request
         case (<- base.getState) of
-            Active -> buttonSetPosition id p
+            Active -> dropDownSetPosition id p
             _ -> 
         position := p       
     
@@ -70,7 +82,6 @@ mkCocoaButton env = class
         result (boolToMaybe (Just this) (<- dynamicHandleEvent t keyEventHandler))
 
     handleEvent (MouseEvent t) modifiers = request
-        buttonHighlight id
         result (boolToMaybe (Just this) (<- dynamicHandleEvent t mouseEventHandler))
     
     handleEvent _ modifiers = request
@@ -79,22 +90,22 @@ mkCocoaButton env = class
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request
             base.setState Active
-            initButton this app
+            initDropDown this app
+            
             inithelper
     
     inithelper = do
-        buttonSetTitle id title
-        buttonSetPosition id position
+        setOptions options
+        dropDownSetPosition id position
             
-    this = Button{..}
+    this = DropDown{..}
 
     result this
 
 --------------------------------------------------------------------------------------------------
 ------          ** EXTERN **            ----------------------------------------------------------  
 
---button      
-extern initButton :: Button -> App -> Request ()
-extern buttonSetTitle :: CocoaID -> String -> Action
-extern buttonSetPosition :: CocoaID -> Position -> Action
-extern buttonHighlight:: CocoaID -> Action
+--dropDown      
+extern initDropDown :: DropDown -> App -> Request ()
+extern dropDownAddOption :: CocoaID -> String -> Action
+extern dropDownSetPosition :: CocoaID -> Position -> Action

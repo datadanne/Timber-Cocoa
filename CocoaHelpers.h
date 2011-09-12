@@ -15,9 +15,9 @@
 
 @interface CocoaWindow : NSWindow {
 @private
-	void (*dispatch)(NSEvent* event);
+	bool (*dispatch)(NSEvent* event);
 }
-- (void) setEventDispatcher:(void(*)(NSEvent*))dispatcher;
+- (void) setEventDispatcher:(bool(*)(NSEvent*))dispatcher;
 @end
 
 #endif

@@ -8,8 +8,6 @@ rm CTApplication.c
 rm CTButton.c
 rm CTButton.h
 rm CTCommon.c
-rm CTLabel.c
-rm CTLabel.h
 rm CTCommon.h
 rm CTContainer.c
 rm CTContainer.h
@@ -17,11 +15,3 @@ rm CTWindow.c
 rm CTWindow.h
 rm NewTest.h
 rm NewTest.c
-rm LockTest
-rm LockTest.c
-rm LockTest.h
-rm Paint
-rm Paint.c
-rm Paint.h
-rm FocusTest.h
-rm FocusTest.c

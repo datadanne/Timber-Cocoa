@@ -13,12 +13,30 @@ mkWindow env = class
     nr := 0
     state := Inactive
     isVisible := False
+    position := {x=0;y=0}
     
-    rootContainer = new mkContainer env
-        
-    
+    rootContainer = new mkCocoaContainer env
     addComponent = rootContainer.addComponent
     getComponents = rootContainer.getComponents
+    removeComponent = rootContainer.removeComponent
+    removeAllComponents = rootContainer.removeAllComponents
+    setBackgroundColor = rootContainer.setBackgroundColor
+    getBackgroundColor = rootContainer.getBackgroundColor
+    
+    getPosition = request
+        result position
+
+    setPosition pos = request
+        if (state == Active) then 
+            windowSetPosition windowId pos
+        position := pos
+
+    getSize = rootContainer.getSize
+    setSize size = request
+        if (state == Active) then 
+            windowSetSize windowId size
+        rootContainer.setSize size
+    
     getId = request
         result nr
     
@@ -26,12 +44,17 @@ mkWindow env = class
         nr := <- initCocoaWindow this app
         rootContainer.init app
         rootContainer.setName "rootContainer"
-        env.stdout.write ("ROOT Container name set to: " ++ (<- rootContainer.getName))
         
         state := Active
         isVisible := True
-        setContentViewForWindow this rootContainer.id
         
+        inithelper 
+        
+    inithelper = do
+        windowSetPosition windowId position
+        windowSetSize windowId (<- rootContainer.getSize)
+        windowSetContentView this rootContainer.id
+
     destroyWindow = request
         if (state == Active) then 
             state := Destroyed
@@ -57,24 +80,29 @@ mkWindow env = class
     focusables := []
     handleEvent (KeyEvent keyEventType) modifiers = request
         newFocus := Nothing
+        
+        if ((<- currentFocus.getState) == Destroyed) then
+            currentFocus := rootContainer
+            
         consumed := isJust (<- currentFocus.handleEvent (KeyEvent keyEventType) modifiers)
         
-        theKey = getKey keyEventType
-
         if (consumed == False) then
+            theKey = getKey keyEventType
             if (theKey == Tab) then
+                cmps <- rootContainer.getAllComponents
                 foundFocus := False
                 focusables := []
-                forall c <- (<-rootContainer.getAllComponents) do
+                
+                forall c <- cmps do
                     if (<- c.getIsFocusable) then
                         focusables := c : focusables
-
+                
                 if (elem Shift modifiers) then
                     focusables := reverse focusables
-                
+            
                 scanList focusables findKeyFocus
-                
-                if (currentFocus == rootContainer) then
+    
+                if (focusables /= [] && currentFocus == rootContainer) then
                     setFocus (head focusables)
 
         -- TODO: Resolve menu key event capture. No listener if consumed.    
@@ -82,7 +110,7 @@ mkWindow env = class
         
     handleEvent (WindowEvent a) modifiers = request
         case a of
-            WindowClosed -> do if (state == Active) then state := Inactive
+            WindowClosed -> rootContainer.setState Inactive
             _ ->
         result (boolToMaybe Nothing (<- dynamicHandleEvent a windowListener))
         
@@ -127,15 +155,14 @@ mkWindow env = class
 
         pos = posget event
         et = getType event
-
         parent <- cmp.getParent
 
-        env.stdout.write ("child name: " ++ (<-cmp.getName) ++ "\n")
+        {-env.stdout.write ("child name: " ++ (<-cmp.getName) ++ "\n")
         if (isJust parent) then
-            env.stdout.write ("parent name: " ++ (<-(fromJust parent).getName) ++ "\n")
-        position <- if (isJust parent) then ((fromJust parent).getPosition) else (do result {x=0;y=0})    
-        --position = {x=0;y=0}
-        pos2 = ({x=pos.x-position.x;y=pos.y-position.y})
+            env.stdout.write ("parent name: " ++ (<-(fromJust parent).getName) ++ "\n") -}
+
+        p <- if (isJust parent) then ((fromJust parent).getPosition) else (do result {x=0;y=0})    
+        pos2 = ({x=pos.x-p.x;y=pos.y-p.y})
         
         env.stdout.write ("")
 
@@ -232,7 +259,9 @@ inInterval x startPos width = (x >= startPos && x <= (startPos+width))
 --window
 extern initCocoaWindow :: CocoaWindow -> App -> Request Int
 extern destroyCocoaWindow :: CocoaID -> Request ()
-extern setContentViewForWindow :: CocoaWindow -> CocoaID -> Request ()      -- external method for changing contentView for a window!
+extern windowSetContentView :: CocoaWindow -> CocoaID -> Request ()      -- external method for changing contentView for a window!
 extern windowSetHidden :: CocoaID -> Action
 extern windowSetVisible :: CocoaID -> Action
+extern windowSetSize :: CocoaID -> Size -> Action
+extern windowSetPosition :: CocoaID -> Position -> Action
 extern windowSetFocus :: CocoaID -> CocoaID -> Request ()

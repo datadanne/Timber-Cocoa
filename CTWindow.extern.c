@@ -6,12 +6,12 @@ CocoaEvent_CTCommon receivedEvent;
 
 pthread_mutex_t eventMutex;
 
-void dispatchEventToTimber(NSEvent* event) { 
+bool dispatchEventToTimber(NSEvent* event) { 
 	App_CTCommon app = getApp();
 	DEBUG("C: Event received in dispatchEventToTimber\n");
 	/* figure out event
 		flag 0,1,2 0 = windowEvent, etc. */
-	if ([event type] == NSLeftMouseDown || [event type] == NSLeftMouseDragged) {
+	if ([event type] == NSLeftMouseDown) {
         
  		Position_CTCommon x_5110;
 	    NEW (Position_CTCommon, x_5110, WORDS(sizeof(struct Position_CTCommon)));
@@ -48,11 +48,11 @@ void dispatchEventToTimber(NSEvent* event) {
         ((_KeyEvent_CTCommon)receivedEvent)->a = (KeyEventType_CTCommon)x_1652;
 
 	} else {
-	    DEBUG("Event received of type: %d", [event type]);
-        return;
+	    printf("Event received of type: %d\n", [event type]);
+        return false;
     }
 
-    app->eventDispatcher_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0, 0);
+    return app->eventDispatcher_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0);
 }
 
 void scanEventReceived(void) {
@@ -65,7 +65,7 @@ void scanEventReceived(void) {
 struct Scanner eventScanner = {scanEventReceived, NULL};
 
 // --------- Window ----------------------------------------------
-TUP0 setContentViewForWindow_CTWindow(CocoaWindow_CTCommon window, CocoaID_CTCommon id, Int dummy) {
+TUP0 windowSetContentView_CTWindow(CocoaWindow_CTCommon window, CocoaID_CTCommon id, Int dummy) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	internal_CocoaID_CTCommon thisWindow = 		  
 		(internal_CocoaID_CTCommon)(window->windowId_CTCommon);
@@ -85,7 +85,7 @@ Int initCocoaWindow_CTWindow(CocoaWindow_CTCommon wnd, App_CTCommon app, Int dum
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
 	CocoaWindow *window;
 	
-	window = [[[CocoaWindow alloc] initWithContentRect:NSMakeRect(0, 0, 300, 300) styleMask:(NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask)  backing:NSBackingStoreBuffered defer:NO] autorelease]; 
+	window = [[[CocoaWindow alloc] initWithContentRect:NSMakeRect(0, 0, 0, 0) styleMask:(NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask)  backing:NSBackingStoreBuffered defer:NO] autorelease]; 
 	
 	pthread_mutex_init(&eventMutex, &glob_mutexattr);
 
@@ -113,9 +113,8 @@ Int initCocoaWindow_CTWindow(CocoaWindow_CTCommon wnd, App_CTCommon app, Int dum
 
 TUP0 destroyCocoaWindow_CTWindow(CocoaID_CTCommon wnd, Int dummy) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	internal_CocoaID_CTCommon thisWindow = (internal_CocoaID_CTCommon)wnd;
-	CocoaWindow *window = (CocoaWindow*)thisWindow->this;
-	[window close];
+	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
+	[thisWindow close];
 	[pool drain];
 }
    
@@ -135,10 +134,29 @@ Msg windowSetHidden_CTWindow(CocoaID_CTCommon wnd, Time start, Time stop) {
 
 TUP0 windowSetFocus_CTWindow(CocoaID_CTCommon wnd, CocoaID_CTCommon cmp, Int dummy) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	internal_CocoaID_CTCommon thisWindow = (internal_CocoaID_CTCommon)wnd;
-	internal_CocoaID_CTCommon thisCmp = (internal_CocoaID_CTCommon)cmp;
-	CocoaWindow *window = (CocoaWindow*)thisWindow->this;
-	NSView *responder = (NSView*)thisCmp->this;
-	[window makeFirstResponder: responder];
+	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
+	NSView *responder = (NSView*) COCOA_REF(cmp);
+	[thisWindow makeFirstResponder: responder];
 	[pool drain];
+}
+
+Msg windowSetSize_CTWindow (CocoaID_CTCommon wnd, Size_CTCommon pos, Time start, Time stop) {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	DEBUG("setting containerSize ext!");
+	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
+	
+	//dispatch_async(dispatch_get_main_queue(), ^{
+	    [thisWindow setContentSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon)];
+//	});
+	[pool drain];
+}
+
+Msg windowSetPosition_CTWindow (CocoaID_CTCommon wnd, Position_CTCommon pos, Time start, Time stop) {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
+    NSPoint p = NSMakePoint(pos->x_CTCommon,pos->y_CTCommon);
+   	//dispatch_async(dispatch_get_main_queue(), ^{
+        [thisWindow setFrameOrigin:p];
+   // });
+   	[pool drain]; 
 }

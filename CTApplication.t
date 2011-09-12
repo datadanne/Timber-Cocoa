@@ -19,7 +19,7 @@ cocoaApplication = class
     setEnv e = request
         env:= Just e
 
-    eventDispatcher (KeyEvent k) windowId = action
+    eventDispatcher (KeyEvent k) windowId = request
       --  (fromJust env).stdout.write "SENT KEYPRESS\n"
         (KeyPressed name) = k
 
@@ -36,15 +36,18 @@ cocoaApplication = class
             _ ->
             
         sendToWindow (KeyEvent k) windowId
+        result False
 
-    eventDispatcher (MouseEvent m) windowId = action
+    eventDispatcher (MouseEvent m) windowId = request
         if (isJust env) then
             (fromJust env).stdout.write ("got a new mouse event to window" ++ (show windowId) ++ "!\n")
         
         sendToWindow (MouseEvent m) windowId
+        result False
         
-    eventDispatcher recv windowId = action
+    eventDispatcher recv windowId = request
         sendToWindow recv windowId
+        result False
 
     
     updateList key = do

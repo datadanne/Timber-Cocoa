@@ -84,13 +84,8 @@ struct HandlesMouseEvents where
 struct IsFocusable where
     setIsFocusable :: Bool -> Request ()
     getIsFocusable :: Request Bool
-    
-struct CocoaID where
-    dummy :: Int
 
-{- This is a hack. We expose id to be able to access the id on each component because this
-   is where we hide the pointer into Cocoa! Not used as a "static variable" -}
-struct AbstractComponent < IsFocusable, HasSize where
+struct BaseComponent < IsFocusable, HasSize where
     setName :: String -> Request ()
     getName :: Request String
     setParent :: (Maybe Component) -> Request ()
@@ -98,17 +93,25 @@ struct AbstractComponent < IsFocusable, HasSize where
     setState :: CocoaState -> Request ()
     getState :: Request CocoaState
     getAllComponents :: Request [Component]
-    
-struct Component < AbstractComponent, HandlesEvents where   
+
+{- This is a hack. We expose id to be able to access the id on each component because this
+   is where we hide the pointer into Cocoa! Not used as a "static variable" -}
+
+struct CocoaID where
+    dummy :: Int
+       
+struct Component < BaseComponent, HandlesEvents where   
     id :: CocoaID          
     init :: App -> Request ()
     destroy :: Request ()
 
 struct ContainsComponents where
     addComponent :: Component -> Request ()
+    removeComponent :: Component -> Request ()
+    removeAllComponents :: Request ()
     getComponents :: Request [Component]
 
-struct CocoaWindow < ContainsComponents, HandlesKeyEvents, HandlesWindowEvents, HandlesMouseEvents where 
+struct CocoaWindow < HasSize, HasBackgroundColor, ContainsComponents, HandlesKeyEvents, HandlesWindowEvents, HandlesMouseEvents where 
     windowId :: CocoaID
     getId :: Request Int
     initWindow :: App -> Request ()
@@ -120,7 +123,7 @@ struct CocoaWindow < ContainsComponents, HandlesKeyEvents, HandlesWindowEvents, 
 struct App where
     showWindow          :: CocoaWindow -> Request () 
     getApplicationState :: Request ApplicationState 
-    eventDispatcher     :: CocoaEvent -> Int -> Action
+    eventDispatcher     :: CocoaEvent -> Int -> Request Bool
     setEnv  :: Env -> Request ()
 
 basicComponent f p n = class
@@ -145,6 +148,13 @@ basicComponent f p n = class
     getSize = sizeWrap.get
     setSize = sizeWrap.set
     
+    {-state := Inactive 
+    getState = request
+        result state
+        
+    setState s = request
+        if (state /= Destroyed) then
+            state := s -}
     stateWrap = new wrapper Inactive
     getState = stateWrap.get
     setState = stateWrap.set
@@ -152,7 +162,7 @@ basicComponent f p n = class
     getAllComponents = request
         result []
     
-    result AbstractComponent {..}
+    result BaseComponent {..}
 
 struct Wrapper a where
     set :: a -> Request ()

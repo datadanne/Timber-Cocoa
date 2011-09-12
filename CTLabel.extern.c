@@ -1,5 +1,6 @@
 #include "CTLabel.extern.h"
 
+
 Msg labelSetTextColor_CTLabel (CocoaID_CTCommon id, Color_CTCommon c, Time start, Time stop) {     
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("Setting label text..");                                    

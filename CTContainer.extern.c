@@ -16,7 +16,7 @@ Msg containerSetBackgroundColor_CTContainer (CocoaID_CTCommon id, Color_CTCommon
 } 
 Msg containerSetSize_CTContainer (CocoaID_CTCommon id, Size_CTCommon pos, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	DEBUG("setting containerSize ext!");
+	printf("setting containerSize ext!\n");
 	CocoaView *thisView = (CocoaView*) (((internal_CocoaID_CTCommon) id)->this); 
 	[thisView setFrameSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon)];
 	[pool drain];
@@ -34,8 +34,22 @@ TUP0 initContainer_CTContainer (Container_CTContainer container, App_CTCommon ap
 	CocoaView *cocoaView = [[CocoaView alloc] initWithFrame: NSMakeRect(100.0, 100.0, 200.0, 200.0)];
 
 	thisContainer->this = cocoaView;
-	
+
 	DEBUG("Container OK!");
 	[pool drain];
 	return 0;
+}
+Msg destroyContainer_CTContainer (CocoaID_CTCommon container, Time start, Time stop) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    CocoaView *thisView = (CocoaView*) COCOA_REF(container);
+    [thisView release];
+    [pool drain];
+}
+
+Msg containerRemoveComponent_CTContainer (CocoaID_CTCommon container, CocoaID_CTCommon newCmp, Time start, Time stop) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	CocoaView *thisView = (CocoaView*) COCOA_REF(container);
+	NSView *object = (NSView*) COCOA_REF(newCmp);
+    [object performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:YES];
+    [pool drain];
 }

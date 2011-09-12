@@ -3,10 +3,8 @@ module CTTextField where
 import CTCommon   
 import POSIX
 
-struct TextField < Component, HandlesMouseEvents, HandlesKeyEvents where
+struct TextField < Component, HasText, HandlesMouseEvents, HandlesKeyEvents where
     appendText :: String -> Action
-    setText :: String -> Action
-    getText :: Request String
     
 
 --------------------------------------------------------------------------------------------------
@@ -34,7 +32,7 @@ mkCocoaTextField env = class
     appendText s = action
         text := text ++ s
         
-    setText s = action
+    setText s = request
         text := s
         setName s
         case (<- base.getState) of

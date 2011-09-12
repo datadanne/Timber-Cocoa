@@ -9,9 +9,7 @@ root w = class
     osx = new cocoa w
 
     w1 = new mkWindow env
-    c2 = new mkContainer env
-    button = new mkCocoaButton env
-    button2 = new mkCocoaButton env
+    c2 = new mkCocoaContainer env
     label = new mkCocoaLabel
     
     posget (MousePressed p) = p
@@ -21,10 +19,10 @@ root w = class
     pixelCount := 0
     
     drawPixel c2 event = request
-        --env.stdout.write "Painting box\n"
-        blackBox = new mkContainer env
+        env.stdout.write "Painting box\n"
+        blackBox = new mkCocoaContainer env
         blackBox.setSize ({width=5;height=5})
-        label.setText ("Pixel Count: " ++ show pixelCount)
+        --label.setText ("Pixel Count: " ++ show pixelCount)
         pos = (posget event)
         blackBox.setBackgroundColor({r=pos.x `mod` 255;g=pos.y `mod` 255;b=2*(pos.y-pos.x) `mod` 255}) 
         blackBox.setPosition pos
@@ -34,6 +32,7 @@ root w = class
         
         after (millisec 100) send action
             w1.addComponent blackBox
+            
         result True
      
     applicationDidFinishLaunching app = action

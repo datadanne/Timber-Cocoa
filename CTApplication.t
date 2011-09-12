@@ -66,7 +66,7 @@ cocoaApplication = class
                 (fromJust env).stdout.write " COMMAND"
             (fromJust env).stdout.write "\n"
         
-    sendToWindow recvEvent windowId = action
+    sendToWindow recvEvent windowId = do
        -- (fromJust env).stdout.write "hello\n"
         forall window <- activeWindows do
             if (<- window.getId == windowId) then

@@ -1,4 +1,5 @@
 #include "CTContainer.extern.h"
+#import "CTContainer.extern.m"
 
 // --------- Container ----------------------------------------------
 Msg containerAddComponent_CTContainer (CocoaID_CTCommon container, CocoaID_CTCommon button, Time start, Time stop) {

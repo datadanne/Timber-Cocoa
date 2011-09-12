@@ -2,9 +2,7 @@ module CTLabel where
             
 import CTCommon
 
-struct Label < Component, HandlesMouseEvents where
-    setText :: String -> Action
-    getText :: Request String  
+struct Label < Component, HasText, HandlesMouseEvents where
     setTextColor :: Color -> Action
     getTextColor :: Request Color
 
@@ -27,7 +25,7 @@ mkCocoaLabel = class
     setState = base.setState
     getAllComponents = base.getAllComponents
     
-    setText s = action
+    setText s = request
         text := s
         case (<- base.getState) of
             Active -> labelSetText id s

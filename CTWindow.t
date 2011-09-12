@@ -123,7 +123,7 @@ mkWindow env = class
         env.stdout.write "------\n"
         scanList cmps (findMouseFocus me modifiers)
         env.stdout.write "GOODBYE\n"
-        result Nothing
+        result (<- rootContainer.handleEvent (MouseEvent me) modifiers)
         
     scanList [] _ = do 
         env.stdout.write "end of list.\n"

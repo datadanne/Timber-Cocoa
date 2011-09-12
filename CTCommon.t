@@ -64,6 +64,10 @@ struct HasPosition where
 struct HasSize < HasPosition where
     setSize :: Size -> Request ()
     getSize :: Request Size
+    
+struct HasText where
+    setText :: String -> Request ()
+    getText :: Request String
 
 struct HasBackgroundColor where
     setBackgroundColor :: Color -> Request ()

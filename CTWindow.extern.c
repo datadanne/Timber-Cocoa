@@ -11,7 +11,7 @@ bool dispatchEventToTimber(NSEvent* event) {
 	DEBUG("C: Event received in dispatchEventToTimber\n");
 	/* figure out event
 		flag 0,1,2 0 = windowEvent, etc. */
-	if ([event type] == NSLeftMouseDown) {
+	if ([event type] == NSLeftMouseDown || [event type] == NSLeftMouseDragged) {
         
  		Position_CTCommon x_5110;
 	    NEW (Position_CTCommon, x_5110, WORDS(sizeof(struct Position_CTCommon)));
@@ -48,7 +48,7 @@ bool dispatchEventToTimber(NSEvent* event) {
         ((_KeyEvent_CTCommon)receivedEvent)->a = (KeyEventType_CTCommon)x_1652;
 
 	} else {
-	    printf("Event received of type: %d\n", [event type]);
+	    printf("Event of type %d was discarded\n", [event type]);
         return false;
     }
 

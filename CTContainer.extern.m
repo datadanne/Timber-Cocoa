@@ -1,7 +1,6 @@
-
-extern App_CTCommon getApp(void);
-
-// ------------- WindowDelegate ----------------------------
+/* 
+    ------------- WindowDelegate ---------------------------- 
+*/
 @implementation WindowDelegate
 -(BOOL) windowShouldClose:(id)sender {
 	
@@ -20,7 +19,9 @@ extern App_CTCommon getApp(void);
 @end
 
 
-// ------------- CocoaView ----------------------------                  
+/* 
+    ------------- CocoaView ----------------------------       
+*/        
 @implementation CocoaView
 - (id)init {
     if ((self = [super init])) {

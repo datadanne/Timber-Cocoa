@@ -79,6 +79,7 @@ root w = class
             w1.addComponent c3 
             w1.removeComponent c2
             w1.setPosition ({x=0;y=0})
+            w1.setSize ({width=400;height=200})
             
             after (sec 3) send action
                 w1.removeAllComponents
@@ -87,7 +88,7 @@ root w = class
                 w1.setPosition ({x=150;y=300})
     
     result action
-        w1.setSize ({width=1200;height=500})
+        w1.setSize ({width=700;height=500})
         w1.setPosition ({x=0;y=0})
 
         buttonOverlay.setSize ({width=108;height=20})

@@ -16,13 +16,18 @@ mkWindow env = class
     position := {x=0;y=0}
     
     rootContainer = new mkCocoaContainer env
-    addComponent = rootContainer.addComponent
+    addComponent a = request
+        rootContainer.addComponent a
+        
     getComponents = rootContainer.getComponents
     removeComponent = rootContainer.removeComponent
     removeAllComponents = rootContainer.removeAllComponents
     setBackgroundColor = rootContainer.setBackgroundColor
     getBackgroundColor = rootContainer.getBackgroundColor
     
+    getContainerID = request
+        result rootContainer.id
+        
     getPosition = request
         result position
 
@@ -115,25 +120,17 @@ mkWindow env = class
         result (boolToMaybe Nothing (<- dynamicHandleEvent a windowListener))
         
     handleEvent (MouseEvent me) modifiers = request
-        env.stdout.write "HELLO\n"
         cmps <- rootContainer.getAllComponents
-        forall c <- cmps do
-            env.stdout.write ((<-c.getName) ++ "\n")
-        
-        env.stdout.write "------\n"
         scanList cmps (findMouseFocus me modifiers)
-        env.stdout.write "GOODBYE\n"
         result (<- rootContainer.handleEvent (MouseEvent me) modifiers)
         
     scanList [] _ = do 
-        env.stdout.write "end of list.\n"
         result False 
         
     scanList x func = do
         if (<- func (head x)) then
             result True
         else
-            env.stdout.write "not it. trying next node.\n"
             result (<- (scanList (tail x) func))
             
     foundFocus := False
@@ -171,7 +168,6 @@ mkWindow env = class
         cmpPos <- cmp.getPosition
         cmpSize <- cmp.getSize               
 
-        env.stdout.write "herp\n"
         if (inInterval pos2.x cmpPos.x cmpSize.width && inInterval pos2.y cmpPos.y cmpSize.height) then
             consumer <- cmp.handleEvent (MouseEvent eventInNewCoordsystem) modifiers
             consume := isJust consumer

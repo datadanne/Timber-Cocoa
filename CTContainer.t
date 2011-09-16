@@ -71,9 +71,11 @@ mkCocoaContainer env = class
     addComponent c = request
         myComponents := c : myComponents
         c.setParent (Just this)
-        if ((<- base.getState) == Active && isJust appRef) then
+        state <- base.getState
+        if (state == Active && isJust appRef) then
             c.init (fromJust appRef)
             containerAddComponent id c.id    
+        env.stdout.write "TooToo\n"
             
     removeComponent c = request
         myComponents := [x | x <- myComponents, not (x == c)]
@@ -105,8 +107,17 @@ mkCocoaContainer env = class
     installKeyListener kl = request
         keyEventHandler := Just kl
 
+    executeHandler handler t = do
+        if (isJust mouseEventHandler) then
+            result (<- ((fromJust mouseEventHandler) t))
+        else
+            result False
+            
     handleEvent (MouseEvent t) modifiers = request
-        result (boolToMaybe (Just this) (<- dynamicHandleEvent t mouseEventHandler))
+        if (<- executeHandler mouseEventHandler t) then
+            result (Just this)
+        else
+            result Nothing
         --result <- mouseEventDispatcher t modifiers
     
     handleEvent _ modifiers = request

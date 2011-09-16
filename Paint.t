@@ -1,11 +1,11 @@
 module Paint where
 
-import POSIX
+import DummyPOSIX
 import COCOA
 import CTLabel
 
 root w = class
-    env = new posix w
+    env = new dummyPosix w
     osx = new cocoa w
 
     w1 = new mkWindow env
@@ -27,7 +27,7 @@ root w = class
         blackBox.setBackgroundColor({r=pos.x `mod` 255;g=pos.y `mod` 255;b=2*(pos.y-pos.x) `mod` 255}) 
         blackBox.setPosition pos
         --env.stdout.write ("Position is: " ++ (show pos.x) ++ "," ++ (show pos.y) ++ "\n")
-        
+        blackBox.destroy
         pixelCount := 1 + pixelCount
         
         after (millisec 100) send action

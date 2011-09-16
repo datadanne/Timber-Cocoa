@@ -24,7 +24,7 @@ mkCocoaLabel = class
     getState = base.getState
     setState = base.setState
     getAllComponents = base.getAllComponents
-    
+
     setText s = request
         text := s
         case (<- base.getState) of
@@ -34,6 +34,8 @@ mkCocoaLabel = class
     getText = request
         result text     
 
+    appendText s = action
+        text := text ++ s
     
     setTextColor c = action
         case (<- base.getState) of

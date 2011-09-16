@@ -39,8 +39,8 @@ cocoaApplication = class
         result False
 
     eventDispatcher (MouseEvent m) windowId = request
-        if (isJust env) then
-            (fromJust env).stdout.write ("got a new mouse event to window" ++ (show windowId) ++ "!\n")
+        --if (isJust env) then
+        --    (fromJust env).stdout.write ("got a new mouse event to window" ++ (show windowId) ++ "!\n")
         
         sendToWindow (MouseEvent m) windowId
         result False
@@ -67,7 +67,6 @@ cocoaApplication = class
             (fromJust env).stdout.write "\n"
         
     sendToWindow recvEvent windowId = do
-       -- (fromJust env).stdout.write "hello\n"
         forall window <- activeWindows do
             if (<- window.getId == windowId) then
                 window.handleEvent recvEvent modifiers

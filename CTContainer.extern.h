@@ -15,11 +15,4 @@
 -(void) setBackgroundColor:(int) ra:(int) ga:(int) ba;
 @end
 
-@interface CocoaWindow : NSWindow {
-@private
-	bool (*dispatch)(NSEvent* event);
-}
-- (void) setEventDispatcher:(bool(*)(NSEvent*))dispatcher;
-@end
-
 #endif

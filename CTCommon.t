@@ -31,16 +31,16 @@ data CocoaKey = A | S | D | F | H | G | Z | X | C | V | Dummy1 |
 
 -- Note: flip inequality
 instance eqComponent :: Eq Component where
-  (==) = compareComponents
-  (/=) = compareComponents
+  (==) = (compareComponents True)
+  (/=) = (compareComponents False)
   
 instance eqCocoaKey :: Eq CocoaKey where
-  (==) = compareKeys
-  (/=) = compareKeys
+  (==) = (compareKeys True)
+  (/=) = (compareKeys False)
 
 instance eqCocoaState :: Eq CocoaState where
-    (==) = compareState
-    (/=) = compareState
+    (==) = (compareState True)
+    (/=) = (compareState False)
     
 struct Position where
     x :: Int
@@ -68,6 +68,7 @@ struct HasSize < HasPosition where
 struct HasText where
     setText :: String -> Request ()
     getText :: Request String
+    appendText :: String -> Action
 
 struct HasBackgroundColor where
     setBackgroundColor :: Color -> Request ()
@@ -84,6 +85,11 @@ struct HandlesKeyEvents where
     
 struct HandlesMouseEvents where
     installMouseListener :: (MouseEventType -> Request Bool) -> Request ()
+
+struct IsScrollable where
+    setScrollable :: (Bool, Bool) -> Request ()
+    getScrollable :: Request (Bool, Bool)
+    
 
 struct IsFocusable where
     setIsFocusable :: Bool -> Request ()
@@ -123,6 +129,7 @@ struct CocoaWindow < HasSize, HasBackgroundColor, ContainsComponents, HandlesKey
     hide :: Request Bool
     setVisible :: Request Bool
     setFocus :: Component -> Action
+    getContainerID :: Request CocoaID
 
 struct App where
     showWindow          :: CocoaWindow -> Request () 
@@ -201,6 +208,6 @@ showName (Just c) = do result <- c.getName
 --other stuff
 extern mkCocoaID :: Class CocoaID
 extern compareCocoaIDs :: CocoaID -> CocoaID -> Bool
-extern compareComponents :: Component -> Component -> Bool
-extern compareKeys :: CocoaKey -> CocoaKey -> Bool
-extern compareState :: CocoaState -> CocoaState -> Bool
+extern compareComponents :: Bool -> Component -> Component -> Bool
+extern compareKeys :: Bool -> CocoaKey -> CocoaKey -> Bool
+extern compareState :: Bool -> CocoaState -> CocoaState -> Bool

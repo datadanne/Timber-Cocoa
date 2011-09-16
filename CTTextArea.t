@@ -1,13 +1,15 @@
-module CTTextField where
+module CTTextArea where
 
 import CTCommon   
 import POSIX
 
-struct TextField < Component, HasText, HandlesMouseEvents, HandlesKeyEvents, IsScrollable    
+struct TextArea < Component, HasText, HandlesMouseEvents, HandlesKeyEvents, IsScrollable where
+    appendText :: String -> Action
+    
 
 --------------------------------------------------------------------------------------------------
-------          ** TextField **            ----------------------------------------------------------
-mkCocoaTextField env = class
+------          ** TextArea **            ----------------------------------------------------------
+mkCocoaTextArea env = class
     size := {width=200; height=17}
     text := ""
     position := {x=0; y=0}
@@ -25,14 +27,13 @@ mkCocoaTextField env = class
     getState = base.getState
     setState = base.setState
     getAllComponents = base.getAllComponents
-    
+
     scrollable := (True, False)
     getScrollable = request
         result scrollable
     
     setScrollable s = request
         scrollable := s
-
 
     appendText s = action
         text := text ++ s
@@ -41,7 +42,7 @@ mkCocoaTextField env = class
         text := s
         setName s
         case (<- base.getState) of
-            Active -> textFieldSetText id s
+            Active -> textAreaSetText id s
             _ ->
    
     getText = request
@@ -50,7 +51,7 @@ mkCocoaTextField env = class
     -- setPosition
     setPosition p = request
         case (<- base.getState) of
-            Active -> textFieldSetPosition id p
+            Active -> textAreaSetPosition id p
             _ -> 
         position := p       
     
@@ -85,22 +86,24 @@ mkCocoaTextField env = class
     -- undocumented feature in Timber, init must be placed above 'this' else we have some nice raise(2); :-)
     init app = request
             base.setState Active
-            initTextField this app
+            initTextArea this app
             
             inithelper
     
     inithelper = do
-        textFieldSetText id text
-        textFieldSetPosition id position
+        textAreaSetText id text
+        textAreaSetPosition id position
+        textAreaSetSize id size
             
-    this = TextField{..}
+    this = TextArea{..}
 
     result this
 
 --------------------------------------------------------------------------------------------------
 ------          ** EXTERN **            ----------------------------------------------------------  
 
---textField      
-extern initTextField :: TextField -> App -> Request ()
-extern textFieldSetText :: CocoaID -> String -> Action
-extern textFieldSetPosition :: CocoaID -> Position -> Action
+--textArea      
+extern initTextArea :: TextArea -> App -> Request ()
+extern textAreaSetText :: CocoaID -> String -> Action
+extern textAreaSetPosition :: CocoaID -> Position -> Action
+extern textAreaSetSize :: CocoaID -> Size -> Action

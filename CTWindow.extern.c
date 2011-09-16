@@ -1,4 +1,5 @@
 #include "CTWindow.extern.h"
+#import "CTWindow.extern.m"
 
 extern pthread_mutex_t envmut;
 extern int envRootsDirty;
@@ -6,15 +7,20 @@ CocoaEvent_CTCommon receivedEvent;
 
 pthread_mutex_t eventMutex;
 
+int p = 0;
 bool dispatchEventToTimber(NSEvent* event) { 
 	App_CTCommon app = getApp();
 	DEBUG("C: Event received in dispatchEventToTimber\n");
 	/* figure out event
 		flag 0,1,2 0 = windowEvent, etc. */
 	if ([event type] == NSLeftMouseDown || [event type] == NSLeftMouseDragged) {
-        
- 		Position_CTCommon x_5110;
+
+        Position_CTCommon x_5110 = NULL;
 	    NEW (Position_CTCommon, x_5110, WORDS(sizeof(struct Position_CTCommon)));
+	    if (x_5110 == NULL) {
+            printf("AW CHUCKS\n");
+            return false;
+        }
 	    x_5110->GCINFO = __GC__Position_CTCommon;
 		NSPoint p = [event locationInWindow];
 	    x_5110->x_CTCommon = p.x;
@@ -51,7 +57,12 @@ bool dispatchEventToTimber(NSEvent* event) {
 	    printf("Event of type %d was discarded\n", [event type]);
         return false;
     }
-
+ 	
+ 	/*DISABLE(envmut);
+    printf("envRD1\n");
+	envRootsDirty = 1;
+	ENABLE(envmut);*/
+	
     return app->eventDispatcher_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0);
 }
 

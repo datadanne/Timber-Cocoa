@@ -5,11 +5,13 @@ import POSIX
 data ApplicationState = Running | Stopped
 data CocoaState = Active | Inactive | Destroyed
 
-data WindowEventType = WindowClosed | WindowNotClosed
+data WindowEventType = WindowClose | WindowResize Size
 data MouseEventType = MouseClicked Position | MousePressed Position | MouseReleased Position | MouseMoved Position
 data KeyEventType  = KeyPressed CocoaKey | KeyReleased CocoaKey
 
 data CocoaEvent = WindowEvent WindowEventType | MouseEvent MouseEventType | KeyEvent KeyEventType
+
+data TimberResult = ResultBool Bool | ResultSize Size | ResultPosition Position
 
 data CocoaKey = A | S | D | F | H | G | Z | X | C | V | Dummy1 | 
                 B | Q | W | E | R | Y | T | Num1 | Num2 | Num3 | Num4 | 
@@ -29,7 +31,6 @@ data CocoaKey = A | S | D | F | H | G | Z | X | C | V | Dummy1 |
                 ForwardDelete | F4 | End | F2 | PageDown | F1 |
                 LeftArrow | RightArrow | DownArrow | UpArrow
 
--- Note: flip inequality
 instance eqComponent :: Eq Component where
   (==) = (compareComponents True)
   (/=) = (compareComponents False)
@@ -75,8 +76,13 @@ struct HasBackgroundColor where
     getBackgroundColor :: Request Color
     
 struct HandlesEvents where
-    handleEvent :: CocoaEvent -> [CocoaKey] -> Request (Maybe Component)
+    handleEvent :: CocoaEvent -> [CocoaKey] -> Request Bool
 
+struct HasHandlers where
+    addHandler :: HandlesEvents -> Request ()
+    setHandlers :: [HandlesEvents] -> Request ()
+    getHandlers :: Request [HandlesEvents]
+    
 struct HandlesWindowEvents < HandlesEvents where
     installWindowListener :: (WindowEventType -> Request Bool) -> Request ()
 
@@ -95,7 +101,7 @@ struct IsFocusable where
     setIsFocusable :: Bool -> Request ()
     getIsFocusable :: Request Bool
 
-struct BaseComponent < IsFocusable, HasSize where
+struct BaseComponent < IsFocusable, HasSize, HasHandlers, HandlesEvents where
     setName :: String -> Request ()
     getName :: Request String
     setParent :: (Maybe Component) -> Request ()
@@ -110,7 +116,7 @@ struct BaseComponent < IsFocusable, HasSize where
 struct CocoaID where
     dummy :: Int
        
-struct Component < BaseComponent, HandlesEvents where   
+struct Component < BaseComponent where   
     id :: CocoaID          
     init :: App -> Request ()
     destroy :: Request ()
@@ -121,7 +127,7 @@ struct ContainsComponents where
     removeAllComponents :: Request ()
     getComponents :: Request [Component]
 
-struct CocoaWindow < HasSize, HasBackgroundColor, ContainsComponents, HandlesKeyEvents, HandlesWindowEvents, HandlesMouseEvents where 
+struct CocoaWindow < HasSize, HasBackgroundColor, ContainsComponents, HasHandlers, HandlesWindowEvents where 
     windowId :: CocoaID
     getId :: Request Int
     initWindow :: App -> Request ()
@@ -129,15 +135,52 @@ struct CocoaWindow < HasSize, HasBackgroundColor, ContainsComponents, HandlesKey
     hide :: Request Bool
     setVisible :: Request Bool
     setFocus :: Component -> Action
+    getFocus :: Request Component
     getContainerID :: Request CocoaID
 
 struct App where
     showWindow          :: CocoaWindow -> Request () 
     getApplicationState :: Request ApplicationState 
-    eventDispatcher     :: CocoaEvent -> Int -> Request Bool
+    eventDispatcher     :: CocoaEvent -> Int -> Request TimberResult
     setEnv  :: Env -> Request ()
 
+
+struct DefaultEventHandler < HasHandlers, HandlesEvents
+
+basicHasHandlers = class
+
+    handlers := []
+    addHandler a = request
+        handlers := a : handlers
+
+    setHandlers aa = request
+        handlers := aa
+    
+    getHandlers = request
+        result handlers
+    
+    -- Return true (block cocoa) if any of the installed handlers say so.
+    returnVal := False
+    handleEvent cocoaEvent modifiers = request
+        returnVal := False
+        forall h <- handlers do
+            res <- h.handleEvent cocoaEvent modifiers
+            if (res == True) then
+                returnVal := True
+
+        result returnVal
+    
+
+    result DefaultEventHandler {..}
+
+
 basicComponent f p n = class
+
+    baseHandler = new basicHasHandlers
+    addHandler = baseHandler.addHandler
+    setHandlers = baseHandler.setHandlers
+    getHandlers = baseHandler.getHandlers
+    handleEvent = baseHandler.handleEvent
 
     nameWrap = new wrapper n
     getName = nameWrap.get
@@ -197,10 +240,6 @@ dynamicHandleEvent event (Just handler) = do
 
 dynamicHandleEvent _ Nothing = do
     result False
-
-boolToMaybe (Just cmp) True = Just cmp
-boolToMaybe _ False = Nothing
-boolToMaybe _ _ = Nothing -- why is this needed????????????????????
 
 showName Nothing = do result "Nothing"
 showName (Just c) = do result <- c.getName

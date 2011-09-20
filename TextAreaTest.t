@@ -26,16 +26,21 @@ root w = class
         app.setEnv env
         app.showWindow w1
         
+        toSize = {width=167;height=133}
+        foo = ResultSize toSize
+        
         after (sec 5) send action
             w1.setSize ({width=500;height=500})
             tarea.setSize ({width=300;height=5}) -- DOESNT WORK. Anchors to right edge?
             tarea.setPosition ({x=100;y=100})
+            tarea.setScrollable (True, False)
+            
     
     result action
         tarea.setSize ({width=200;height=100})
-        tarea.setPosition ({x=0;y=0})
-        tarea.setText "Here be text and scrolling\n\n\nLine breaks work too."
-
+        tarea.setPosition ({x=0;y=50})
+        tarea.setText "Here be text and scrolling\n\n\nLine breaks work too.\n\n\nEND OF TEXT"
+        tarea.setScrollable (False, True)
         w1.addComponent tarea
         w1.addComponent label
         w1.setBackgroundColor ({r=100;g=200;b=100})

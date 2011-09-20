@@ -3,7 +3,7 @@ module CTDropDown where
 import CTCommon   
 import POSIX
 
-struct DropDown < Component, HandlesMouseEvents, HandlesKeyEvents where
+struct DropDown < Component where
     addOption :: String -> Action
     setOptions :: [String] -> Action
     getOptions :: Request [String]
@@ -20,6 +20,9 @@ mkCocoaDropDown env = class
     
     id = new mkCocoaID
     base = new basicComponent True Nothing "DropDown"
+    addHandler = base.addHandler
+    setHandlers = base.setHandlers
+    getHandlers = base.getHandlers
     setParent = base.setParent
     getParent = base.getParent
     setIsFocusable = base.setIsFocusable
@@ -79,13 +82,13 @@ mkCocoaDropDown env = class
         mouseEventHandler := Just ml
 
     handleEvent (KeyEvent t) modifiers = request
-        result (boolToMaybe (Just this) (<- dynamicHandleEvent t keyEventHandler))
+        result (<- dynamicHandleEvent t keyEventHandler)
 
     handleEvent (MouseEvent t) modifiers = request
-        result (boolToMaybe (Just this) (<- dynamicHandleEvent t mouseEventHandler))
+        result (<- dynamicHandleEvent t mouseEventHandler)
     
     handleEvent _ modifiers = request
-        result Nothing
+        result False
 
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request

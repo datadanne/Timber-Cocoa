@@ -2,12 +2,11 @@ module CTLabel where
             
 import CTCommon
 
-struct Label < Component, HasText, HandlesMouseEvents where
+struct Label < Component, HasText where
     setTextColor :: Color -> Action
     getTextColor :: Request Color
 
 mkCocoaLabel = class
-    position := {x=0; y=0}
     size := {width=0; height=0}
     mouseEventHandler := Nothing          
     textColor := {r=0;g=0;b=0}
@@ -15,6 +14,9 @@ mkCocoaLabel = class
 
     id = new mkCocoaID
     base = new basicComponent False Nothing "Label"
+    addHandler = base.addHandler
+    setHandlers = base.setHandlers
+    getHandlers = base.getHandlers
     setParent = base.setParent
     getParent = base.getParent
     setIsFocusable = base.setIsFocusable
@@ -24,6 +26,7 @@ mkCocoaLabel = class
     getState = base.getState
     setState = base.setState
     getAllComponents = base.getAllComponents
+    handleEvent = base.handleEvent
 
     setText s = request
         text := s
@@ -50,12 +53,10 @@ mkCocoaLabel = class
     setPosition p = request  
         case (<- base.getState) of
             Active -> labelSetPosition id p
-            _ -> 
-            
-        position := p       
+            _ ->
+        base.setPosition p  
     
-    getPosition = request
-        result position
+    getPosition = base.getPosition
 
     setSize s = request
         size := s
@@ -66,16 +67,6 @@ mkCocoaLabel = class
     destroy = request
         base.setState Destroyed
                             
-    -- handles mouse events
-    installMouseListener ml = request
-        mouseEventHandler := Just ml
-                             
-    handleEvent (MouseEvent t) modifiers = request
-        result (boolToMaybe (Just this) (<- dynamicHandleEvent t mouseEventHandler))
-    
-    handleEvent _ modifiers = request
-        result Nothing
-
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request
             base.setState Active
@@ -85,7 +76,7 @@ mkCocoaLabel = class
     
     inithelper = do
         labelSetText id text
-        labelSetPosition id position
+        labelSetPosition id (<- base.getPosition)
         labelSetSize id size  
         labelSetTextColor id textColor
             

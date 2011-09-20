@@ -3,7 +3,7 @@ module CTButton where
 import CTCommon   
 import POSIX
 
-struct Button < Component, HandlesMouseEvents, HandlesKeyEvents where
+struct Button < Component where
     setTitle :: String -> Action
     getTitle :: Request String
 
@@ -18,6 +18,9 @@ mkCocoaButton env = class
     
     id = new mkCocoaID
     base = new basicComponent True Nothing "BUTTON"
+    addHandler = base.addHandler
+    setHandlers = base.setHandlers
+    getHandlers = base.getHandlers
     setParent = base.setParent
     getParent = base.getParent
     setIsFocusable = base.setIsFocusable
@@ -27,6 +30,7 @@ mkCocoaButton env = class
     getState = base.getState
     setState = base.setState
     getAllComponents = base.getAllComponents
+    handleEvent = base.handleEvent
     
     -- setTitle
     setTitle s = action
@@ -59,22 +63,6 @@ mkCocoaButton env = class
         
     destroy = request
         base.setState Destroyed
-        
-    installKeyListener kl = request
-        keyEventHandler := Just kl
-
-    installMouseListener ml = request
-        mouseEventHandler := Just ml
-
-    handleEvent (KeyEvent t) modifiers = request
-        result (boolToMaybe (Just this) (<- dynamicHandleEvent t keyEventHandler))
-
-    handleEvent (MouseEvent t) modifiers = request
-        buttonHighlight id
-        result (boolToMaybe (Just this) (<- dynamicHandleEvent t mouseEventHandler))
-    
-    handleEvent _ modifiers = request
-        result Nothing
 
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request

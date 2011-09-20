@@ -35,20 +35,13 @@ cocoaApplication = class
             Command -> updateList name
             _ ->
             
-        sendToWindow (KeyEvent k) windowId
-        result False
+        result (<- sendToWindow (KeyEvent k) windowId)
 
     eventDispatcher (MouseEvent m) windowId = request
-        --if (isJust env) then
-        --    (fromJust env).stdout.write ("got a new mouse event to window" ++ (show windowId) ++ "!\n")
-        
-        sendToWindow (MouseEvent m) windowId
-        result False
-        
-    eventDispatcher recv windowId = request
-        sendToWindow recv windowId
-        result False
-
+        result (<- sendToWindow (MouseEvent m) windowId)
+  
+    eventDispatcher (WindowEvent w) windowId = request
+        result (<- sendToWindow (WindowEvent w) windowId)
     
     updateList key = do
         if (elem key modifiers) then
@@ -66,10 +59,14 @@ cocoaApplication = class
                 (fromJust env).stdout.write " COMMAND"
             (fromJust env).stdout.write "\n"
         
+    resultState := (ResultBool False)
     sendToWindow recvEvent windowId = do
+        
         forall window <- activeWindows do
             if (<- window.getId == windowId) then
-                window.handleEvent recvEvent modifiers
+                resultState := (ResultBool (<- window.handleEvent recvEvent modifiers))
+        
+        result resultState
 
     getApplicationState = request
         result Running

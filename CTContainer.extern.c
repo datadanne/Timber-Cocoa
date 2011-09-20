@@ -7,6 +7,7 @@ Msg containerAddComponent_CTContainer (CocoaID_CTCommon container, CocoaID_CTCom
 	NSObject *object = (NSObject*) COCOA_REF(button);
 
 	[thisView performSelectorOnMainThread:@selector(addSubview:) withObject:object waitUntilDone:YES];
+    [thisView setNeedsDisplay:YES];
 
 }
 Msg containerSetBackgroundColor_CTContainer (CocoaID_CTCommon id, Color_CTCommon c, Time start, Time stop) { 
@@ -20,7 +21,7 @@ Msg containerSetSize_CTContainer (CocoaID_CTCommon id, Size_CTCommon pos, Time s
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("setting containerSize ext!\n");
 	CocoaView *thisView = (CocoaView*) (((internal_CocoaID_CTCommon) id)->this); 
-	[thisView setFrameSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon)];
+	[thisView setFrameSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon-20)];
 	[pool drain];
 }
 Msg containerSetPosition_CTContainer (CocoaID_CTCommon id, Position_CTCommon pos, Time start, Time stop) {

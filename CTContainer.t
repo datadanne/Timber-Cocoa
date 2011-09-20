@@ -15,13 +15,11 @@ mkCocoaContainer env = class
     mouseEventHandler := Nothing
     keyEventHandler := Nothing
 
-    currentEventHasBeenConsumedBy := Nothing
-    
-    nextFocusTarget := Nothing
-    previousFocusTarget := Nothing
-
     id = new mkCocoaID
     base = new basicComponent False Nothing "ContainerWHAT"
+    addHandler = base.addHandler
+    setHandlers = base.setHandlers
+    getHandlers = base.getHandlers
     setParent = base.setParent
     getParent = base.getParent
     setIsFocusable = base.setIsFocusable
@@ -75,7 +73,6 @@ mkCocoaContainer env = class
         if (state == Active && isJust appRef) then
             c.init (fromJust appRef)
             containerAddComponent id c.id    
-        env.stdout.write "TooToo\n"
             
     removeComponent c = request
         myComponents := [x | x <- myComponents, not (x == c)]
@@ -100,28 +97,18 @@ mkCocoaContainer env = class
     getComponents = request
         result myComponents
 
-
     installMouseListener ml = request
         mouseEventHandler := Just ml
     
     installKeyListener kl = request
         keyEventHandler := Just kl
-
-    executeHandler handler t = do
-        if (isJust mouseEventHandler) then
-            result (<- ((fromJust mouseEventHandler) t))
-        else
-            result False
             
     handleEvent (MouseEvent t) modifiers = request
-        if (<- executeHandler mouseEventHandler t) then
-            result (Just this)
-        else
-            result Nothing
-        --result <- mouseEventDispatcher t modifiers
-    
+        result (<- dynamicHandleEvent t mouseEventHandler)
+        
     handleEvent _ modifiers = request
-        result Nothing
+        result False
+
 
     getType (MousePressed _) = MousePressed
     getType (MouseReleased _) = MouseReleased

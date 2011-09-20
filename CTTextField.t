@@ -3,7 +3,7 @@ module CTTextField where
 import CTCommon   
 import POSIX
 
-struct TextField < Component, HasText, HandlesMouseEvents, HandlesKeyEvents, IsScrollable    
+struct TextField < Component, HasText, IsScrollable    
 
 --------------------------------------------------------------------------------------------------
 ------          ** TextField **            ----------------------------------------------------------
@@ -16,6 +16,9 @@ mkCocoaTextField env = class
     
     id = new mkCocoaID
     base = new basicComponent True Nothing "TEXT_AREA"
+    addHandler = base.addHandler
+    setHandlers = base.setHandlers
+    getHandlers = base.getHandlers
     setParent = base.setParent
     getParent = base.getParent
     setIsFocusable = base.setIsFocusable
@@ -25,7 +28,8 @@ mkCocoaTextField env = class
     getState = base.getState
     setState = base.setState
     getAllComponents = base.getAllComponents
-    
+    handleEvent = base.handleEvent
+
     scrollable := (True, False)
     getScrollable = request
         result scrollable
@@ -66,21 +70,6 @@ mkCocoaTextField env = class
         
     destroy = request
         base.setState Destroyed
-        
-    installKeyListener kl = request
-        keyEventHandler := Just kl
-
-    installMouseListener ml = request
-        mouseEventHandler := Just ml
-
-    handleEvent (KeyEvent t) modifiers = request
-        result (boolToMaybe (Just this) (<- dynamicHandleEvent t keyEventHandler))
-
-    handleEvent (MouseEvent t) modifiers = request
-        result (boolToMaybe (Just this) (<- dynamicHandleEvent t mouseEventHandler))
-    
-    handleEvent _ modifiers = request
-        result Nothing
 
     -- undocumented feature in Timber, init must be placed above 'this' else we have some nice raise(2); :-)
     init app = request

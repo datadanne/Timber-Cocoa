@@ -4,34 +4,41 @@
 Msg textAreaSetText_CTTextArea(CocoaID_CTCommon id, LIST s, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("external method setTitle :DD");
-	NSScrollView *scrollview = (NSScrollView*) COCOA_REF(id);
-	NSTextView *theTextView = [scrollview documentView];
+	NSScrollView *scrollView = (NSScrollView*) COCOA_REF(id);
+	NSTextView *theTextView = [scrollView documentView];
 	char* buf = listToChars(s);
 	[theTextView setString:[NSString stringWithFormat:@"%s", buf]];
-	//[scrollview setNeedsDisplay];
+	
+    [theTextView setNeedsDisplay:YES];
+    [theTextView displayIfNeeded];
 	[pool drain];
 } 
+
 Msg textAreaSetPosition_CTTextArea(CocoaID_CTCommon id, Position_CTCommon pos, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("setting POS externally..");
 	
-	NSScrollView *thisTextArea = (NSScrollView*) COCOA_REF(id);
+	NSScrollView *scrollView = (NSScrollView*) COCOA_REF(id);
+	NSTextView *theTextView = [scrollView documentView];
 	
-	DEBUG("TextArea(pos) OK %p!", thisTextArea);
+	
+	DEBUG("TextArea(pos) OK %p!", scrollView);
 	NSPoint p = NSMakePoint(pos->x_CTCommon-5,pos->y_CTCommon-20); // TODO: Remove hardcoded offset.
 	
-	[thisTextArea setFrameOrigin: p];
-	[thisTextArea performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
+	[scrollView setFrameOrigin: p];
+	
+    [theTextView setNeedsDisplay:YES];
+    [theTextView displayIfNeeded];
    	[pool drain]; 
 }
 
 Msg textAreaSetSize_CTTextArea (CocoaID_CTCommon id, Size_CTCommon pos, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("setting containerSize ext!\n");
-    NSScrollView *thisTextArea = (NSScrollView*) COCOA_REF(id);
-	NSTextView *theTextView = [thisTextArea documentView];
+    NSScrollView *scrollView = (NSScrollView*) COCOA_REF(id);
+	NSTextView *theTextView = [scrollView documentView];
 
-	[thisTextArea setFrameSize: NSMakeSize(pos->width_CTCommon,pos->height_CTCommon)];
+	[scrollView setFrameSize: NSMakeSize(pos->width_CTCommon,pos->height_CTCommon)];
 	
 	[theTextView setMinSize:NSMakeSize(pos->width_CTCommon, pos->height_CTCommon)];
     [theTextView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
@@ -41,63 +48,71 @@ Msg textAreaSetSize_CTTextArea (CocoaID_CTCommon id, Size_CTCommon pos, Time sta
 
     [[theTextView textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
     
-    
+    [theTextView setNeedsDisplay:YES];
 	[pool drain];
 }
 
-Msg textAreaSetHorizontalScroll_CTTextArea(CocoaID_CTCommon id, Bool enabled, Time start, Time stop) {
-    NSScrollView *scrollview = (NSScrollView*) COCOA_REF(id);
-	NSTextView *theTextView = [scrollview documentView];
+TUP0 textAreaSetHorizontalScroll_CTTextArea(CocoaID_CTCommon id, Bool enabled, int dummy) {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+    NSScrollView *scrollView = (NSScrollView*) COCOA_REF(id);
+    NSTextView *theTextView = [scrollView documentView];
 
     // Horizontal scrolling
-    [[theTextView enclosingScrollView] setHasHorizontalScroller:YES];
-    [theTextView setHorizontallyResizable:YES];
-    [theTextView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+    [scrollView setHasHorizontalScroller:enabled];
+    [theTextView setHorizontallyResizable:enabled];
     [[theTextView textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
-    [[theTextView textContainer] setWidthTracksTextView:NO];
+    
+    [theTextView setNeedsDisplay:YES];
+	[pool drain];
 }
 
-Msg textAreaSetVerticalScroll_CTTextArea(CocoaID_CTCommon id, Bool enabled, Time start, Time stop) {
+TUP0 textAreaSetVerticalScroll_CTTextArea(CocoaID_CTCommon id, Bool enabled, int dummy) {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+    NSScrollView *scrollView = (NSScrollView*) COCOA_REF(id);
+    NSTextView *theTextView = [scrollView documentView];
     
+    // Vertical scrolling
+    [scrollView setHasVerticalScroller:enabled];
+    [theTextView setVerticallyResizable:enabled];
+//    NSUInteger mask = (enabled) ? [theTextView autoresizingMask]:0;
+//    [theTextView setAutoresizingMask:(mask | NSViewHeightSizable)];
+    [[theTextView textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
+    
+    [theTextView setNeedsDisplay:YES];
+	[pool drain];
+
 }                               
 
 TUP0 initTextArea_CTTextArea(TextArea_CTTextArea textArea, App_CTCommon app, Int dummy) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
 	DEBUG("Initializing NSScrollView: ");
-	internal_CocoaID_CTCommon thisTextArea = (internal_CocoaID_CTCommon)(textArea->l_TextArea_CTTextArea_Component_CTCommon_CTTextArea->id_CTCommon);
+	internal_CocoaID_CTCommon scrollViewID = (internal_CocoaID_CTCommon)(textArea->l_TextArea_CTTextArea_Component_CTCommon_CTTextArea->id_CTCommon);
 
     // CODE TO MAKE A SCROLL VIEW!
-    NSScrollView *scrollview = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)];
+    NSScrollView *scrollView = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)];
+    NSSize contentSize = [scrollView contentSize];
 
-    NSSize contentSize = [scrollview contentSize];
-
-    [scrollview setBorderType:NSNoBorder];
-    [scrollview setHasVerticalScroller:YES];
-    [scrollview setHasHorizontalScroller:NO];
-    [scrollview setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+    [scrollView setBorderType:NSNoBorder];
+    [scrollView setHasVerticalScroller:NO];
+    [scrollView setHasHorizontalScroller:NO];
 
     NSTextView *theTextView = [[NSTextView alloc] initWithFrame:NSMakeRect(0, 0, contentSize.width, contentSize.height)];
     [theTextView setMinSize:NSMakeSize(0.0, contentSize.height)];
     [theTextView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
-    [theTextView setVerticallyResizable:YES];
-    [theTextView setHorizontallyResizable:NO];
+//    [theTextView setVerticallyResizable:YES];
+//    [theTextView setHorizontallyResizable:NO];
     [theTextView setAutoresizingMask:NSViewWidthSizable];
 
     [[theTextView textContainer]
     setContainerSize:NSMakeSize(contentSize.width, FLT_MAX)];
     [[theTextView textContainer] setWidthTracksTextView:YES];
 
-    [scrollview setDocumentView:theTextView];
-
-    // Horizontal scrolling
-    [[theTextView enclosingScrollView] setHasHorizontalScroller:YES];
-    [theTextView setHorizontallyResizable:YES];
-    [theTextView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
-    [[theTextView textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
-    [[theTextView textContainer] setWidthTracksTextView:NO];
+    [scrollView setDocumentView:theTextView];
 
     [theTextView setString: @"TEXT"];
-	thisTextArea->this = scrollview;
+	scrollViewID->this = scrollView;
 
 	[pool drain];
 	return 0;

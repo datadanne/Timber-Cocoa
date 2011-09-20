@@ -1,6 +1,7 @@
 module NewTest where
 
 import COCOA
+import EventHandler
 
 root w = class
     env = new posix w
@@ -32,6 +33,8 @@ root w = class
         result True
      
     applicationDidFinishLaunching app = action
+    
+    
         app.setEnv env
         app.showWindow w1
         cid <- w1.getContainerID

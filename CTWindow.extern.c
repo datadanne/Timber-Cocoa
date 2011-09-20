@@ -63,7 +63,14 @@ bool dispatchEventToTimber(NSEvent* event) {
 	envRootsDirty = 1;
 	ENABLE(envmut);*/
 	
-    return app->eventDispatcher_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0);
+    TimberResult_CTCommon tres = app->eventDispatcher_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0);
+    
+    if (tres->Tag == 2) {
+        _ResultBool_CTCommon r = (_ResultBool_CTCommon) tres;
+        return (bool)r->a;
+    } else {
+        return false;
+    }
 }
 
 void scanEventReceived(void) {
@@ -156,9 +163,8 @@ Msg windowSetSize_CTWindow (CocoaID_CTCommon wnd, Size_CTCommon pos, Time start,
 	DEBUG("setting containerSize ext!");
 	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
 	
-	//dispatch_async(dispatch_get_main_queue(), ^{
-	    [thisWindow setContentSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon)];
-//	});
+	[thisWindow setContentSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon-20)]; //-20 to compensate for border.
+	
 	[pool drain];
 }
 

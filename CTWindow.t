@@ -16,15 +16,19 @@ mkWindow env = class
     position := {x=0;y=0}
     
     rootContainer = new mkCocoaContainer env
-    addComponent a = request
-        rootContainer.addComponent a
-        
+    addComponent = rootContainer.addComponent
     getComponents = rootContainer.getComponents
     removeComponent = rootContainer.removeComponent
     removeAllComponents = rootContainer.removeAllComponents
     setBackgroundColor = rootContainer.setBackgroundColor
     getBackgroundColor = rootContainer.getBackgroundColor
-    
+
+    handlers = new basicHasHandlers 
+    addHandler = handlers.addHandler
+    setHandlers = handlers.setHandlers
+    getHandlers = handlers.getHandlers
+    handleEvent = handlers.handleEvent
+
     getContainerID = request
         result rootContainer.id
         
@@ -59,6 +63,9 @@ mkWindow env = class
         windowSetPosition windowId position
         windowSetSize windowId (<- rootContainer.getSize)
         windowSetContentView this rootContainer.id
+        
+        eventHandler = new windowEventHandler this rootContainer env
+        handlers.addHandler eventHandler
 
     destroyWindow = request
         if (state == Active) then 
@@ -66,165 +73,20 @@ mkWindow env = class
             rootContainer.destroy
             destroyCocoaWindow windowId
 
-    
-    getKey (KeyPressed theKey) = theKey
-    getKey _ = raise 9
-    
-    currentFocus := rootContainer
-    newFocus := Nothing
-    
-    getType (MousePressed _) = MousePressed
-    getType (MouseReleased _) = MouseReleased
-    getType (MouseClicked _) = MouseClicked
-
-    posget (MousePressed p) = p 
-    posget (MouseReleased p) = p 
-    posget (MouseClicked p) = p 
-        
-    consumed := False
-    focusables := []
-    handleEvent (KeyEvent keyEventType) modifiers = request
-        newFocus := Nothing
-        
-        if ((<- currentFocus.getState) == Destroyed) then
-            currentFocus := rootContainer
-            
-        consumed := isJust (<- currentFocus.handleEvent (KeyEvent keyEventType) modifiers)
-        
-        if (consumed == False) then
-            theKey = getKey keyEventType
-            if (theKey == Tab) then
-                cmps <- rootContainer.getAllComponents
-                foundFocus := False
-                focusables := []
-                
-                forall c <- cmps do
-                    if (<- c.getIsFocusable) then
-                        focusables := c : focusables
-                
-                if (elem Shift modifiers) then
-                    focusables := reverse focusables
-            
-                scanList focusables findKeyFocus
-    
-                if (focusables /= [] && currentFocus == rootContainer) then
-                    setFocus (head focusables)
-
-        -- TODO: Resolve menu key event capture. No listener if consumed.    
-        result (boolToMaybe Nothing (<- dynamicHandleEvent keyEventType keyListener))
-        
-    handleEvent (WindowEvent a) modifiers = request
-        case a of
-            WindowClosed -> rootContainer.setState Inactive
-            _ ->
-        result (boolToMaybe Nothing (<- dynamicHandleEvent a windowListener))
-        
-    handleEvent (MouseEvent me) modifiers = request
-        cmps <- rootContainer.getAllComponents
-        scanList cmps (findMouseFocus me modifiers)
-        result (<- rootContainer.handleEvent (MouseEvent me) modifiers)
-        
-    scanList [] _ = do 
-        result False 
-        
-    scanList x func = do
-        if (<- func (head x)) then
-            result True
-        else
-            result (<- (scanList (tail x) func))
-            
-    foundFocus := False
-    findKeyFocus cmp = do
-        if (foundFocus) then
-            currentFocus := cmp
-            setFocus cmp
-            result True
-        elsif (cmp == currentFocus) then
-            currentFocus := rootContainer
-            foundFocus := True
-            result False
-        else
-            result False
-        
-    consume := False
-    findMouseFocus event modifiers cmp = do
-        consume := False
-
-        pos = posget event
-        et = getType event
-        parent <- cmp.getParent
-
-        {-env.stdout.write ("child name: " ++ (<-cmp.getName) ++ "\n")
-        if (isJust parent) then
-            env.stdout.write ("parent name: " ++ (<-(fromJust parent).getName) ++ "\n") -}
-
-        p <- if (isJust parent) then ((fromJust parent).getPosition) else (do result {x=0;y=0})    
-        pos2 = ({x=pos.x-p.x;y=pos.y-p.y})
-        
-        env.stdout.write ("")
-
-        -- "create" new event to the containers coordsystem
-        eventInNewCoordsystem = ((getType event) pos)
-        cmpPos <- cmp.getPosition
-        cmpSize <- cmp.getSize               
-
-        if (inInterval pos2.x cmpPos.x cmpSize.width && inInterval pos2.y cmpPos.y cmpSize.height) then
-            consumer <- cmp.handleEvent (MouseEvent eventInNewCoordsystem) modifiers
-            consume := isJust consumer
-
-            if (consume) then
-                env.stdout.write ("Sending event to " ++ (<- (fromJust consumer).getName) ++ "\n")
-                focusable <- (fromJust consumer).getIsFocusable
-                if (focusable) then
-                    setFocus (fromJust consumer)
-        result consume 
-                 
-{-        cmp <- rootContainer.handleEvent (MouseEvent a) modifiers
-        if (isJust cmp) then
-            jcmp = fromJust cmp
-            if (<-jcmp.getIsFocusable) then
-                env.stdout.write ("Mouse Click set focus to: " ++ (<- jcmp.getName) ++ "\n")
-                setFocus jcmp
-        result cmp-}
- 
-    setFocus cmp = action
-        currentFocus := cmp
-        if (state == Active) then
-            windowSetFocus windowId cmp.id
-            
-        env.stdout.write ("FOCUS SET TO: " ++ (<- currentFocus.getName) ++ "\n")
-            
-       
- {-   handleEvent a modifiers = request
-        cmp <- rootContainer.handleEvent a modifiers
-        case a of
-            MouseEvent m -> 
-                if (isJust cmp) then
-                    if (<-(fromJust cmp).getIsFocusable) then
-                        setFocus (fromJust cmp)
-            _ ->
-        result cmp -} 
-
     installWindowListener wl = request
         windowListener := Just wl
-        
-    installKeyListener kl = request
-        keyListener := Just kl
-        
-    installMouseListener = rootContainer.installMouseListener
+
+    currentFocus := rootContainer
+    setFocus cmp = action
+         currentFocus := cmp
+         if (state == Active) then
+             windowSetFocus windowId cmp.id
+
+         env.stdout.write ("FOCUS SET TO: " ++ (<- cmp.getName) ++ "\n")
          
-{-    handleKeyEvent e = do
-        consumed = False
-        
-        if (isJust keyListener) then
-            consumed <- (fromJust keyListener) e
-        
-    --  if (consumed == False) then
-        --  consumed <- focusTarget.handleEvent e 
-        result consumed
--}    
- 
-                            
+    getFocus = request
+        result currentFocus
+
     -- VISIBILITY
     hide = request
         if (state == Active && isVisible == True) then
@@ -246,6 +108,121 @@ mkWindow env = class
     
     result this
 
+
+windowEventHandler window rootContainer env = class
+
+    getKey (KeyPressed theKey) = theKey
+    getKey _ = raise 9
+
+    getType (MousePressed _) = MousePressed
+    getType (MouseReleased _) = MouseReleased
+    getType (MouseClicked _) = MouseClicked
+
+    posget (MousePressed p) = p 
+    posget (MouseReleased p) = p 
+    posget (MouseClicked p) = p 
+    
+    currentFocus := rootContainer
+
+    focusables := []
+    handleEvent (KeyEvent keyEventType) modifiers = request
+        currentFocus := <- window.getFocus
+        
+        if ((<- currentFocus.getState) == Destroyed) then
+            window.setFocus rootContainer
+
+        consumed = (<- currentFocus.handleEvent (KeyEvent keyEventType) modifiers)
+    
+        if (consumed == False) then
+            env.stdout.write "moving focus" 
+            theKey = getKey keyEventType
+            if (theKey == Tab) then
+                cmps <- rootContainer.getAllComponents
+                foundFocus := False
+                focusables := []
+            
+                forall c <- cmps do
+                    if (<- c.getIsFocusable) then
+                        focusables := c : focusables
+            
+                if (elem Shift modifiers) then
+                    focusables := reverse focusables
+        
+                scanList focusables findKeyFocus
+
+                if (focusables /= [] && currentFocus == rootContainer) then
+                    window.setFocus (head focusables)
+
+        -- TODO: Resolve menu key event capture. No listener if consumed.    
+        result False
+    
+    handleEvent (WindowEvent eventType) modifiers = request
+        case eventType of
+            WindowClose -> 
+                rootContainer.setState Inactive
+                result False
+            WindowResize toSize -> 
+                width = toSize.width
+                height = toSize.height
+                scale = max width height
+                newSize = {width=scale;height=scale}
+                result False
+            _ ->
+                result False
+    
+    handleEvent (MouseEvent me) modifiers = request
+        cmps <- rootContainer.getAllComponents
+        scanList cmps (findMouseFocus me modifiers)
+        result (<- rootContainer.handleEvent (MouseEvent me) modifiers)
+    
+    scanList [] _ = do 
+        result False 
+    
+    scanList x func = do
+        if (<- func (head x)) then
+            result True
+        else
+            result (<- (scanList (tail x) func))
+        
+    foundFocus := False
+
+    findKeyFocus cmp = do
+        if (foundFocus) then
+            currentFocus := cmp
+            window.setFocus cmp
+            result True
+        elsif (cmp == currentFocus) then
+            currentFocus := rootContainer
+            foundFocus := True
+            result False
+        else
+            result False
+    
+    consume := False
+    findMouseFocus event modifiers cmp = do
+        consume := False
+
+        pos = posget event
+        et = getType event
+        parent <- cmp.getParent
+        p <- if (isJust parent) then ((fromJust parent).getPosition) else (do result {x=0;y=0})    
+        pos2 = ({x=pos.x-p.x;y=pos.y-p.y})
+
+        -- "create" new event to the containers coordsystem
+        eventInNewCoordsystem = ((getType event) pos)
+        cmpPos <- cmp.getPosition
+        cmpSize <- cmp.getSize               
+
+        if (inInterval pos2.x cmpPos.x cmpSize.width && inInterval pos2.y cmpPos.y cmpSize.height) then
+            cmp.handleEvent (MouseEvent eventInNewCoordsystem) modifiers
+
+            env.stdout.write ("Sending event to " ++ (<- cmp.getName) ++ "\n")
+            focusable <- cmp.getIsFocusable
+            if (focusable) then
+                window.setFocus cmp
+        result consume
+    
+    result HandlesEvents {..}
 
 inInterval x startPos width = (x >= startPos && x <= (startPos+width))
 

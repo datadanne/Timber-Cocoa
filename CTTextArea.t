@@ -3,8 +3,7 @@ module CTTextArea where
 import CTCommon   
 import POSIX
 
-struct TextArea < Component, HasText, HandlesMouseEvents, HandlesKeyEvents, IsScrollable where
-    appendText :: String -> Action
+struct TextArea < Component, HasText, IsScrollable
     
 
 --------------------------------------------------------------------------------------------------
@@ -18,6 +17,9 @@ mkCocoaTextArea env = class
     
     id = new mkCocoaID
     base = new basicComponent True Nothing "TEXT_AREA"
+    addHandler = base.addHandler
+    setHandlers = base.setHandlers
+    getHandlers = base.getHandlers
     setParent = base.setParent
     getParent = base.getParent
     setIsFocusable = base.setIsFocusable
@@ -27,13 +29,20 @@ mkCocoaTextArea env = class
     getState = base.getState
     setState = base.setState
     getAllComponents = base.getAllComponents
+    handleEvent = base.handleEvent
 
-    scrollable := (True, False)
+    scrollable := (False, True)
     getScrollable = request
         result scrollable
     
     setScrollable s = request
         scrollable := s
+        case (<- base.getState) of  
+            Active -> 
+                      (hoz,vert) = s
+                      textAreaSetHorizontalScroll id hoz
+                      textAreaSetVerticalScroll id vert
+            _ -> 
 
     appendText s = action
         text := text ++ s
@@ -74,15 +83,6 @@ mkCocoaTextArea env = class
     installMouseListener ml = request
         mouseEventHandler := Just ml
 
-    handleEvent (KeyEvent t) modifiers = request
-        result (boolToMaybe (Just this) (<- dynamicHandleEvent t keyEventHandler))
-
-    handleEvent (MouseEvent t) modifiers = request
-        result (boolToMaybe (Just this) (<- dynamicHandleEvent t mouseEventHandler))
-    
-    handleEvent _ modifiers = request
-        result Nothing
-
     -- undocumented feature in Timber, init must be placed above 'this' else we have some nice raise(2); :-)
     init app = request
             base.setState Active
@@ -94,6 +94,10 @@ mkCocoaTextArea env = class
         textAreaSetText id text
         textAreaSetPosition id position
         textAreaSetSize id size
+
+        (hoz,vert) = scrollable
+        textAreaSetHorizontalScroll id hoz
+        textAreaSetVerticalScroll id vert
             
     this = TextArea{..}
 
@@ -107,3 +111,5 @@ extern initTextArea :: TextArea -> App -> Request ()
 extern textAreaSetText :: CocoaID -> String -> Action
 extern textAreaSetPosition :: CocoaID -> Position -> Action
 extern textAreaSetSize :: CocoaID -> Size -> Action
+extern textAreaSetHorizontalScroll :: CocoaID -> Bool -> Request ()
+extern textAreaSetVerticalScroll :: CocoaID -> Bool -> Request ()

@@ -30,6 +30,9 @@ data CocoaKey = A | S | D | F | H | G | Z | X | C | V | Dummy1 |
                 F10 | Dummy14 | F12 | Dummy15 | F15 | Help |Home | PageUp |
                 ForwardDelete | F4 | End | F2 | PageDown | F1 |
                 LeftArrow | RightArrow | DownArrow | UpArrow
+                
+type Modifiers = [CocoaKey]
+type WindowID = Int
 
 instance eqComponent :: Eq Component where
   (==) = (compareComponents True)
@@ -75,22 +78,20 @@ struct HasBackgroundColor where
     setBackgroundColor :: Color -> Request ()
     getBackgroundColor :: Request Color
     
-struct HandlesEvents where
-    handleEvent :: CocoaEvent -> [CocoaKey] -> Request Bool
 
-struct HasHandlers where
-    addHandler :: HandlesEvents -> Request ()
-    setHandlers :: [HandlesEvents] -> Request ()
-    getHandlers :: Request [HandlesEvents]
     
-struct HandlesWindowEvents < HandlesEvents where
-    installWindowListener :: (WindowEventType -> Request Bool) -> Request ()
+struct RespondsToWindowEvents where
+    onWindowResize :: Size -> Modifiers -> Request Size
+    onWindowCloseRequest :: Modifiers -> Request Bool
+    setWindowResponder :: RespondsToWindowEvents -> Request ()
+    
+struct HasResponders where
+    addResponder :: RespondsToInputEvents -> Request ()
+    setResponders :: [RespondsToInputEvents] -> Request ()
+    getResponders :: Request [RespondsToInputEvents]
 
-struct HandlesKeyEvents where
-    installKeyListener :: (KeyEventType -> Request Bool) -> Request ()
-    
-struct HandlesMouseEvents where
-    installMouseListener :: (MouseEventType -> Request Bool) -> Request ()
+struct RespondsToInputEvents where
+    handleEvent :: CocoaEvent -> Modifiers -> Request Bool
 
 struct IsScrollable where
     setScrollable :: (Bool, Bool) -> Request ()
@@ -101,7 +102,7 @@ struct IsFocusable where
     setIsFocusable :: Bool -> Request ()
     getIsFocusable :: Request Bool
 
-struct BaseComponent < IsFocusable, HasSize, HasHandlers, HandlesEvents where
+struct BaseComponent < IsFocusable, HasSize, HasResponders, RespondsToInputEvents where
     setName :: String -> Request ()
     getName :: Request String
     setParent :: (Maybe Component) -> Request ()
@@ -127,9 +128,9 @@ struct ContainsComponents where
     removeAllComponents :: Request ()
     getComponents :: Request [Component]
 
-struct CocoaWindow < HasSize, HasBackgroundColor, ContainsComponents, HasHandlers, HandlesWindowEvents where 
+struct CocoaWindow < HasSize, HasBackgroundColor, ContainsComponents, HasResponders, RespondsToWindowEvents, RespondsToInputEvents where 
     windowId :: CocoaID
-    getId :: Request Int
+    getId :: Request WindowID
     initWindow :: App -> Request ()
     destroyWindow :: Request ()
     hide :: Request Bool
@@ -139,24 +140,26 @@ struct CocoaWindow < HasSize, HasBackgroundColor, ContainsComponents, HasHandler
     getContainerID :: Request CocoaID
 
 struct App where
-    showWindow          :: CocoaWindow -> Request () 
-    getApplicationState :: Request ApplicationState 
-    eventDispatcher     :: CocoaEvent -> Int -> Request TimberResult
+    showWindow              :: CocoaWindow -> Request () 
+    getApplicationState     :: Request ApplicationState 
+    sendInputEvent          :: CocoaEvent -> WindowID -> Request Bool
+    sendWindowResize        :: Size -> WindowID -> Request Size
+    sendWindowCloseRequest  :: WindowID -> Request Bool
     setEnv  :: Env -> Request ()
 
 
-struct DefaultEventHandler < HasHandlers, HandlesEvents
+struct DefaultEventResponder < HasResponders, RespondsToInputEvents
 
-basicHasHandlers = class
+basicHasResponders = class
 
     handlers := []
-    addHandler a = request
+    addResponder a = request
         handlers := a : handlers
 
-    setHandlers aa = request
+    setResponders aa = request
         handlers := aa
     
-    getHandlers = request
+    getResponders = request
         result handlers
     
     -- Return true (block cocoa) if any of the installed handlers say so.
@@ -171,16 +174,16 @@ basicHasHandlers = class
         result returnVal
     
 
-    result DefaultEventHandler {..}
+    result DefaultEventResponder {..}
 
 
 basicComponent f p n = class
 
-    baseHandler = new basicHasHandlers
-    addHandler = baseHandler.addHandler
-    setHandlers = baseHandler.setHandlers
-    getHandlers = baseHandler.getHandlers
-    handleEvent = baseHandler.handleEvent
+    baseResponder = new basicHasResponders
+    addResponder = baseResponder.addResponder
+    setResponders = baseResponder.setResponders
+    getResponders = baseResponder.getResponders
+    handleEvent = baseResponder.handleEvent
 
     nameWrap = new wrapper n
     getName = nameWrap.get

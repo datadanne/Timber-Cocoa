@@ -21,7 +21,7 @@ Msg containerSetSize_CTContainer (CocoaID_CTCommon id, Size_CTCommon pos, Time s
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("setting containerSize ext!\n");
 	CocoaView *thisView = (CocoaView*) (((internal_CocoaID_CTCommon) id)->this); 
-	[thisView setFrameSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon-20)];
+	[thisView setFrameSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon)];
 	[pool drain];
 }
 Msg containerSetPosition_CTContainer (CocoaID_CTCommon id, Position_CTCommon pos, Time start, Time stop) {

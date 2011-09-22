@@ -8,15 +8,15 @@ struct Label < Component, HasText where
 
 mkCocoaLabel = class
     size := {width=0; height=0}
-    mouseEventHandler := Nothing          
+    mouseEventResponder := Nothing          
     textColor := {r=0;g=0;b=0}
     text := "Default Label"
 
     id = new mkCocoaID
     base = new basicComponent False Nothing "Label"
-    addHandler = base.addHandler
-    setHandlers = base.setHandlers
-    getHandlers = base.getHandlers
+    addResponder = base.addResponder
+    setResponders = base.setResponders
+    getResponders = base.getResponders
     setParent = base.setParent
     getParent = base.getParent
     setIsFocusable = base.setIsFocusable

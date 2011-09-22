@@ -3,7 +3,7 @@ module CTContainer where
 import POSIX
 import CTCommon
 
-struct Container < Component, ContainsComponents, HandlesMouseEvents, HandlesKeyEvents, HasBackgroundColor
+struct Container < Component, ContainsComponents, HasBackgroundColor
 
 --------------------------------------------------------------------------------------------------
 ------          ** CONTAINER **         ----------------------------------------------------------
@@ -12,14 +12,14 @@ mkCocoaContainer env = class
     color := {r=255; g=255; b=255}
 
     appRef := Nothing
-    mouseEventHandler := Nothing
-    keyEventHandler := Nothing
+    mouseEventResponder := Nothing
+    keyEventResponder := Nothing
 
     id = new mkCocoaID
     base = new basicComponent False Nothing "ContainerWHAT"
-    addHandler = base.addHandler
-    setHandlers = base.setHandlers
-    getHandlers = base.getHandlers
+    addResponder = base.addResponder
+    setResponders = base.setResponders
+    getResponders = base.getResponders
     setParent = base.setParent
     getParent = base.getParent
     setIsFocusable = base.setIsFocusable
@@ -28,6 +28,7 @@ mkCocoaContainer env = class
     getName = base.getName
     getState = base.getState
     setState = base.setState
+    handleEvent = base.handleEvent
 
     setPosition p = request
         case (<- base.getState) of
@@ -54,9 +55,9 @@ mkCocoaContainer env = class
     getBackgroundColor = request
         result color
         
-    empty [] = True
-    empty _ = False
-    
+    getComponents = request
+        result myComponents
+
     children := []
     getAllComponents = request
         children := []
@@ -94,29 +95,7 @@ mkCocoaContainer env = class
             destroyContainer id
             base.setState Destroyed
         
-    getComponents = request
-        result myComponents
 
-    installMouseListener ml = request
-        mouseEventHandler := Just ml
-    
-    installKeyListener kl = request
-        keyEventHandler := Just kl
-            
-    handleEvent (MouseEvent t) modifiers = request
-        result (<- dynamicHandleEvent t mouseEventHandler)
-        
-    handleEvent _ modifiers = request
-        result False
-
-
-    getType (MousePressed _) = MousePressed
-    getType (MouseReleased _) = MouseReleased
-    getType (MouseClicked _) = MouseClicked
-
-    posget (MousePressed p) = p 
-    posget (MouseReleased p) = p 
-    posget (MouseClicked p) = p 
 
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request
@@ -138,8 +117,6 @@ mkCocoaContainer env = class
 
 
     result this
-
-inInterval x startPos width = (x >= startPos && x <= (startPos+width))
 
 --------------------------------------------------------------------------------------------------
 ------          ** EXTERN **            ----------------------------------------------------------  

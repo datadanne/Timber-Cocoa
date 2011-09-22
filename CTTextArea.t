@@ -12,14 +12,14 @@ mkCocoaTextArea env = class
     size := {width=200; height=17}
     text := ""
     position := {x=0; y=0}
-    keyEventHandler := Nothing
-    mouseEventHandler := Nothing
+    keyEventResponder := Nothing
+    mouseEventResponder := Nothing
     
     id = new mkCocoaID
     base = new basicComponent True Nothing "TEXT_AREA"
-    addHandler = base.addHandler
-    setHandlers = base.setHandlers
-    getHandlers = base.getHandlers
+    addResponder = base.addResponder
+    setResponders = base.setResponders
+    getResponders = base.getResponders
     setParent = base.setParent
     getParent = base.getParent
     setIsFocusable = base.setIsFocusable
@@ -78,10 +78,10 @@ mkCocoaTextArea env = class
         base.setState Destroyed
         
     installKeyListener kl = request
-        keyEventHandler := Just kl
+        keyEventResponder := Just kl
 
     installMouseListener ml = request
-        mouseEventHandler := Just ml
+        mouseEventResponder := Just ml
 
     -- undocumented feature in Timber, init must be placed above 'this' else we have some nice raise(2); :-)
     init app = request

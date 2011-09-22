@@ -15,16 +15,13 @@ root w = class
     inputField = new mkCocoaTextField env
     dropDown = new mkCocoaDropDown env
     
-    tabKeyHandler app wid = class
+    tabKeyResponder app wid = class
         handleEvent event modifiers = request
             env.stdout.write ("Sending KeyPressed \"Tab\" to window which has ID: " ++ (show wid) ++ "\n")
-            foo = KeyEvent (KeyPressed UpArrow)
-            superTest = KeyEvent (KeyPressed Tab)
-            app.eventDispatcher superTest wid
             result True
-        result HandlesEvents {..}
+        result RespondsToInputEvents {..}
     
-    tabStopHandler = class
+    tabStopResponder = class
         block := False
         handleEvent event modifiers = request
             button.setTitle ("Consume: " ++ (show (not block)))
@@ -34,13 +31,7 @@ root w = class
             else
                 "It's ok. Tab may continue.\n")
             result block
-        result HandlesEvents {..}
-        
-  {-  redclicked app wid event = request
-        env.stdout.write ("red clicked!!!: " ++ (show wid) ++ "\n")
-        superTest = KeyEvent (KeyPressed "ShiftTab")
-        app.eventDispatcher superTest wid
-        result True  -}
+        result RespondsToInputEvents {..}
         
     applicationDidFinishLaunching app = action                         
         app.showWindow w1
@@ -48,13 +39,7 @@ root w = class
         tabButton = new mkCocoaButton env
         tabButton.setTitle "Tab (nofocus)"
         tabButton.setPosition ({x=0;y=250})
-       -- tabButton.installMouseListener doNothing --(tabClick app (<- w1.getId))
         tabButton.setIsFocusable False
-    {-   button.installMouseListener doNothing
-        button2.installMouseListener doNothing
-        inputField.installMouseListener doNothing
-        inputField.installKeyListener doNothing
-        dropDown.installMouseListener doNothing -}
         dropDown.addOption "hey"
         
         w1.addComponent tabButton
@@ -65,10 +50,9 @@ root w = class
         button2.setTitle "Second"
         c2.removeComponent tabButton
         
-     {-   after (sec 1) send action
+        after (sec 1) send action
             button3 = new mkCocoaButton env
             button3.setTitle "Three?"
-           -- button3.installMouseListener doNothing
             c3 = new mkCocoaContainer env
             c3.addComponent button3
             c3.setSize ({width=180;height=50})
@@ -80,11 +64,11 @@ root w = class
             w1.setPosition ({x=0;y=0})
             w1.setSize ({width=400;height=200})
             
-            after (sec 3) send action
+            after (sec 5) send action
                 w1.removeAllComponents
                 w1.addComponent buttonOverlay
                 w1.setSize ({width=300;height=400})
-                w1.setPosition ({x=150;y=300})-}
+                w1.setPosition ({x=150;y=300})
     
     result action
         w1.setSize ({width=700;height=500})
@@ -96,8 +80,8 @@ root w = class
 
         button2.setName "Second"
         button.setName "First"
-        tsh = new tabStopHandler
-        button.addHandler tsh
+        tsh = new tabStopResponder
+        button.addResponder tsh
         c2.setName "greenContainer"
         
         c2.setSize ({width=180;height=140})

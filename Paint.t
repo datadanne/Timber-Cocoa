@@ -23,17 +23,14 @@ paintHandler w1 label env = class
         blackBox.setBackgroundColor({r=pos.x `mod` 255;g=pos.y `mod` 255;b=2*(pos.y-pos.x) `mod` 255}) 
         blackBox.setPosition pos
         w1.addComponent blackBox
-        
-        --label.setPosition pos
-        
-        
+
         pixelCount := 1 + pixelCount
         result False
         
     handleEvent _ modifiers = request
         result False
         
-    result HandlesEvents {..}
+    result RespondsToInputEvents {..}
 
 root w = class
     env = new dummyPosix w
@@ -53,12 +50,13 @@ root w = class
     result action
         label.setSize ({width=300;height=50})
         label.setPosition ({x=50;y=200})
-        label.setText "PainTimber. Paint slowly or I will segfault. :("
+        label.setText "PainT_Timber"
         c2.setSize ({width=500;height=500})
         c2.setBackgroundColor ({r=100;g=150;b=150})
         --c2.addComponent label
        -- w1.addComponent c2
         w1.addComponent label
         w1.addHandler painter
+        w1.setSize ({width=500;height=500})
 
         osx.startApplication applicationDidFinishLaunching

@@ -11,14 +11,14 @@ mkCocoaTextField env = class
     size := {width=200; height=17}
     text := ""
     position := {x=0; y=0}
-    keyEventHandler := Nothing
-    mouseEventHandler := Nothing
+    keyEventResponder := Nothing
+    mouseEventResponder := Nothing
     
     id = new mkCocoaID
     base = new basicComponent True Nothing "TEXT_AREA"
-    addHandler = base.addHandler
-    setHandlers = base.setHandlers
-    getHandlers = base.getHandlers
+    addResponder = base.addResponder
+    setResponders = base.setResponders
+    getResponders = base.getResponders
     setParent = base.setParent
     getParent = base.getParent
     setIsFocusable = base.setIsFocusable

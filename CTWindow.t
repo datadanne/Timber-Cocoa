@@ -8,9 +8,6 @@ import CTContainer
 ------          ** WINDOW **            ---------------------------------------------------------- 
 mkWindow env = class        
     windowId = new mkCocoaID
-    keyListener := Nothing
-    windowListener := Nothing
-    nr := 0
     state := Inactive
     isVisible := False
     position := {x=0;y=0}
@@ -22,12 +19,18 @@ mkWindow env = class
     removeAllComponents = rootContainer.removeAllComponents
     setBackgroundColor = rootContainer.setBackgroundColor
     getBackgroundColor = rootContainer.getBackgroundColor
-
-    handlers = new basicHasHandlers 
-    addHandler = handlers.addHandler
-    setHandlers = handlers.setHandlers
-    getHandlers = handlers.getHandlers
+ 
+    handlers = new basicHasResponders 
+    addResponder = handlers.addResponder
+    setResponders = handlers.setResponders
+    getResponders = handlers.getResponders
     handleEvent = handlers.handleEvent
+       
+    dwh = new defaultWindowResponder this env
+    onWindowResize = dwh.onWindowResize
+    onWindowCloseRequest = dwh.onWindowCloseRequest
+    setWindowResponder = dwh.setWindowResponder
+    
 
     getContainerID = request
         result rootContainer.id
@@ -46,9 +49,7 @@ mkWindow env = class
             windowSetSize windowId size
         rootContainer.setSize size
     
-    getId = request
-        result nr
-    
+    nr := 0
     initWindow app = request
         nr := <- initCocoaWindow this app
         rootContainer.init app
@@ -64,17 +65,17 @@ mkWindow env = class
         windowSetSize windowId (<- rootContainer.getSize)
         windowSetContentView this rootContainer.id
         
-        eventHandler = new windowEventHandler this rootContainer env
-        handlers.addHandler eventHandler
+        wh = new defaultInputResponder this rootContainer env
+        handlers.addResponder wh
+
+    getId = request
+        result nr
 
     destroyWindow = request
         if (state == Active) then 
             state := Destroyed
             rootContainer.destroy
             destroyCocoaWindow windowId
-
-    installWindowListener wl = request
-        windowListener := Just wl
 
     currentFocus := rootContainer
     setFocus cmp = action
@@ -104,13 +105,27 @@ mkWindow env = class
         else
             result False
     
-    this := CocoaWindow {..}
+    this = CocoaWindow {..}
     
     result this
 
+defaultWindowResponder window env = class
+    max := 0
+    onWindowResize toSize modifiers = request
+        env.stdout.write ("Resizing window to width: " ++ (show toSize.width) ++ ", height: " ++ (show toSize.height) ++ "\n")
+        max := toSize.width
+        if (toSize.height > toSize.width) then
+            max := toSize.height
+        result ({width=max; height=max})
 
-windowEventHandler window rootContainer env = class
+    onWindowCloseRequest modifiers = request
+        result False
 
+    setWindowResponder responder = request
+
+    result RespondsToWindowEvents {..}
+    
+defaultInputResponder window rootContainer env = class
     getKey (KeyPressed theKey) = theKey
     getKey _ = raise 9
 
@@ -222,7 +237,7 @@ windowEventHandler window rootContainer env = class
                 window.setFocus cmp
         result consume
     
-    result HandlesEvents {..}
+    result RespondsToInputEvents {..}
 
 inInterval x startPos width = (x >= startPos && x <= (startPos+width))
 

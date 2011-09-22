@@ -19,29 +19,42 @@ cocoaApplication = class
     setEnv e = request
         env:= Just e
 
-    eventDispatcher (KeyEvent k) windowId = request
-      --  (fromJust env).stdout.write "SENT KEYPRESS\n"
+    sendInputEvent (KeyEvent k) windowId = request
         (KeyPressed name) = k
 
         case (name) of
-            Tab -> 
-              --  (fromJust env).stdout.write "TAB\n"
-                       updateList name
+            Tab ->  updateList name
             Shift ->
-                    if (isJust env) then 
-                        (fromJust env).stdout.write ("shift " ++ (if (elem Shift modifiers) then "down" else "up") ++ "\n")
+                    --if (isJust env) then 
+                    --    (fromJust env).stdout.write ("shift " ++ (if (elem Shift modifiers) then "down" else "up") ++ "\n")
                     updateList name
             Control -> updateList name
             Command -> updateList name
             _ ->
             
-        result (<- sendToWindow (KeyEvent k) windowId)
+        result (<- sendInputToWindow (KeyEvent k) windowId)
 
-    eventDispatcher (MouseEvent m) windowId = request
-        result (<- sendToWindow (MouseEvent m) windowId)
+    sendInputEvent (MouseEvent m) windowId = request
+        result (<- sendInputToWindow (MouseEvent m) windowId)
   
-    eventDispatcher (WindowEvent w) windowId = request
-        result (<- sendToWindow (WindowEvent w) windowId)
+    sendInputEvent _ _ = request
+        result False
+    
+    newSize := ({width=100;height=100})
+    sendWindowResize toSize windowId = request
+        newSize := toSize
+        forall window <- activeWindows do
+            if (<- window.getId == windowId) then
+                newSize := (<- window.onWindowResize toSize modifiers)
+        result newSize
+
+    shouldClose := False
+    sendWindowCloseRequest windowId = request
+        shouldClose := False
+        forall window <- activeWindows do
+            if (<- window.getId == windowId) then
+                shouldClose := (<- window.onWindowCloseRequest modifiers)
+        result shouldClose
     
     updateList key = do
         if (elem key modifiers) then
@@ -58,13 +71,13 @@ cocoaApplication = class
             if (elem Command modifiers) then
                 (fromJust env).stdout.write " COMMAND"
             (fromJust env).stdout.write "\n"
-        
-    resultState := (ResultBool False)
-    sendToWindow recvEvent windowId = do
+
+    resultState := False
+    sendInputToWindow recvEvent windowId = do
         
         forall window <- activeWindows do
             if (<- window.getId == windowId) then
-                resultState := (ResultBool (<- window.handleEvent recvEvent modifiers))
+                resultState := (<- window.handleEvent recvEvent modifiers)
         
         result resultState
 

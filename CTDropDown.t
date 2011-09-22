@@ -15,14 +15,14 @@ mkCocoaDropDown env = class
     size := {width=108; height=17}
     title := ""
     position := {x=0; y=0}
-    keyEventHandler := Nothing
-    mouseEventHandler := Nothing
+    keyEventResponder := Nothing
+    mouseEventResponder := Nothing
     
     id = new mkCocoaID
     base = new basicComponent True Nothing "DropDown"
-    addHandler = base.addHandler
-    setHandlers = base.setHandlers
-    getHandlers = base.getHandlers
+    addResponder = base.addResponder
+    setResponders = base.setResponders
+    getResponders = base.getResponders
     setParent = base.setParent
     getParent = base.getParent
     setIsFocusable = base.setIsFocusable
@@ -76,16 +76,16 @@ mkCocoaDropDown env = class
         base.setState Destroyed
         
     installKeyListener kl = request
-        keyEventHandler := Just kl
+        keyEventResponder := Just kl
 
     installMouseListener ml = request
-        mouseEventHandler := Just ml
+        mouseEventResponder := Just ml
 
     handleEvent (KeyEvent t) modifiers = request
-        result (<- dynamicHandleEvent t keyEventHandler)
+        result (<- dynamicHandleEvent t keyEventResponder)
 
     handleEvent (MouseEvent t) modifiers = request
-        result (<- dynamicHandleEvent t mouseEventHandler)
+        result (<- dynamicHandleEvent t mouseEventResponder)
     
     handleEvent _ modifiers = request
         result False

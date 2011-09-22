@@ -14,18 +14,16 @@ bool dispatchEventToTimber(NSEvent* event) {
 	/* figure out event
 		flag 0,1,2 0 = windowEvent, etc. */
 	if ([event type] == NSLeftMouseDown || [event type] == NSLeftMouseDragged) {
-
         Position_CTCommon x_5110 = NULL;
 	    NEW (Position_CTCommon, x_5110, WORDS(sizeof(struct Position_CTCommon)));
-	    if (x_5110 == NULL) {
-            printf("AW CHUCKS\n");
-            return false;
-        }
+
 	    x_5110->GCINFO = __GC__Position_CTCommon;
 		NSPoint p = [event locationInWindow];
 	    x_5110->x_CTCommon = p.x;
 		x_5110->y_CTCommon = p.y;
+		
 		DEBUG("C detects mouse at %f , %f", p.x, p.y);
+		
 	    _MouseClicked_CTCommon x_5111;
 	    NEW (_MouseClicked_CTCommon, x_5111, WORDS(sizeof(struct _MouseClicked_CTCommon)));
 	    x_5111->GCINFO = __GC___MouseClicked_CTCommon;
@@ -63,14 +61,7 @@ bool dispatchEventToTimber(NSEvent* event) {
 	envRootsDirty = 1;
 	ENABLE(envmut);*/
 	
-    TimberResult_CTCommon tres = app->eventDispatcher_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0);
-    
-    if (tres->Tag == 2) {
-        _ResultBool_CTCommon r = (_ResultBool_CTCommon) tres;
-        return (bool)r->a;
-    } else {
-        return false;
-    }
+    return app->sendInputEvent_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0);
 }
 
 void scanEventReceived(void) {
@@ -163,7 +154,7 @@ Msg windowSetSize_CTWindow (CocoaID_CTCommon wnd, Size_CTCommon pos, Time start,
 	DEBUG("setting containerSize ext!");
 	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
 	
-	[thisWindow setContentSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon-20)]; //-20 to compensate for border.
+	[thisWindow setContentSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon)]; //-20 to compensate for border.
 	
 	[pool drain];
 }

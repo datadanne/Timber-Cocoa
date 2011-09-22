@@ -56,7 +56,7 @@ root w = class
         --c2.addComponent label
        -- w1.addComponent c2
         w1.addComponent label
-        w1.addHandler painter
+        w1.addResponder painter
         w1.setSize ({width=500;height=500})
 
         osx.startApplication applicationDidFinishLaunching

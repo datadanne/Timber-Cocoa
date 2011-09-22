@@ -85,6 +85,33 @@ TUP0 textAreaSetVerticalScroll_CTTextArea(CocoaID_CTCommon id, Bool enabled, int
 
 }                               
 
+float x = 0;
+float y = 0;   
+
+Msg textAreaScrollTo_CTTextArea(CocoaID_CTCommon id, float dx, float dy, Time start, Time stop) {
+    // printf("textarea was begged to scroll.. deltaX %f deltaY %f\n", dx, dy);  
+    NSScrollView *scrollview = (NSScrollView*) COCOA_REF(id);
+	NSTextView *theTextView = [scrollview documentView];
+    NSClipView *theClipView = [scrollview contentView];
+    
+    y += dy;
+    
+    // TODO: find out max scroll values..
+    if (y < NSMinY(theTextView.frame)) y = NSMinY(theTextView.frame);
+    if (y > NSMaxY(theTextView.frame)) y = NSMaxY(theTextView.frame);                                                 
+    
+    
+    x += dx;
+    
+    // TODO: find out max scroll values.. 
+    if (x < NSMinX(theTextView.frame)) x = NSMinX(theTextView.frame);    
+    if (x > NSMaxX(theTextView.frame)) x = NSMaxX(theTextView.frame); 
+    
+    [theClipView scrollPoint: NSMakePoint(x, y)]; 
+    
+    printf("scrolling to x%f, y%f\n", x, y);
+}
+
 TUP0 initTextArea_CTTextArea(TextArea_CTTextArea textArea, App_CTCommon app, Int dummy) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
 	DEBUG("Initializing NSScrollView: ");

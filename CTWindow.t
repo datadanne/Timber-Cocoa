@@ -129,13 +129,16 @@ defaultInputResponder window rootContainer env = class
     getKey (KeyPressed theKey) = theKey
     getKey _ = raise 9
 
-    getType (MousePressed _) = MousePressed
-    getType (MouseReleased _) = MouseReleased
-    getType (MouseClicked _) = MouseClicked
+    mkNewEvent (MousePressed _) p = MousePressed p
+    mkNewEvent (MouseReleased _) p = MouseReleased p
+    mkNewEvent (MouseClicked _) p = MouseClicked p
+    mkNewEvent (MouseMoved _) p = MouseMoved p
+    mkNewEvent (MouseWheelScroll _ dx dy) p = MouseWheelScroll p dx dy
 
     posget (MousePressed p) = p 
     posget (MouseReleased p) = p 
-    posget (MouseClicked p) = p 
+    posget (MouseClicked p) = p
+    posget (MouseWheelScroll p _ _) = p   
     
     currentFocus := rootContainer
 
@@ -170,21 +173,7 @@ defaultInputResponder window rootContainer env = class
 
         -- TODO: Resolve menu key event capture. No listener if consumed.    
         result False
-    
-    handleEvent (WindowEvent eventType) modifiers = request
-        case eventType of
-            WindowClose -> 
-                rootContainer.setState Inactive
-                result False
-            WindowResize toSize -> 
-                width = toSize.width
-                height = toSize.height
-                scale = max width height
-                newSize = {width=scale;height=scale}
-                result False
-            _ ->
-                result False
-    
+
     handleEvent (MouseEvent me) modifiers = request
         cmps <- rootContainer.getAllComponents
         scanList cmps (findMouseFocus me modifiers)
@@ -215,16 +204,16 @@ defaultInputResponder window rootContainer env = class
     
     consume := False
     findMouseFocus event modifiers cmp = do
-        consume := False
+        cmp.handleEvent (MouseEvent event) modifiers 
+       {- consume := False
 
         pos = posget event
-        et = getType event
         parent <- cmp.getParent
         p <- if (isJust parent) then ((fromJust parent).getPosition) else (do result {x=0;y=0})    
         pos2 = ({x=pos.x-p.x;y=pos.y-p.y})
 
         -- "create" new event to the containers coordsystem
-        eventInNewCoordsystem = ((getType event) pos)
+        eventInNewCoordsystem = mkNewEvent event pos
         cmpPos <- cmp.getPosition
         cmpSize <- cmp.getSize               
 
@@ -234,7 +223,7 @@ defaultInputResponder window rootContainer env = class
             env.stdout.write ("Sending event to " ++ (<- cmp.getName) ++ "\n")
             focusable <- cmp.getIsFocusable
             if (focusable) then
-                window.setFocus cmp
+                window.setFocus cmp-}
         result consume
     
     result RespondsToInputEvents {..}

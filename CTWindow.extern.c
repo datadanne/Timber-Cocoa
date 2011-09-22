@@ -7,9 +7,13 @@ CocoaEvent_CTCommon receivedEvent;
 
 pthread_mutex_t eventMutex;
 
+@interface NSEvent (DeviceDelta)
+  - (float)deviceDeltaX;
+  - (float)deviceDeltaY;
+@end
+
 int p = 0;
 bool dispatchEventToTimber(NSEvent* event) { 
-	App_CTCommon app = getApp();
 	DEBUG("C: Event received in dispatchEventToTimber\n");
 	/* figure out event
 		flag 0,1,2 0 = windowEvent, etc. */
@@ -51,8 +55,59 @@ bool dispatchEventToTimber(NSEvent* event) {
         ((_KeyEvent_CTCommon)receivedEvent)->Tag = 0;
         ((_KeyEvent_CTCommon)receivedEvent)->a = (KeyEventType_CTCommon)x_1652;
 
+	} else if ([event type] == NSScrollWheel) {
+  	    NSLog(@"Scroll Event: %@", event);
+
+        printf("Scrolling event! \n");            
+        //    printf("deltaX: %f \n", [event deltaX]);
+        //    printf("deltaY: %f \n", [event deltaX]);
+        // 
+        //    printf("hasPreciseScrollingDeltas: %d \n", [event hasPreciseScrollingDeltas]);
+        //    printf("scrollingDeltaX: %f \n", [event scrollingDeltaX]);
+        //    printf("scrollingDeltaY: %f \n", [event scrollingDeltaY]);                                   
+        //    printf("isDirectionIntevertedFromDevice: %d", [event isDirectionInvertedFromDevice]);  
+
+   		NSPoint p = [event locationInWindow];
+
+        Position_CTCommon x_1073;
+        NEW(Position_CTCommon, x_1073, WORDS(sizeof(struct Position_CTCommon)));
+        x_1073->GCINFO = __GC__Position_CTCommon;
+        x_1073->x_CTCommon = p.x;
+        x_1073->y_CTCommon = p.y;
+        _MouseWheelScroll_CTCommon x_1074;
+        NEW (_MouseWheelScroll_CTCommon, x_1074, WORDS(sizeof(struct _MouseWheelScroll_CTCommon)));
+        x_1074->GCINFO = __GC___MouseWheelScroll_CTCommon;
+        x_1074->Tag = 4;
+        x_1074->a = x_1073;
+
+        float deltaX = -1 * [event deviceDeltaX];
+        float deltaY = -1 * [event deviceDeltaY];
+
+#if _ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED_ >= 1070
+            if ([event hasPreciseScrollingDeltas]) {
+                deltaX = [event scrollingDeltaX];
+                deltaY = [event scrollingDeltaY];
+            }
+
+            if ([event isDirectionInvertedFromDevice]) {
+                deltaX *= -1;
+                deltaY *= -1;
+            }
+#endif
+        x_1074->b = deltaX;
+        x_1074->c = deltaY;
+
+        //CocoaEvent_CTCommon test_12;
+        NEW (CocoaEvent_CTCommon, receivedEvent, WORDS(sizeof(struct _MouseEvent_CTCommon)));
+        ((_MouseEvent_CTCommon)receivedEvent)->GCINFO = __GC___MouseEvent_CTCommon;
+        ((_MouseEvent_CTCommon)receivedEvent)->Tag = 1;
+        ((_MouseEvent_CTCommon)receivedEvent)->a = (MouseEventType_CTCommon)x_1074;     
+
+    	App_CTCommon app = getApp();
+        app->sendInputEvent_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0);      
+        return true;
 	} else {
-	    printf("Event of type %d was discarded\n", [event type]);
+        printf("Event of type %d was discarded\n", [event type]);
         return false;
     }
  	
@@ -60,7 +115,8 @@ bool dispatchEventToTimber(NSEvent* event) {
     printf("envRD1\n");
 	envRootsDirty = 1;
 	ENABLE(envmut);*/
-	
+
+	App_CTCommon app = getApp();
     return app->sendInputEvent_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0);
 }
 

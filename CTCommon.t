@@ -6,7 +6,7 @@ data ApplicationState = Running | Stopped
 data CocoaState = Active | Inactive | Destroyed
 
 data WindowEventType = WindowClose | WindowResize Size
-data MouseEventType = MouseClicked Position | MousePressed Position | MouseReleased Position | MouseMoved Position
+data MouseEventType = MouseWheelScroll Position Float Float | MouseClicked Position | MousePressed Position | MouseReleased Position | MouseMoved Position
 data KeyEventType  = KeyPressed CocoaKey | KeyReleased CocoaKey
 
 data CocoaEvent = WindowEvent WindowEventType | MouseEvent MouseEventType | KeyEvent KeyEventType

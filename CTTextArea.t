@@ -76,12 +76,6 @@ mkCocoaTextArea env = class
         
     destroy = request
         base.setState Destroyed
-        
-    installKeyListener kl = request
-        keyEventResponder := Just kl
-
-    installMouseListener ml = request
-        mouseEventResponder := Just ml
 
     -- undocumented feature in Timber, init must be placed above 'this' else we have some nice raise(2); :-)
     init app = request
@@ -98,11 +92,36 @@ mkCocoaTextArea env = class
         (hoz,vert) = scrollable
         textAreaSetHorizontalScroll id hoz
         textAreaSetVerticalScroll id vert
+        
+        dts = new defaultTextScrollResponder this env
+        addResponder dts
             
     this = TextArea{..}
 
     result this
 
+defaultTextScrollResponder textArea env = class
+    scrolledState := (1.0, 1.0)
+    
+    scrollTo deltaX deltaY = do
+        env.stdout.write ("deltaY: " ++ (show deltaY) ++ ", deltaX: " ++ (show deltaX))
+        scrolledState := (deltaX, deltaY)
+        textAreaScrollTo textArea.id deltaX deltaY
+    
+    handleEvent (MouseEvent t) modifiers = request
+        case t of
+            MouseMoved pos ->
+            MouseWheelScroll pos deltaX deltaY -> 
+                env.stdout.write ("pos: " ++ (show deltaX) ++ "," ++ (show deltaY) ++ "\n")
+                scrollTo deltaX deltaY
+            _ ->                    
+            
+        result True
+    
+    handleEvent _ modifiers = request
+        result False
+    
+    result RespondsToInputEvents {..}
 --------------------------------------------------------------------------------------------------
 ------          ** EXTERN **            ----------------------------------------------------------  
 
@@ -113,3 +132,4 @@ extern textAreaSetPosition :: CocoaID -> Position -> Action
 extern textAreaSetSize :: CocoaID -> Size -> Action
 extern textAreaSetHorizontalScroll :: CocoaID -> Bool -> Request ()
 extern textAreaSetVerticalScroll :: CocoaID -> Bool -> Request ()
+extern textAreaScrollTo :: CocoaID -> Float -> Float -> Action

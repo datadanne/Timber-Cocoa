@@ -81,7 +81,7 @@ struct HasBackgroundColor where
 
     
 struct RespondsToWindowEvents where
-    onWindowResize :: Size -> Modifiers -> Request Size
+    onWindowResize :: Size -> Modifiers -> Request ()
     onWindowCloseRequest :: Modifiers -> Request Bool
     setWindowResponder :: RespondsToWindowEvents -> Request ()
     
@@ -143,7 +143,7 @@ struct App where
     showWindow              :: CocoaWindow -> Request () 
     getApplicationState     :: Request ApplicationState 
     sendInputEvent          :: CocoaEvent -> WindowID -> Request Bool
-    sendWindowResize        :: Size -> WindowID -> Request Size
+    sendWindowResize        :: Size -> WindowID -> Request ()
     sendWindowCloseRequest  :: WindowID -> Request Bool
     setEnv  :: Env -> Request ()
 

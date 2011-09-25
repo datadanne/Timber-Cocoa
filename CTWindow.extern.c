@@ -1,6 +1,9 @@
 #include "CTWindow.extern.h"
 #import "CTWindow.extern.m"
 
+#include <assert.h>
+
+extern pthread_mutex_t rts;
 extern pthread_mutex_t envmut;
 extern int envRootsDirty;
 CocoaEvent_CTCommon receivedEvent;
@@ -12,9 +15,15 @@ pthread_mutex_t eventMutex;
   - (float)deviceDeltaY;
 @end
 
+extern ADDR base;
+
 int p = 0;
 bool dispatchEventToTimber(NSEvent* event) { 
-	DEBUG("C: Event received in dispatchEventToTimber\n");
+	DEBUG("C: Event received in dispatchEventToTimber\n"); 
+    int b1;
+    DISABLE(rts);
+    b1 = *base;
+    ENABLE(rts);
 	/* figure out event
 		flag 0,1,2 0 = windowEvent, etc. */
 	if ([event type] == NSLeftMouseDown || [event type] == NSLeftMouseDragged) {
@@ -117,6 +126,13 @@ bool dispatchEventToTimber(NSEvent* event) {
 	ENABLE(envmut);*/
 
 	App_CTCommon app = getApp();
+	
+    int b2;
+    DISABLE(rts);
+    b2 = *base;
+    ENABLE(rts);
+	
+    assert(b1 == b2);
     return app->sendInputEvent_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0);
 }
 
@@ -142,37 +158,42 @@ TUP0 windowSetContentView_CTWindow(CocoaWindow_CTCommon window, CocoaID_CTCommon
 	return 0;
 }
 
-
 static WindowDelegate *delegate;
 
 Int initCocoaWindow_CTWindow(CocoaWindow_CTCommon wnd, App_CTCommon app, Int dummy) {   
 	DEBUG("Initializing window...");
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
-	CocoaWindow *window;
-	
-	window = [[[CocoaWindow alloc] initWithContentRect:NSMakeRect(0, 0, 0, 0) styleMask:(NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask)  backing:NSBackingStoreBuffered defer:NO] autorelease]; 
-	
-	pthread_mutex_init(&eventMutex, &glob_mutexattr);
 
+	// Install event scanner to keep track of delegate address.
+	pthread_mutex_init(&eventMutex, &glob_mutexattr);
 	DISABLE(envmut);
 	addRootScanner(&eventScanner);
 	envRootsDirty = 1;
 	ENABLE(envmut);
 
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
+	
+    NSRect frameRect = NSMakeRect(0, 0, 0, 0);
+    NSUInteger styleMask = (NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask);
+	CocoaWindow *window = [[CocoaWindow alloc] initWithContentRect:frameRect styleMask:styleMask  backing:NSBackingStoreBuffered defer:NO]; 
+
+    // Move window to the top left corner
     [window cascadeTopLeftFromPoint:NSMakePoint(10,10)];
+    
     [window setTitle:@"new WINDOW!"];
+	
 	[window setEventDispatcher:dispatchEventToTimber];
 	
 	if (!delegate)
 		delegate = [[WindowDelegate alloc] init];
-	
+
 	[window setDelegate:delegate];
-	[window makeKeyAndOrderFront:NSApp];
+	[window makeKeyAndOrderFront:window];
 	
-	internal_CocoaID_CTCommon thisWindow = (internal_CocoaID_CTCommon)(wnd->windowId_CTCommon);
+	// NOTE: Can't use COCOA_ID macro here due to windowId, not Id
+    internal_CocoaID_CTCommon thisWindow = (internal_CocoaID_CTCommon)(wnd->windowId_CTCommon);
 	thisWindow->this = (NSObject*) window;
 	DEBUG("Window OK!");
-	
+    [pool drain];
 	return [window windowNumber];
 }
 

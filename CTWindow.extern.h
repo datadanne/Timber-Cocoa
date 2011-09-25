@@ -14,6 +14,7 @@
 	bool (*dispatch)(NSEvent* event);
 }
 - (void) setEventDispatcher:(bool(*)(NSEvent*))dispatcher;
++ (id) createAndStuff;
 @end
         
 #endif

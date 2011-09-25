@@ -61,8 +61,10 @@ mkWindow env = class
         inithelper 
         
     inithelper = do
+        rsize = (<- rootContainer.getSize)
+        foo = ({width = rsize.width+20;height=rsize.height+20})
         windowSetPosition windowId position
-        windowSetSize windowId (<- rootContainer.getSize)
+        windowSetSize windowId foo
         windowSetContentView this rootContainer.id
         
         wh = new defaultInputResponder this rootContainer env
@@ -116,7 +118,7 @@ defaultWindowResponder window env = class
         max := toSize.width
         if (toSize.height > toSize.width) then
             max := toSize.height
-        result ({width=max; height=max})
+
 
     onWindowCloseRequest modifiers = request
         result False
@@ -201,33 +203,49 @@ defaultInputResponder window rootContainer env = class
             result False
         else
             result False
-    
+            
+    getParentPosition :: (Maybe Component) -> Cmd _ Position
+    getParentPosition parent = do
+        if (isJust parent) then
+            result <- (fromJust parent).getPosition
+        else
+            result ({x=0;y=0})
+        
     consume := False
     findMouseFocus event modifiers cmp = do
         cmp.handleEvent (MouseEvent event) modifiers 
-       {- consume := False
+        cmp.handleEvent (MouseEvent event) modifiers 
+        cmp.handleEvent (MouseEvent event) modifiers 
+        consume := False
 
-        pos = posget event
-        parent <- cmp.getParent
-        p <- if (isJust parent) then ((fromJust parent).getPosition) else (do result {x=0;y=0})    
-        pos2 = ({x=pos.x-p.x;y=pos.y-p.y})
-
-        -- "create" new event to the containers coordsystem
-        eventInNewCoordsystem = mkNewEvent event pos
+        eventPosition = posget event
         cmpPos <- cmp.getPosition
-        cmpSize <- cmp.getSize               
+        cmpSize <- cmp.getSize
+        parent <- cmp.getParent
+        
+        parentPosition <- (getParentPosition parent)
+        --p <- if (isJust parent) then ((fromJust parent).getPosition) else (do result {x=0;y=0})
+        relativePosition = ({x=eventPosition.x-parentPosition.x;y=eventPosition.y-parentPosition.y})
 
-        if (inInterval pos2.x cmpPos.x cmpSize.width && inInterval pos2.y cmpPos.y cmpSize.height) then
-            cmp.handleEvent (MouseEvent eventInNewCoordsystem) modifiers
+        -- Construct new event based on local coordinates.
+        eventInLocalCoords = mkNewEvent event relativePosition
+
+        if (clickInsideBox relativePosition cmpPos cmpSize) then
+            cmp.handleEvent (MouseEvent eventInLocalCoords) modifiers
 
             env.stdout.write ("Sending event to " ++ (<- cmp.getName) ++ "\n")
             focusable <- cmp.getIsFocusable
             if (focusable) then
-                window.setFocus cmp-}
+                window.setFocus cmp
         result consume
     
-    result RespondsToInputEvents {..}
 
+            
+    result RespondsToInputEvents {..}
+    
+    
+
+clickInsideBox mousePos boxPos boxSize = inInterval mousePos.x boxPos.x boxSize.width && inInterval mousePos.y boxPos.y boxSize.height
 inInterval x startPos width = (x >= startPos && x <= (startPos+width))
 
 --------------------------------------------------------------------------------------------------

@@ -40,13 +40,10 @@ cocoaApplication = class
     sendInputEvent _ _ = request
         result False
     
-    newSize := ({width=100;height=100})
     sendWindowResize toSize windowId = request
-        newSize := toSize
         forall window <- activeWindows do
             if (<- window.getId == windowId) then
-                newSize := (<- window.onWindowResize toSize modifiers)
-        result newSize
+                window.onWindowResize toSize modifiers
 
     shouldClose := False
     sendWindowCloseRequest windowId = request

@@ -4,6 +4,8 @@
 struct AppCallback;
 typedef struct AppCallback * AppCallback;
 
+extern ADDR copy(ADDR obj);
+
 struct AppCallback {
 	POLY GCINFO;
 	TUP0 (*Code)(AppCallback, App_CTCommon, Time, Time); 
@@ -14,6 +16,7 @@ struct Env_COCOA cenv_struct = { 0, &startApplication_COCOA };
 Env_COCOA cenv				 = &cenv_struct;
                                                         
 Env_COCOA cocoa_COCOA(World w, Int dummy) {
+    // Keep w but don't use it.
 	return cenv;
 }
 
@@ -88,11 +91,13 @@ void *createCocoaApplication(void *arg) {
 	CocoaDelegate *delegate = [[CocoaDelegate alloc] init];
 	[[NSApplication sharedApplication] setDelegate:delegate];
 	
+	NSRect rect = NSMakeRect(0, 0, 0, 0);
+    NSUInteger styleMask = NSBorderlessWindowMask;
+   	[[[CocoaWindow createAndStuff] initWithContentRect:rect styleMask:styleMask  backing:NSBackingStoreBuffered defer:NO] autorelease];
+	[pool drain];
 	[NSApp run];
-	
-	[NSApp setDelegate:nil];
-	[NSApp release];
-	[pool release];
+		
+    return NULL;
 }
 
 TUP0 startApplication_COCOA (Env_COCOA env, CLOS clos, Int poly) {

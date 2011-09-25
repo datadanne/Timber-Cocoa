@@ -91,9 +91,6 @@ void *createCocoaApplication(void *arg) {
 	CocoaDelegate *delegate = [[CocoaDelegate alloc] init];
 	[[NSApplication sharedApplication] setDelegate:delegate];
 	
-	NSRect rect = NSMakeRect(0, 0, 0, 0);
-    NSUInteger styleMask = NSBorderlessWindowMask;
-   	[[[CocoaWindow createAndStuff] initWithContentRect:rect styleMask:styleMask  backing:NSBackingStoreBuffered defer:NO] autorelease];
 	[pool drain];
 	[NSApp run];
 		

@@ -169,31 +169,35 @@ Int initCocoaWindow_CTWindow(CocoaWindow_CTCommon wnd, App_CTCommon app, Int dum
 	addRootScanner(&eventScanner);
 	envRootsDirty = 1;
 	ENABLE(envmut);
-
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
-	
-    NSRect frameRect = NSMakeRect(0, 0, 0, 0);
-    NSUInteger styleMask = (NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask);
-	CocoaWindow *window = [[CocoaWindow alloc] initWithContentRect:frameRect styleMask:styleMask  backing:NSBackingStoreBuffered defer:NO]; 
-
-    // Move window to the top left corner
-    [window cascadeTopLeftFromPoint:NSMakePoint(10,10)];
     
-    [window setTitle:@"new WINDOW!"];
-	
-	[window setEventDispatcher:dispatchEventToTimber];
-	
-	if (!delegate)
-		delegate = [[WindowDelegate alloc] init];
+    __block CocoaWindow *window;
+    dispatch_sync(dispatch_get_main_queue(), ^{
+    	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
 
-	[window setDelegate:delegate];
-	[window makeKeyAndOrderFront:window];
-	
-	// NOTE: Can't use COCOA_ID macro here due to windowId, not Id
-    internal_CocoaID_CTCommon thisWindow = (internal_CocoaID_CTCommon)(wnd->windowId_CTCommon);
-	thisWindow->this = (NSObject*) window;
-	DEBUG("Window OK!");
-    [pool drain];
+        NSRect frameRect = NSMakeRect(0, 0, 0, 0);
+        NSUInteger styleMask = (NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask);
+        window = [[CocoaWindow alloc] initWithContentRect:frameRect styleMask:styleMask  backing:NSBackingStoreBuffered defer:NO]; 
+
+        // Move window to the top left corner
+        [window cascadeTopLeftFromPoint:NSMakePoint(10,10)];
+
+        [window setTitle:@"new WINDOW!"];
+
+        [window setEventDispatcher:dispatchEventToTimber];
+
+        if (!delegate)
+        	delegate = [[WindowDelegate alloc] init];
+
+        [window setDelegate:delegate];
+        [window makeKeyAndOrderFront:window];
+
+        // NOTE: Can't use COCOA_ID macro here due to windowId, not Id
+        internal_CocoaID_CTCommon thisWindow = (internal_CocoaID_CTCommon)(wnd->windowId_CTCommon);
+        thisWindow->this = (NSObject*) window;
+        DEBUG("Window OK!");
+        [pool drain];
+    });
+    
 	return [window windowNumber];
 }
 

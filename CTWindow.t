@@ -38,13 +38,14 @@ mkWindow env = class
     getPosition = request
         result position
 
-    setPosition pos = request
+    setPosition pos = action
         if (state == Active) then 
             windowSetPosition windowId pos
         position := pos
 
     getSize = rootContainer.getSize
-    setSize size = request
+    
+    setSize size = action
         if (state == Active) then 
             windowSetSize windowId size
         rootContainer.setSize size
@@ -112,13 +113,9 @@ mkWindow env = class
     result this
 
 defaultWindowResponder window env = class
-    max := 0
+
     onWindowResize toSize modifiers = request
         env.stdout.write ("Resizing window to width: " ++ (show toSize.width) ++ ", height: " ++ (show toSize.height) ++ "\n")
-        max := toSize.width
-        if (toSize.height > toSize.width) then
-            max := toSize.height
-
 
     onWindowCloseRequest modifiers = request
         result False

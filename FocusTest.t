@@ -50,7 +50,7 @@ root w = class
         button2.setTitle "Second"
         c2.removeComponent tabButton
         
-        after (sec 1) send action
+        after (sec 13) send action
             button3 = new mkCocoaButton env
             button3.setTitle "Three?"
             c3 = new mkCocoaContainer env
@@ -82,13 +82,15 @@ root w = class
         button.setName "First"
         tsh = new tabStopResponder
         button.addResponder tsh
-        c2.setName "greenContainer"
         
+        c2.setName "greenContainer"
         c2.setSize ({width=180;height=140})
         c2.setPosition ({x=0;y=0})
         c2.setBackgroundColor({r=0;g=255;b=0}) 
         w1.addComponent button
+        w1.addComponent buttonOverlay
         c2.addComponent button2
+
         c2.addComponent inputField
         
         inputField.setSize ({width=180;height=17})

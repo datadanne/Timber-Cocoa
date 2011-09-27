@@ -27,7 +27,7 @@ Env_COCOA cocoa_COCOA(World w, Int dummy) {
 // GC Root Scanner
 
 extern pthread_mutex_t envmut;
-extern int envRootsDirty;
+extern int rootsDirty;
 
 static AppCallback toRunWhenAppFinished;
 App_CTCommon app;
@@ -62,7 +62,8 @@ struct Scanner appScanner = {scanAppInit, NULL};
 }
 @end
 
-void *createCocoaApplication(void *arg) {
+void createCocoaApplication(void) {
+    printf("hello says createCocoaApplication\n");
 	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
 	/* https://gnunet.org/svn/GNUnet/src/setup/cocoa/config_cocoa.m */
@@ -93,9 +94,10 @@ void *createCocoaApplication(void *arg) {
 	
 	[pool drain];
 	[NSApp run];
-		
-    return NULL;
+
 }
+
+extern pthread_cond_t sleepVar;
 
 TUP0 startApplication_COCOA (Env_COCOA env, CLOS clos, Int poly) {
 	printf("Initializing cocoa application: ");
@@ -103,16 +105,18 @@ TUP0 startApplication_COCOA (Env_COCOA env, CLOS clos, Int poly) {
 
 	if (!app) {
 		app = cocoaApplication_CTApplication(0);
-		
-		DISABLE(envmut);
-		addRootScanner(&appScanner);
-		envRootsDirty = 1;
-		ENABLE(envmut);   
-		                                  			 	
-		struct Handler handler = { NULL, &createCocoaApplication };
-		addHandler(&handler, 1);
+
+        runAsMainContinuation(createCocoaApplication);
+        pthread_cond_signal(&sleepVar);
+        
+        printf("sent main continuation\n");
 	}
-		
-	return 0;
+	
+    return 0;
 }
 
+void _init_external_COCOA(void) {
+    addRootScanner(&appScanner);
+    printf("got gc to cooperate\n");		                                  			 	
+    // Nothing
+}

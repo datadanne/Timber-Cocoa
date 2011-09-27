@@ -35,7 +35,7 @@ mkCocoaTextArea env = class
     getScrollable = request
         result scrollable
     
-    setScrollable s = request
+    setScrollable s = action
         scrollable := s
         case (<- base.getState) of  
             Active -> 
@@ -47,7 +47,7 @@ mkCocoaTextArea env = class
     appendText s = action
         text := text ++ s
         
-    setText s = request
+    setText s = action
         text := s
         setName s
         case (<- base.getState) of
@@ -58,7 +58,7 @@ mkCocoaTextArea env = class
         result text
     
     -- setPosition
-    setPosition p = request
+    setPosition p = action
         case (<- base.getState) of
             Active -> textAreaSetPosition id p
             _ -> 
@@ -68,7 +68,7 @@ mkCocoaTextArea env = class
     getPosition = request
         result position
 
-    setSize s = request
+    setSize s = action
         size := s
 
     getSize = request

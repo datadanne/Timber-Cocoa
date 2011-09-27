@@ -18,3 +18,6 @@ TUP0 doAllTheThings_ExternTest(CLOS func, Int dum) {
 	return 0;
 }
 
+void _init_external_ExternTest(void) {
+    // Nothing
+}

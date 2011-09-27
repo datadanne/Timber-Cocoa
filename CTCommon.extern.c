@@ -70,3 +70,7 @@ Bool compareKeys_CTCommon(Bool targetValue, CocoaKey_CTCommon aKey, CocoaKey_CTC
 Bool compareState_CTCommon(Bool targetValue, CocoaState_CTCommon aState, CocoaState_CTCommon anotherState) {
     return (targetValue == (((int)aState == (int)anotherState)));
 }
+
+void _init_external_CTCommon(void) {
+    // Nothing
+}

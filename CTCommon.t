@@ -61,29 +61,22 @@ struct Color where
     b :: Int
                                               
 struct HasPosition where
-    setPosition :: Position -> Request ()
+    setPosition :: Position -> Action
     getPosition :: Request Position 
     --getRelativePosition :: Request Position
     
 struct HasSize < HasPosition where
-    setSize :: Size -> Request ()
+    setSize :: Size -> Action
     getSize :: Request Size
     
 struct HasText where
-    setText :: String -> Request ()
+    setText :: String -> Action
     getText :: Request String
     appendText :: String -> Action
 
 struct HasBackgroundColor where
     setBackgroundColor :: Color -> Request ()
     getBackgroundColor :: Request Color
-    
-
-    
-struct RespondsToWindowEvents where
-    onWindowResize :: Size -> Modifiers -> Request ()
-    onWindowCloseRequest :: Modifiers -> Request Bool
-    setWindowResponder :: RespondsToWindowEvents -> Request ()
     
 struct HasResponders where
     addResponder :: RespondsToInputEvents -> Request ()
@@ -93,21 +86,25 @@ struct HasResponders where
 struct RespondsToInputEvents where
     handleEvent :: CocoaEvent -> Modifiers -> Request Bool
 
+struct RespondsToWindowEvents where
+    onWindowResize :: Size -> Modifiers -> Request ()
+    onWindowCloseRequest :: Modifiers -> Request Bool
+    setWindowResponder :: RespondsToWindowEvents -> Request ()
+
 struct IsScrollable where
-    setScrollable :: (Bool, Bool) -> Request ()
+    setScrollable :: (Bool, Bool) -> Action
     getScrollable :: Request (Bool, Bool)
     
-
 struct IsFocusable where
-    setIsFocusable :: Bool -> Request ()
+    setIsFocusable :: Bool -> Action
     getIsFocusable :: Request Bool
 
 struct BaseComponent < IsFocusable, HasSize, HasResponders, RespondsToInputEvents where
-    setName :: String -> Request ()
+    setName :: String -> Action
     getName :: Request String
-    setParent :: (Maybe Component) -> Request ()
+    setParent :: (Maybe Component) -> Action
     getParent :: Request (Maybe Component)
-    setState :: CocoaState -> Request ()
+    setState :: CocoaState -> Action
     getState :: Request CocoaState
     getAllComponents :: Request [Component]
 
@@ -222,13 +219,13 @@ basicComponent f p n = class
     result BaseComponent {..}
 
 struct Wrapper a where
-    set :: a -> Request ()
+    set :: a -> Action
     get :: Request a
     
 wrapper s = class
     a := s
     
-    set b = request
+    set b = action
         a := b
         
     get = request

@@ -13,13 +13,15 @@ root w = class
     applicationDidFinishLaunching app = action                         
         app.showWindow w1
         app.setEnv env
+        env.stdout.write "Step 3\n"
         
     
     result action
+        env.stdout.write "Step 1\n"
         w1.setSize ({width=700;height=500})
         w1.setPosition ({x=0;y=0})                                         
         
-        --test = MouseEvent (MouseWheelScroll ({x=100;y=200}) 0.1 1.0)
+        test = MouseEvent (MouseWheelScroll ({x=100;y=200}) 0.1 1.0)
        
         textA.setSize ({width=300;height=300})
         textA.setPosition ({x=100;y=100})
@@ -28,3 +30,4 @@ root w = class
         w1.addComponent textA
         w1.setBackgroundColor ({r=100;b=0;g=130})
         osx.startApplication applicationDidFinishLaunching
+        env.stdout.write "Step 2\n"

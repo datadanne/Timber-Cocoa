@@ -67,3 +67,7 @@ TUP0 initLabel_CTLabel (Label_CTLabel label, App_CTCommon app, Int dummy) {
 	[pool drain];
 	return 0;
 }
+
+void _init_external_CTLabel(void) {
+    // Nothing
+}

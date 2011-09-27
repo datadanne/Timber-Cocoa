@@ -48,3 +48,6 @@ TUP0 initButton_CTButton(Button_CTButton button, App_CTCommon app, Int dummy) {
 	return 0;
 }
 
+void _init_external_CTButton(void) {
+    // Nothing
+}

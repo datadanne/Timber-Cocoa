@@ -41,3 +41,6 @@ TUP0 initDropDown_CTDropDown(DropDown_CTDropDown dropDown, App_CTCommon app, Int
 	return 0;
 } 
 
+void _init_external_CTDropDown(void) {
+    // Nothing
+}

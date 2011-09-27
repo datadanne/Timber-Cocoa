@@ -34,14 +34,14 @@ mkCocoaTextField env = class
     getScrollable = request
         result scrollable
     
-    setScrollable s = request
+    setScrollable s = action
         scrollable := s
 
 
     appendText s = action
         text := text ++ s
         
-    setText s = request
+    setText s = action
         text := s
         setName s
         case (<- base.getState) of
@@ -52,7 +52,7 @@ mkCocoaTextField env = class
         result text
     
     -- setPosition
-    setPosition p = request
+    setPosition p = action
         case (<- base.getState) of
             Active -> textFieldSetPosition id p
             _ -> 
@@ -62,7 +62,7 @@ mkCocoaTextField env = class
     getPosition = request
         result position
 
-    setSize s = request
+    setSize s = action
         size := s
 
     getSize = request

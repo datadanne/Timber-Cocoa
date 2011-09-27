@@ -12,12 +12,8 @@ struct DropDown < Component where
 --------------------------------------------------------------------------------------------------
 ------          ** BUTTON **            ----------------------------------------------------------
 mkCocoaDropDown env = class
-    size := {width=108; height=17}
     title := ""
-    position := {x=0; y=0}
-    keyEventResponder := Nothing
-    mouseEventResponder := Nothing
-    
+
     id = new mkCocoaID
     base = new basicComponent True Nothing "DropDown"
     addResponder = base.addResponder
@@ -32,11 +28,12 @@ mkCocoaDropDown env = class
     getState = base.getState
     setState = base.setState
     getAllComponents = base.getAllComponents
+    handleEvent = base.handleEvent
     
     options := []
     
     addOption o = action
-        --options := o : options
+        options := o : options
         case (<- base.getState) of
             Active ->  dropDownAddOption id o
             _ ->
@@ -44,7 +41,7 @@ mkCocoaDropDown env = class
     setOptions os = action
         options := os
         forall o <- os do
-            addOption o
+            send addOption o
         
     getOptions = request
         result options
@@ -56,50 +53,32 @@ mkCocoaDropDown env = class
         result currentOption
 
     -- setPosition
-    setPosition p = request
+    setPosition p = action
         case (<- base.getState) of
             Active -> dropDownSetPosition id p
             _ -> 
-        position := p       
+        base.setPosition p    
     
     -- getPosition  
-    getPosition = request
-        result position
+    getPosition = base.getPosition
 
-    setSize s = request
-        size := s
-
-    getSize = request
-        result size
+    setSize = base.setSize
+    getSize = base.getSize
         
     destroy = request
         base.setState Destroyed
-        
-    installKeyListener kl = request
-        keyEventResponder := Just kl
-
-    installMouseListener ml = request
-        mouseEventResponder := Just ml
-
-    handleEvent (KeyEvent t) modifiers = request
-        result (<- dynamicHandleEvent t keyEventResponder)
-
-    handleEvent (MouseEvent t) modifiers = request
-        result (<- dynamicHandleEvent t mouseEventResponder)
-    
-    handleEvent _ modifiers = request
-        result False
 
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request
             base.setState Active
+            base.setSize ({width=108; height=17})
             initDropDown this app
             
             inithelper
     
     inithelper = do
-        setOptions options
-        dropDownSetPosition id position
+        send setOptions options
+        send dropDownSetPosition id (<- base.getPosition)
             
     this = DropDown{..}
 

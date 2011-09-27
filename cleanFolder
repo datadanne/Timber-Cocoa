@@ -17,4 +17,4 @@ rm NewTest.h
 rm NewTest.c
 mv $(ls | grep -v "extern.c$" | grep ".c$") tmp
 mv $(ls | grep -v "extern.h$" | grep ".h$") tmp
-mv $(ls | egrep -v "\.|cleanFolder|tmp|Old|stuff") tmp
+mv $(ls | egrep -v "\.|makeTest|cleanFolder|tmp|Old|stuff") tmp

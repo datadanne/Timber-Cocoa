@@ -5,7 +5,7 @@
 
 extern pthread_mutex_t rts;
 extern pthread_mutex_t envmut;
-extern int envRootsDirty;
+extern int rootsDirty;
 CocoaEvent_CTCommon receivedEvent;
 
 pthread_mutex_t eventMutex;
@@ -122,7 +122,7 @@ bool dispatchEventToTimber(NSEvent* event) {
  	
  	/*DISABLE(envmut);
     printf("envRD1\n");
-	envRootsDirty = 1;
+	rootsDirty = 1;
 	ENABLE(envmut);*/
 
 	App_CTCommon app = getApp();
@@ -135,15 +135,6 @@ bool dispatchEventToTimber(NSEvent* event) {
     assert(b1 == b2);
     return app->sendInputEvent_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0);
 }
-
-void scanEventReceived(void) {
-	DISABLE(envmut);
-	if(receivedEvent)
-		receivedEvent = (CocoaEvent_CTCommon)copy((ADDR)receivedEvent);
-	ENABLE(envmut);
-}
-
-struct Scanner eventScanner = {scanEventReceived, NULL};
 
 // --------- Window ----------------------------------------------
 TUP0 windowSetContentView_CTWindow(CocoaWindow_CTCommon window, CocoaID_CTCommon id, Int dummy) {
@@ -158,7 +149,16 @@ TUP0 windowSetContentView_CTWindow(CocoaWindow_CTCommon window, CocoaID_CTCommon
 	return 0;
 }
 
+void scanEventReceived() {
+	DISABLE(envmut);
+	if(receivedEvent)
+		receivedEvent = (CocoaEvent_CTCommon)copy((ADDR)receivedEvent);
+	ENABLE(envmut);
+}
+
+struct Scanner eventScanner = {scanEventReceived, NULL};
 static WindowDelegate *delegate;
+
 
 Int initCocoaWindow_CTWindow(CocoaWindow_CTCommon wnd, App_CTCommon app, Int dummy) {   
 	DEBUG("Initializing window...");
@@ -167,7 +167,7 @@ Int initCocoaWindow_CTWindow(CocoaWindow_CTCommon wnd, App_CTCommon app, Int dum
 	pthread_mutex_init(&eventMutex, &glob_mutexattr);
 	DISABLE(envmut);
 	addRootScanner(&eventScanner);
-	envRootsDirty = 1;
+	rootsDirty = 1;
 	ENABLE(envmut);
     
     __block CocoaWindow *window;
@@ -235,7 +235,7 @@ Msg windowSetSize_CTWindow (CocoaID_CTCommon wnd, Size_CTCommon pos, Time start,
 	DEBUG("setting containerSize ext!");
 	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
 	
-	[thisWindow setContentSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon)]; //-20 to compensate for border.
+	[thisWindow setContentSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon)];
 	
 	[pool drain];
 }
@@ -244,8 +244,10 @@ Msg windowSetPosition_CTWindow (CocoaID_CTCommon wnd, Position_CTCommon pos, Tim
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
     NSPoint p = NSMakePoint(pos->x_CTCommon,pos->y_CTCommon);
-   	//dispatch_async(dispatch_get_main_queue(), ^{
-        [thisWindow setFrameOrigin:p];
-   // });
+    [thisWindow setFrameOrigin:p];
    	[pool drain]; 
+}
+
+void _init_external_CTWindow(void) {
+    // Nothing
 }

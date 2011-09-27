@@ -41,3 +41,6 @@ TUP0 initTextField_CTTextField(TextField_CTTextField textField, App_CTCommon app
 	return 0;
 } 
 
+void _init_external_CTTextField(void) {
+    // Nothing
+}

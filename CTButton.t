@@ -45,7 +45,7 @@ mkCocoaButton env = class
         result title   
     
     -- setPosition
-    setPosition p = request
+    setPosition p = action
         case (<- base.getState) of
             Active -> buttonSetPosition id p
             _ -> 
@@ -55,7 +55,7 @@ mkCocoaButton env = class
     getPosition = request
         result position
 
-    setSize s = request
+    setSize s = action
         size := s
 
     getSize = request

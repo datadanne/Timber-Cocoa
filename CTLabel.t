@@ -28,7 +28,7 @@ mkCocoaLabel = class
     getAllComponents = base.getAllComponents
     handleEvent = base.handleEvent
 
-    setText s = request
+    setText s = action
         text := s
         case (<- base.getState) of
             Active -> labelSetText id s
@@ -50,7 +50,7 @@ mkCocoaLabel = class
     getTextColor = request
         result textColor
     
-    setPosition p = request  
+    setPosition p = action  
         case (<- base.getState) of
             Active -> labelSetPosition id p
             _ ->
@@ -58,7 +58,7 @@ mkCocoaLabel = class
     
     getPosition = base.getPosition
 
-    setSize s = request
+    setSize s = action
         size := s
 
     getSize = request

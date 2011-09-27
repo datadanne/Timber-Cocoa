@@ -145,3 +145,6 @@ TUP0 initTextArea_CTTextArea(TextArea_CTTextArea textArea, App_CTCommon app, Int
 	return 0;
 } 
 
+void _init_external_CTTextArea(void) {
+    // Nothing
+}

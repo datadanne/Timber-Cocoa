@@ -1,6 +1,7 @@
 #include "CTContainer.extern.h"
 #import "CTContainer.extern.m"
 
+
 // --------- Container ----------------------------------------------
 Msg containerAddComponent_CTContainer (CocoaID_CTCommon container, CocoaID_CTCommon button, Time start, Time stop) {
 	CocoaView *thisView = (CocoaView*) COCOA_REF(container);
@@ -55,4 +56,8 @@ Msg containerRemoveComponent_CTContainer (CocoaID_CTCommon container, CocoaID_CT
 	NSView *object = (NSView*) COCOA_REF(newCmp);
     [object performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:YES];
     [pool drain];
+}
+
+void _init_external_CTContainer(void) {
+    // Nothing
 }

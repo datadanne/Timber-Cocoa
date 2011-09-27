@@ -30,7 +30,7 @@ mkCocoaContainer env = class
     setState = base.setState
     handleEvent = base.handleEvent
 
-    setPosition p = request
+    setPosition p = action
         case (<- base.getState) of
             Active -> containerSetPosition id p
             _ ->
@@ -38,7 +38,7 @@ mkCocoaContainer env = class
 
     getPosition = base.getPosition
 
-    setSize s = request
+    setSize s = action
         case (<- base.getState) of
             Active -> containerSetSize id s
             _ ->

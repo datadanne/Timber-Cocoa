@@ -61,18 +61,17 @@ struct Color where
     b :: Int
                                               
 struct HasPosition where
-    setPosition :: Position -> Action
+    setPosition :: Position -> Request ()
     getPosition :: Request Position 
-    --getRelativePosition :: Request Position
     
 struct HasSize < HasPosition where
-    setSize :: Size -> Action
+    setSize :: Size -> Request ()
     getSize :: Request Size
     
 struct HasText where
-    setText :: String -> Action
+    setText :: String -> Request ()
     getText :: Request String
-    appendText :: String -> Action
+    appendText :: String -> Request ()
 
 struct HasBackgroundColor where
     setBackgroundColor :: Color -> Request ()
@@ -92,19 +91,19 @@ struct RespondsToWindowEvents where
     setWindowResponder :: RespondsToWindowEvents -> Request ()
 
 struct IsScrollable where
-    setScrollable :: (Bool, Bool) -> Action
+    setScrollable :: (Bool, Bool) -> Request ()
     getScrollable :: Request (Bool, Bool)
     
 struct IsFocusable where
-    setIsFocusable :: Bool -> Action
+    setIsFocusable :: Bool -> Request ()
     getIsFocusable :: Request Bool
 
 struct BaseComponent < IsFocusable, HasSize, HasResponders, RespondsToInputEvents where
-    setName :: String -> Action
+    setName :: String -> Request ()
     getName :: Request String
-    setParent :: (Maybe Component) -> Action
+    setParent :: (Maybe Component) -> Request ()
     getParent :: Request (Maybe Component)
-    setState :: CocoaState -> Action
+    setState :: CocoaState -> Request ()
     getState :: Request CocoaState
     getAllComponents :: Request [Component]
 
@@ -132,7 +131,7 @@ struct CocoaWindow < HasSize, HasBackgroundColor, ContainsComponents, HasRespond
     destroyWindow :: Request ()
     hide :: Request Bool
     setVisible :: Request Bool
-    setFocus :: Component -> Action
+    setFocus :: Component -> Request ()
     getFocus :: Request Component
     getContainerID :: Request CocoaID
 
@@ -219,13 +218,13 @@ basicComponent f p n = class
     result BaseComponent {..}
 
 struct Wrapper a where
-    set :: a -> Action
+    set :: a -> Request ()
     get :: Request a
     
 wrapper s = class
     a := s
     
-    set b = action
+    set b = request
         a := b
         
     get = request

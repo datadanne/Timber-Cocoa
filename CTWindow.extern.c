@@ -133,7 +133,8 @@ bool dispatchEventToTimber(NSEvent* event) {
     ENABLE(rts);
 	
     assert(b1 == b2);
-    return app->sendInputEvent_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0);
+    bool timberResult = app->sendInputEvent_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0);
+    return timberResult;
 }
 
 // --------- Window ----------------------------------------------
@@ -162,13 +163,6 @@ static WindowDelegate *delegate;
 
 Int initCocoaWindow_CTWindow(CocoaWindow_CTCommon wnd, App_CTCommon app, Int dummy) {   
 	DEBUG("Initializing window...");
-
-	// Install event scanner to keep track of delegate address.
-	pthread_mutex_init(&eventMutex, &glob_mutexattr);
-	DISABLE(envmut);
-	addRootScanner(&eventScanner);
-	rootsDirty = 1;
-	ENABLE(envmut);
     
     __block CocoaWindow *window;
     dispatch_sync(dispatch_get_main_queue(), ^{
@@ -249,5 +243,10 @@ Msg windowSetPosition_CTWindow (CocoaID_CTCommon wnd, Position_CTCommon pos, Tim
 }
 
 void _init_external_CTWindow(void) {
-    // Nothing
+	// Install event scanner to keep track of delegate address.
+	pthread_mutex_init(&eventMutex, &glob_mutexattr);
+	DISABLE(envmut);
+	addRootScanner(&eventScanner);
+	rootsDirty = 1;
+	ENABLE(envmut);
 }

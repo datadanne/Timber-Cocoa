@@ -31,16 +31,18 @@ Msg containerSetPosition_CTContainer (CocoaID_CTCommon id, Position_CTCommon pos
 	[thisContainer setFrameOrigin: NSMakePoint(pos->x_CTCommon,pos->y_CTCommon)];
    	[pool drain]; 
 }
-TUP0 initContainer_CTContainer (Container_CTContainer container, App_CTCommon app, Int dummy) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+TUP0 initContainer_CTContainer (/*Container_CTContainer container*/CocoaID_CTCommon id, App_CTCommon app, Int dummy) {
+    internal_CocoaID_CTCommon thisContainer = (internal_CocoaID_CTCommon)id;//(internal_CocoaID_CTCommon)(container->l_Container_CTContainer_Component_CTCommon_CTContainer->id_CTCommon);	
+	CocoaView *cocoaView;
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("Initializing NSContainer: ");
-	internal_CocoaID_CTCommon thisContainer = (internal_CocoaID_CTCommon)(container->l_Container_CTContainer_Component_CTCommon_CTContainer->id_CTCommon);	
-	CocoaView *cocoaView = [[CocoaView alloc] initWithFrame: NSMakeRect(100.0, 100.0, 200.0, 200.0)];
+    cocoaView = [[CocoaView alloc] initWithFrame: NSMakeRect(0, 0, 200.0, 200.0)];
 
 	thisContainer->this = cocoaView;
 
 	DEBUG("Container OK!");
 	[pool drain];
+
 	return 0;
 }
 Msg destroyContainer_CTContainer (CocoaID_CTCommon container, Time start, Time stop) {

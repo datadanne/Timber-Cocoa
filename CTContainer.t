@@ -16,7 +16,7 @@ mkCocoaContainer env = class
     keyEventResponder := Nothing
 
     id = new mkCocoaID
-    base = new basicComponent False Nothing "ContainerWHAT"
+    base = new basicComponent False Nothing "Container"
     addResponder = base.addResponder
     setResponders = base.setResponders
     getResponders = base.getResponders
@@ -30,7 +30,7 @@ mkCocoaContainer env = class
     setState = base.setState
     handleEvent = base.handleEvent
 
-    setPosition p = action
+    setPosition p = request
         case (<- base.getState) of
             Active -> containerSetPosition id p
             _ ->
@@ -38,7 +38,7 @@ mkCocoaContainer env = class
 
     getPosition = base.getPosition
 
-    setSize s = action
+    setSize s = request
         case (<- base.getState) of
             Active -> containerSetSize id s
             _ ->
@@ -54,26 +54,17 @@ mkCocoaContainer env = class
 
     getBackgroundColor = request
         result color
-        
-    getComponents = request
-        result myComponents
-
-    children := []
-    getAllComponents = request
-        children := []
-
-        forall c <- myComponents do
-            children := (children ++ (<- c.getAllComponents) ++ [c])
-            
-        result children
     
-    addComponent c = request
+    
+    addComponent c = request        
         myComponents := c : myComponents
         c.setParent (Just this)
+
         state <- base.getState
         if (state == Active && isJust appRef) then
             c.init (fromJust appRef)
             containerAddComponent id c.id    
+        env.stdout.write ("Adding " ++ (<- c.getName) ++ "\n")
             
     removeComponent c = request
         myComponents := [x | x <- myComponents, not (x == c)]
@@ -89,40 +80,49 @@ mkCocoaContainer env = class
     removeAllComponents = request
         internalRemoveAllComponents
 
+    getComponents = request
+        result myComponents
+
+    children := []
+    getAllComponents = request
+        children := []
+        forall c <- myComponents do
+            children := (children ++ (<- c.getAllComponents) ++ [c])
+        result children
+        
     destroy = request
         if ((<- base.getState) == Active) then
             internalRemoveAllComponents
             destroyContainer id
             base.setState Destroyed
         
-
-
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request
             appRef := Just app
             base.setState Active
-            initContainer this app
+            initContainer id app
             inithelper
 
             forall cmp <- myComponents do
                 cmp.init app
                 containerAddComponent id cmp.id
-
-    this = Container{..}  
-
     inithelper = do
-        containerSetSize id (<- base.getSize)
-        containerSetBackgroundColor id color
-        containerSetPosition id (<- base.getPosition)
-
+       containerSetSize id (<- base.getSize)
+       containerSetBackgroundColor id color
+       containerSetPosition id (<- base.getPosition)
+       
+    this := Container{..}  
 
     result this
+        
+    
 
 --------------------------------------------------------------------------------------------------
 ------          ** EXTERN **            ----------------------------------------------------------  
 
 --container
-extern initContainer :: Container -> App -> Request ()
+
+extern initContainer :: CocoaID -> App -> Request ()
 extern destroyContainer :: CocoaID -> Action
 extern containerSetBackgroundColor :: CocoaID -> Color -> Action
 extern containerSetSize :: CocoaID -> Size -> Action

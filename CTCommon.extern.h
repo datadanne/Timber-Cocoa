@@ -5,7 +5,7 @@
 #import <Cocoa/Cocoa.h>
 
 #define COCOA_REF(id) (((internal_CocoaID_CTCommon) id)->this)
-#define DEBUGGING 1
+#define DEBUGGING 0
 #define DEBUG(...) if(DEBUGGING){printf("%s:%d ",__FILE__, __LINE__);printf(__VA_ARGS__);printf("\n");}
 
 struct Callback;

@@ -4,8 +4,8 @@ import CTCommon
 import POSIX
 
 struct DropDown < Component where
-    addOption :: String -> Action
-    setOptions :: [String] -> Action
+    addOption :: String -> Request ()
+    setOptions :: [String] -> Request ()
     getOptions :: Request [String]
     getCurrentOption :: Request String
 
@@ -31,17 +31,23 @@ mkCocoaDropDown env = class
     handleEvent = base.handleEvent
     
     options := []
-    
-    addOption o = action
+    addOption o = request
+        internalAddOption o
+        
+    setOptions os = request
+        internalSetOptions os
+        
+    internalSetOptions os = do
+        options := os
+        forall o <- os do
+            internalAddOption o
+
+    internalAddOption o = do
         options := o : options
         case (<- base.getState) of
             Active ->  dropDownAddOption id o
             _ ->
-        
-    setOptions os = action
-        options := os
-        forall o <- os do
-            send addOption o
+
         
     getOptions = request
         result options
@@ -53,7 +59,7 @@ mkCocoaDropDown env = class
         result currentOption
 
     -- setPosition
-    setPosition p = action
+    setPosition p = request
         case (<- base.getState) of
             Active -> dropDownSetPosition id p
             _ -> 
@@ -77,8 +83,8 @@ mkCocoaDropDown env = class
             inithelper
     
     inithelper = do
-        send setOptions options
-        send dropDownSetPosition id (<- base.getPosition)
+        internalSetOptions options
+        dropDownSetPosition id (<- base.getPosition)
             
     this = DropDown{..}
 
@@ -88,6 +94,7 @@ mkCocoaDropDown env = class
 ------          ** EXTERN **            ----------------------------------------------------------  
 
 --dropDown      
+private
 extern initDropDown :: DropDown -> App -> Request ()
 extern dropDownAddOption :: CocoaID -> String -> Action
 extern dropDownSetPosition :: CocoaID -> Position -> Action

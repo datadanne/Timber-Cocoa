@@ -4,7 +4,7 @@ import CTCommon
 import POSIX
 
 struct Button < Component where
-    setTitle :: String -> Action
+    setTitle :: String -> Request ()
     getTitle :: Request String
 
 --------------------------------------------------------------------------------------------------
@@ -33,7 +33,7 @@ mkCocoaButton env = class
     handleEvent = base.handleEvent
     
     -- setTitle
-    setTitle s = action
+    setTitle s = request
         title := s
         setName s
         case (<- base.getState) of
@@ -45,7 +45,7 @@ mkCocoaButton env = class
         result title   
     
     -- setPosition
-    setPosition p = action
+    setPosition p = request
         case (<- base.getState) of
             Active -> buttonSetPosition id p
             _ -> 
@@ -55,7 +55,7 @@ mkCocoaButton env = class
     getPosition = request
         result position
 
-    setSize s = action
+    setSize s = request
         size := s
 
     getSize = request
@@ -81,7 +81,8 @@ mkCocoaButton env = class
 --------------------------------------------------------------------------------------------------
 ------          ** EXTERN **            ----------------------------------------------------------  
 
---button      
+--button     
+private 
 extern initButton :: Button -> App -> Request ()
 extern buttonSetTitle :: CocoaID -> String -> Action
 extern buttonSetPosition :: CocoaID -> Position -> Action

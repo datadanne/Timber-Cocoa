@@ -34,14 +34,14 @@ mkCocoaTextField env = class
     getScrollable = request
         result scrollable
     
-    setScrollable s = action
+    setScrollable s = request
         scrollable := s
 
 
-    appendText s = action
+    appendText s = request
         text := text ++ s
         
-    setText s = action
+    setText s = request
         text := s
         setName s
         case (<- base.getState) of
@@ -52,7 +52,7 @@ mkCocoaTextField env = class
         result text
     
     -- setPosition
-    setPosition p = action
+    setPosition p = request
         case (<- base.getState) of
             Active -> textFieldSetPosition id p
             _ -> 
@@ -62,7 +62,7 @@ mkCocoaTextField env = class
     getPosition = request
         result position
 
-    setSize s = action
+    setSize s = request
         size := s
 
     getSize = request
@@ -90,6 +90,7 @@ mkCocoaTextField env = class
 ------          ** EXTERN **            ----------------------------------------------------------  
 
 --textField      
+private
 extern initTextField :: TextField -> App -> Request ()
 extern textFieldSetText :: CocoaID -> String -> Action
 extern textFieldSetPosition :: CocoaID -> Position -> Action

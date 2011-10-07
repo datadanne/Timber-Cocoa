@@ -3,14 +3,14 @@ module CTWindow where
 import POSIX
 import CTCommon
 import CTContainer
-
+    
 --------------------------------------------------------------------------------------------------
 ------          ** WINDOW **            ---------------------------------------------------------- 
-mkWindow env = class        
+mkWindow env = class    
+    position := {x=0;y=0}
     windowId = new mkCocoaID
     state := Inactive
     isVisible := False
-    position := {x=0;y=0}
     
     rootContainer = new mkCocoaContainer env
     addComponent = rootContainer.addComponent
@@ -30,7 +30,6 @@ mkWindow env = class
     onWindowResize = dwh.onWindowResize
     onWindowCloseRequest = dwh.onWindowCloseRequest
     setWindowResponder = dwh.setWindowResponder
-    
 
     getContainerID = request
         result rootContainer.id
@@ -38,14 +37,13 @@ mkWindow env = class
     getPosition = request
         result position
 
-    setPosition pos = action
+    setPosition pos = request
         if (state == Active) then 
             windowSetPosition windowId pos
         position := pos
 
     getSize = rootContainer.getSize
-    
-    setSize size = action
+    setSize size = request
         if (state == Active) then 
             windowSetSize windowId size
         rootContainer.setSize size
@@ -81,7 +79,7 @@ mkWindow env = class
             destroyCocoaWindow windowId
 
     currentFocus := rootContainer
-    setFocus cmp = action
+    setFocus cmp = request
          currentFocus := cmp
          if (state == Active) then
              windowSetFocus windowId cmp.id
@@ -188,7 +186,6 @@ defaultInputResponder window rootContainer env = class
             result (<- (scanList (tail x) func))
         
     foundFocus := False
-
     findKeyFocus cmp = do
         if (foundFocus) then
             currentFocus := cmp
@@ -200,47 +197,34 @@ defaultInputResponder window rootContainer env = class
             result False
         else
             result False
-            
-    getParentPosition :: (Maybe Component) -> Cmd _ Position
-    getParentPosition parent = do
-        if (isJust parent) then
-            result <- (fromJust parent).getPosition
-        else
-            result ({x=0;y=0})
-        
-    consume := False
-    findMouseFocus event modifiers cmp = do
-        cmp.handleEvent (MouseEvent event) modifiers 
-        cmp.handleEvent (MouseEvent event) modifiers 
-        cmp.handleEvent (MouseEvent event) modifiers 
-        consume := False
 
+    findMouseFocus event modifiers cmp = do
         eventPosition = posget event
-        cmpPos <- cmp.getPosition
-        cmpSize <- cmp.getSize
-        parent <- cmp.getParent
-        
-        parentPosition <- (getParentPosition parent)
-        --p <- if (isJust parent) then ((fromJust parent).getPosition) else (do result {x=0;y=0})
-        relativePosition = ({x=eventPosition.x-parentPosition.x;y=eventPosition.y-parentPosition.y})
+        parentPosition <- (getParentPosition cmp)
+        relativePosition = getRelativePosition parentPosition eventPosition
 
         -- Construct new event based on local coordinates.
         eventInLocalCoords = mkNewEvent event relativePosition
-
+        
+        cmpPos <- cmp.getPosition
+        cmpSize <- cmp.getSize
         if (clickInsideBox relativePosition cmpPos cmpSize) then
-            cmp.handleEvent (MouseEvent eventInLocalCoords) modifiers
-
-            env.stdout.write ("Sending event to " ++ (<- cmp.getName) ++ "\n")
-            focusable <- cmp.getIsFocusable
-            if (focusable) then
+            if ( <- cmp.getIsFocusable ) then
                 window.setFocus cmp
-        result consume
-    
-
-            
+            result (<- cmp.handleEvent (MouseEvent eventInLocalCoords) modifiers)
+        else
+            result False
+        
     result RespondsToInputEvents {..}
     
-    
+getParentPosition cmp = do
+    parent <- cmp.getParent
+    if (isJust parent) then
+        result <- (fromJust parent).getPosition
+    else
+        result ({x=0;y=0})
+
+getRelativePosition from to = {x=to.x-from.x;y=to.y-from.y}
 
 clickInsideBox mousePos boxPos boxSize = inInterval mousePos.x boxPos.x boxSize.width && inInterval mousePos.y boxPos.y boxSize.height
 inInterval x startPos width = (x >= startPos && x <= (startPos+width))
@@ -249,6 +233,7 @@ inInterval x startPos width = (x >= startPos && x <= (startPos+width))
 ------          ** EXTERN **            ----------------------------------------------------------  
 
 --window
+private
 extern initCocoaWindow :: CocoaWindow -> App -> Request Int
 extern destroyCocoaWindow :: CocoaID -> Request ()
 extern windowSetContentView :: CocoaWindow -> CocoaID -> Request ()      -- external method for changing contentView for a window!

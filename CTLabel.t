@@ -3,7 +3,7 @@ module CTLabel where
 import CTCommon
 
 struct Label < Component, HasText where
-    setTextColor :: Color -> Action
+    setTextColor :: Color -> Request ()
     getTextColor :: Request Color
 
 mkCocoaLabel = class
@@ -28,7 +28,7 @@ mkCocoaLabel = class
     getAllComponents = base.getAllComponents
     handleEvent = base.handleEvent
 
-    setText s = action
+    setText s = request
         text := s
         case (<- base.getState) of
             Active -> labelSetText id s
@@ -37,10 +37,10 @@ mkCocoaLabel = class
     getText = request
         result text     
 
-    appendText s = action
+    appendText s = request
         text := text ++ s
     
-    setTextColor c = action
+    setTextColor c = request
         case (<- base.getState) of
             Active -> labelSetTextColor id c
             _ ->
@@ -50,7 +50,7 @@ mkCocoaLabel = class
     getTextColor = request
         result textColor
     
-    setPosition p = action  
+    setPosition p = request  
         case (<- base.getState) of
             Active -> labelSetPosition id p
             _ ->
@@ -58,7 +58,7 @@ mkCocoaLabel = class
     
     getPosition = base.getPosition
 
-    setSize s = action
+    setSize s = request
         size := s
 
     getSize = request
@@ -85,6 +85,7 @@ mkCocoaLabel = class
     result this  
 
 -- extern stuff --
+private
 extern initLabel :: Label -> App -> Request ()
 extern labelSetText :: CocoaID -> String -> Action
 extern labelSetPosition :: CocoaID -> Position -> Action    

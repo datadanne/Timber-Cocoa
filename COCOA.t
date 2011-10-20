@@ -11,7 +11,7 @@ import CTTextArea
 import CTDropDown
 
 
-struct Env where
+struct CocoaEnv where
 	startApplication	:: (App -> Action) -> Request ()   	-- what to do?           
 
-extern cocoa :: World -> Class Env
+extern cocoa :: World -> Class CocoaEnv

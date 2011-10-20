@@ -129,8 +129,7 @@ struct CocoaWindow < HasSize, HasBackgroundColor, ContainsComponents, HasRespond
     getId :: Request WindowID
     initWindow :: App -> Request ()
     destroyWindow :: Request ()
-    hide :: Request Bool
-    setVisible :: Request Bool
+    setVisible :: Bool -> Request Bool
     setFocus :: Component -> Request ()
     getFocus :: Request Component
     getContainerID :: Request CocoaID

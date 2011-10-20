@@ -44,7 +44,6 @@ mkCocoaLabel = class
         case (<- base.getState) of
             Active -> labelSetTextColor id c
             _ ->
-            
         textColor := c
     
     getTextColor = request

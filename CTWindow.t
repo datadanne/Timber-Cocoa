@@ -10,8 +10,7 @@ mkWindow env = class
     position := {x=0;y=0}
     windowId = new mkCocoaID
     state := Inactive
-    isVisible := False
-    
+        
     rootContainer = new mkCocoaContainer env
     addComponent = rootContainer.addComponent
     getComponents = rootContainer.getComponents
@@ -50,21 +49,21 @@ mkWindow env = class
     
     nr := 0
     initWindow app = request
-        nr := <- initCocoaWindow this app
-        rootContainer.init app
-        rootContainer.setName "rootContainer"
-        
-        state := Active
-        isVisible := True
-        
-        inithelper 
+        if (state == Inactive) then
+            nr := <- initCocoaWindow this app
+            rootContainer.init app
+            rootContainer.setName "rootContainer"
+            
+            state := Active
+            inithelper 
         
     inithelper = do
         rsize = (<- rootContainer.getSize)
         foo = ({width = rsize.width+20;height=rsize.height+20})
         windowSetPosition windowId position
-        windowSetSize windowId foo
+        windowSetSize windowId (<- rootContainer.getSize)
         windowSetContentView this rootContainer.id
+        _ <- internalSetVisible
         
         wh = new defaultInputResponder this rootContainer env
         handlers.addResponder wh
@@ -84,27 +83,28 @@ mkWindow env = class
          if (state == Active) then
              windowSetFocus windowId cmp.id
 
-         env.stdout.write ("FOCUS SET TO: " ++ (<- cmp.getName) ++ "\n")
+         --env.stdout.write ("FOCUS SET TO: " ++ (<- cmp.getName) ++ "\n")
          
     getFocus = request
         result currentFocus
+             
 
-    -- VISIBILITY
-    hide = request
-        if (state == Active && isVisible == True) then
-            windowSetHidden windowId
-            isVisible := False
-            result True
+    isVisible := True
+    setVisible b = request
+        if (isVisible /= b)  then
+            isVisible := b
+            result (<- internalSetVisible)
         else
             result False
-                              
-    setVisible = request
-        if (state == Active && isVisible == False) then
-            windowSetVisible windowId
-            isVisible := True
-            result True
-        else
-            result False
+            
+    internalSetVisible = do
+        isActive = (state == Active)
+        if (isActive) then
+            if (isVisible) then
+                windowSetVisible windowId
+            else
+                windowSetHidden windowId
+        result isActive
     
     this = CocoaWindow {..}
     

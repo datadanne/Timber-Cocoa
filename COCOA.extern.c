@@ -12,10 +12,10 @@ struct AppCallback {
 };
 
 // place COCOA struct outisde the garbage collected heap by setting gcinfo to 0
-struct Env_COCOA cenv_struct = { 0, &startApplication_COCOA }; 
-Env_COCOA cenv				 = &cenv_struct;
+struct CocoaEnv_COCOA cenv_struct = { 0, &startApplication_COCOA }; 
+CocoaEnv_COCOA cenv				 = &cenv_struct;
                                                         
-Env_COCOA cocoa_COCOA(World w, Int dummy) {
+CocoaEnv_COCOA cocoa_COCOA(World w, Int dummy) {
     // Keep w but don't use it.
 	return cenv;
 }
@@ -99,7 +99,7 @@ void createCocoaApplication(void) {
 
 extern pthread_cond_t sleepVar;
 
-TUP0 startApplication_COCOA (Env_COCOA env, CLOS clos, Int poly) {
+TUP0 startApplication_COCOA (CocoaEnv_COCOA env, CLOS clos, Int poly) {
 	printf("Initializing cocoa application: ");
 	toRunWhenAppFinished = (AppCallback)clos;
 
@@ -117,6 +117,5 @@ TUP0 startApplication_COCOA (Env_COCOA env, CLOS clos, Int poly) {
 
 void _init_external_COCOA(void) {
     addRootScanner(&appScanner);
-    printf("got gc to cooperate\n");		                                  			 	
     // Nothing
 }

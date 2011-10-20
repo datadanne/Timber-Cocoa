@@ -8,7 +8,7 @@ Msg labelSetTextColor_CTLabel (CocoaID_CTCommon id, Color_CTCommon c, Time start
 	NSTextField *thisLabel = (NSTextField*) COCOA_REF(id);
 	DEBUG("Label pointer OK %p!", thisLabel);
 
-	[thisLabel setTextColor:[NSColor colorWithCalibratedRed:c->r_CTCommon/255 green:c->g_CTCommon blue:c->b_CTCommon alpha:1.0]];
+	[thisLabel setTextColor:[NSColor colorWithCalibratedRed:c->r_CTCommon/255.0 green:c->g_CTCommon/255.0 blue:c->b_CTCommon/255.0 alpha:1.0]];
 	[thisLabel setNeedsDisplay];
 	
 	[pool drain]; 
@@ -42,7 +42,7 @@ Msg labelSetPosition_CTLabel (CocoaID_CTCommon id, Position_CTCommon pos, Time s
 	NSTextField *thisLabel = (NSTextField*) COCOA_REF(id);
 	
 	DEBUG("Button(pos) OK %p!", thisLabel);
-	NSPoint p = NSMakePoint(pos->x_CTCommon-5,pos->y_CTCommon-20); // TODO: Remove hardcoded offset.
+	NSPoint p = NSMakePoint(pos->x_CTCommon,pos->y_CTCommon); // TODO: Remove hardcoded offset.
 	
 	[thisLabel setFrameOrigin: p];
 	[thisLabel performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];

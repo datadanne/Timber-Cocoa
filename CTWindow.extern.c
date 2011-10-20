@@ -206,14 +206,14 @@ TUP0 destroyCocoaWindow_CTWindow(CocoaID_CTCommon wnd, Int dummy) {
         });
 }
    
-Msg windowSetVisible_CTWindow(CocoaID_CTCommon wnd, Time start, Time stop) {  
+TUP0 windowSetVisible_CTWindow(CocoaID_CTCommon wnd, Int dummy) {  
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
 	[thisWindow orderFront: NULL];
 	[pool drain];
 }
 
-Msg windowSetHidden_CTWindow(CocoaID_CTCommon wnd, Time start, Time stop) {
+TUP0 windowSetHidden_CTWindow(CocoaID_CTCommon wnd, Int dummy) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
 	[thisWindow orderOut: NULL];
@@ -228,7 +228,7 @@ TUP0 windowSetFocus_CTWindow(CocoaID_CTCommon wnd, CocoaID_CTCommon cmp, Int dum
 	[pool drain];
 }
 
-Msg windowSetSize_CTWindow (CocoaID_CTCommon wnd, Size_CTCommon pos, Time start, Time stop) {
+TUP0 windowSetSize_CTWindow (CocoaID_CTCommon wnd, Size_CTCommon pos, Int dummy) {
 	DEBUG("setting containerSize ext!");
 	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
 	
@@ -239,7 +239,7 @@ Msg windowSetSize_CTWindow (CocoaID_CTCommon wnd, Size_CTCommon pos, Time start,
     });
 }
 
-Msg windowSetPosition_CTWindow (CocoaID_CTCommon wnd, Position_CTCommon pos, Time start, Time stop) {
+TUP0 windowSetPosition_CTWindow (CocoaID_CTCommon wnd, Position_CTCommon pos, Int dummy) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
     NSPoint p = NSMakePoint(pos->x_CTCommon,pos->y_CTCommon);

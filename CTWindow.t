@@ -245,8 +245,8 @@ private
 extern initCocoaWindow :: CocoaWindow -> App -> Request Int
 extern destroyCocoaWindow :: CocoaID -> Request ()
 extern windowSetContentView :: CocoaWindow -> CocoaID -> Request ()      -- external method for changing contentView for a window!
-extern windowSetHidden :: CocoaID -> Action
-extern windowSetVisible :: CocoaID -> Action
-extern windowSetSize :: CocoaID -> Size -> Action
-extern windowSetPosition :: CocoaID -> Position -> Action
+extern windowSetHidden :: CocoaID -> Request ()
+extern windowSetVisible :: CocoaID -> Request ()
+extern windowSetSize :: CocoaID -> Size -> Request ()
+extern windowSetPosition :: CocoaID -> Position -> Request ()
 extern windowSetFocus :: CocoaID -> CocoaID -> Request ()

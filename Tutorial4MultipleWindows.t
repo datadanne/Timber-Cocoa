@@ -12,20 +12,18 @@ root w = class
     colorWindow = new mkCocoaWindow env
     
     applicationDidFinishLaunching app = action
-        after (sec 1) send action
-            w1.setSize ({width=400;height=400}) 
-            w1.setBackgroundColor ({r=200;g=200;b=200})
-	
-            createComponentHierarchy
-    
-            app.addWindow w1
-            app.addWindow colorWindow
-    
-            addButtonResponder
-            addWindowResponder
-    
-            addColorPicker
-           
+        w1.setSize ({width=400;height=400}) 
+        w1.setBackgroundColor ({r=200;g=200;b=200})
+
+        createComponentHierarchy
+        addColorPicker
+        
+        app.addWindow w1
+        app.addWindow colorWindow
+
+        addButtonResponder
+        addWindowResponder
+
     label = new mkCocoaLabel
     tabCountLabel = new mkCocoaLabel
     button = new mkCocoaButton env
@@ -96,14 +94,14 @@ root w = class
         rightContainer.addComponent rgbLabel
         
         colorButton = new mkCocoaButton env   
-        colorButton.setTitle "Open Color Picker"
-        colorButton.setSize ({width=110;height=21})
+        colorButton.setTitle "Open ColorPicker"
+        colorButton.setSize ({width=150;height=21})
         colorButton.setPosition ({x=40; y=75})
         colorButton.addResponder (new colorPickerToggle colorButton colorWindow env)
-        w1.addComponent colorButton
+        leftContainer.addComponent colorButton
         
         colorWindow.setSize ({width=215;height=215})
-        colorWindow.setPosition ({x=430;y=300})
+        colorWindow.setPosition ({x=445;y=300})
         colorWindow.setVisible False
         
         initColorGrid = new colorPickerGrid colorWindow setColor env
@@ -177,7 +175,7 @@ colorPickerToggle this window env = class
     toggle := True
     respondToInputEvent (MouseEvent event) modifiers = request
         _ <- window.setVisible toggle
-        send action this.setTitle ((if (toggle) then "Open" else "Close") ++ " Color picker")
+        send action this.setTitle ((if (toggle) then "Open" else "Close") ++ " ColorPicker")
         
         toggle := not toggle
         result False

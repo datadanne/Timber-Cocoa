@@ -14,28 +14,19 @@ Msg containerAddComponent_CTContainer (CocoaID_CTCommon container, CocoaID_CTCom
 Msg containerSetBackgroundColor_CTContainer (CocoaID_CTCommon id, Color_CTCommon c, Time start, Time stop) { 
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	__block CocoaView *thisView = (CocoaView*) COCOA_REF(id);
-	printf("setting containerBgColor ext!\n");
-	                        
-	
-    int r = 5;
-    printf("R is ok =D\n");
-    printf("can haz C? %p \n", c);
+
+    int r = c->r_CTCommon;
     int g = c->g_CTCommon;
     int b = c->b_CTCommon;
-    
-    printf("rgb is ok? \n"); 
+
     dispatch_sync(dispatch_get_main_queue(), ^{
-        printf("can i run mainqueue plz?? %p\n", thisView); 
-        printf("R: %d, G: %d, B: %d\n", r, g, b);
-	    [thisView setBackgroundColor:r:g:b]; 
-        printf("oh hello?? \n");
-    });                         
-    printf("im back!\n");
+	    [thisView setBackgroundColor:r:g:b];
+    });
 	[pool drain];
 } 
 Msg containerSetSize_CTContainer (CocoaID_CTCommon id, Size_CTCommon pos, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	printf("setting containerSize ext!\n");
+	DEBUG("setting containerSize ext!\n");
 	__block CocoaView *thisView = (CocoaView*) (((internal_CocoaID_CTCommon) id)->this); 
     dispatch_sync(dispatch_get_main_queue(), ^{
 	    [thisView setFrameSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon)];
@@ -44,7 +35,7 @@ Msg containerSetSize_CTContainer (CocoaID_CTCommon id, Size_CTCommon pos, Time s
 }
 Msg containerSetPosition_CTContainer (CocoaID_CTCommon id, Position_CTCommon pos, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    printf("setting position on container ext!\n");
+    DEBUG("setting position on container ext!\n");
 	__block CocoaView *thisContainer = (CocoaView*) COCOA_REF(id);
     dispatch_sync(dispatch_get_main_queue(), ^{
 	    [thisContainer setFrameOrigin: NSMakePoint(pos->x_CTCommon,pos->y_CTCommon)];
@@ -55,7 +46,7 @@ TUP0 initContainer_CTContainer (/*Container_CTContainer container*/CocoaID_CTCom
     internal_CocoaID_CTCommon thisContainer = (internal_CocoaID_CTCommon)id;//(internal_CocoaID_CTCommon)(container->l_Container_CTContainer_Component_CTCommon_CTContainer->id_CTCommon);	
 	__block CocoaView *cocoaView;
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	printf("Initializing NSContainer: \n");
+	DEBUG("Initializing NSContainer: \n");
 	
     dispatch_sync(dispatch_get_main_queue(), ^{
         cocoaView = [[CocoaView alloc] initWithFrame: NSMakeRect(0, 0, 200.0, 200.0)];
@@ -63,7 +54,7 @@ TUP0 initContainer_CTContainer (/*Container_CTContainer container*/CocoaID_CTCom
 
 	thisContainer->this = cocoaView;
 
-	printf("Container OK! %p\n", cocoaView);
+	DEBUG("Container OK! %p\n", cocoaView);
 	[pool drain];
 
 	return 0;

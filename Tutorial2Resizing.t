@@ -3,13 +3,13 @@ module Tutorial2Resizing where
 import COCOA
 import POSIX
 
-import CTWindow 
 root w = class
     env = new posix w
     osx = new cocoa w
 
+    w1 = new mkCocoaWindow env
+
     applicationDidFinishLaunching app = action                         
-        w1 = new mkCocoaWindow env
         w1.setSize ({width=400; height=400})
       	
         leftContainer = new mkCocoaContainer env 
@@ -39,7 +39,7 @@ root w = class
         w1.addComponent leftContainer
         w1.addComponent rightContainer
 
-        app.showWindow w1  
+        app.addWindow w1  
         
         handler = new buttonHandler label
         button.addResponder handler     
@@ -80,7 +80,7 @@ windowResponder textarea env = class
 buttonHandler label = class
     clickCount := 0
 
-    handleEvent (MouseEvent event) modifiers = request
+    respondToInputEvent (MouseEvent event) modifiers = request
         -- here we will place the code for handling mouse events
         case event of
             MouseClicked pos ->
@@ -90,7 +90,7 @@ buttonHandler label = class
             _ ->
                 result False     
         
-    handleEvent _ modifiers = request
+    respondToInputEvent _ modifiers = request
         result False
     
     result RespondsToInputEvents {..}        

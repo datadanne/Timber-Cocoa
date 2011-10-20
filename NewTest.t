@@ -36,7 +36,7 @@ root w = class
     
     
         app.setEnv env
-        app.showWindow w1
+        app.addWindow w1
         cid <- w1.getContainerID
         w1.installMouseListener (drawPixel app cid)
 

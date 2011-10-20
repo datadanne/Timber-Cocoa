@@ -62,8 +62,8 @@
     x_5111->Tag = 3;
     x_5111->a = x_5110;
     
-    CocoaEvent_CTCommon receivedEvent;
-    NEW (CocoaEvent_CTCommon, receivedEvent, WORDS(sizeof(struct _MouseEvent_CTCommon)));
+    InputEvent_CTCommon receivedEvent;
+    NEW (InputEvent_CTCommon, receivedEvent, WORDS(sizeof(struct _MouseEvent_CTCommon)));
     ((_MouseEvent_CTCommon)receivedEvent)->GCINFO = __GC___MouseEvent_CTCommon;
     ((_MouseEvent_CTCommon)receivedEvent)->Tag = 1;
     ((_MouseEvent_CTCommon)receivedEvent)->a = (MouseEventType_CTCommon)x_5111;    
@@ -79,14 +79,14 @@
 
     x_1144->a = getStr(buf); 
     
-    CocoaEvent_CTCommon zuperEvent_11;
-    NEW (CocoaEvent_CTCommon, zuperEvent_11, WORDS(sizeof(struct _SelectionEvent_CTCommon)));
+    InputEvent_CTCommon zuperEvent_11;
+    NEW (InputEvent_CTCommon, zuperEvent_11, WORDS(sizeof(struct _SelectionEvent_CTCommon)));
     ((_SelectionEvent_CTCommon)zuperEvent_11)->GCINFO = __GC___SelectionEvent_CTCommon;
     ((_SelectionEvent_CTCommon)zuperEvent_11)->Tag = 0;
     ((_SelectionEvent_CTCommon)zuperEvent_11)->a = (SelectionEventType_CTCommon)x_1144;*/
 
     
-    app->sendInputEvent_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, windowId, 0);
+    app->sendInputEvent_CTCommon(app, (InputEvent_CTCommon)receivedEvent, windowId, 0);
 }  
 
 - (void) setCoordsX: (float) xarg andY: (float) yarg {

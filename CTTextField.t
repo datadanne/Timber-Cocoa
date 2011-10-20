@@ -28,7 +28,7 @@ mkCocoaTextField env = class
     getState = base.getState
     setState = base.setState
     getAllComponents = base.getAllComponents
-    handleEvent = base.handleEvent
+    respondToInputEvent = base.respondToInputEvent
 
     scrollable := (True, False)
     getScrollable = request

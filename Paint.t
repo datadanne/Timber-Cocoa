@@ -19,7 +19,7 @@ mkPaintBackdrop env = class
     getName = base.getName
     getState = base.getState
     setState = base.setState
-    handleEvent = base.handleEvent
+    respondToInputEvent = base.respondToInputEvent
 
     setPosition = base.setPosition
     getPosition = base.getPosition
@@ -54,7 +54,7 @@ paintHandler w1 label env = class
     posget (MouseClicked p) = p
     posget (MouseWheelScroll p _ _) = p   
 
-    handleEvent (MouseEvent event) modifiers = request
+    respondToInputEvent (MouseEvent event) modifiers = request
         pos = (posget event)
     
         env.stdout.write "Painting box\n"
@@ -71,7 +71,7 @@ paintHandler w1 label env = class
         pixelCount := 1 + pixelCount
         result False
         
-    handleEvent _ modifiers = request
+    respondToInputEvent _ modifiers = request
         result False
         
     result RespondsToInputEvents {..}
@@ -88,7 +88,7 @@ root w = class
 
     applicationDidFinishLaunching app = action
         app.setEnv env
-        app.showWindow w1
+        app.addWindow w1
         w1.addComponent label
         bg.addResponder painter
     

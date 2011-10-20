@@ -60,7 +60,7 @@ mkCocoaDropDown env = class
     getState = base.getState
     setState = base.setState
     getAllComponents = base.getAllComponents
-    handleEvent = base.handleEvent
+    respondToInputEvent = base.respondToInputEvent
     
     options := []
     
@@ -169,10 +169,10 @@ deriving instance eqSizeState :: Eq SizeState
 defaultHandler dropdownUpdateMethod = class 
     sizeState := Small
     
-    handleEvent (KeyEvent t) modifiers = request
+    respondToInputEvent (KeyEvent t) modifiers = request
         result False 
 
-    handleEvent (MouseEvent t) modifiers = request
+    respondToInputEvent (MouseEvent t) modifiers = request
         case t of
             MouseClicked pos ->
                 if (sizeState == Small) then
@@ -186,7 +186,7 @@ defaultHandler dropdownUpdateMethod = class
             _ ->    
         result True 
 
-    handleEvent _ modifiers = request
+    respondToInputEvent _ modifiers = request
         result False 
         
     result RespondsToInputEvents {..}

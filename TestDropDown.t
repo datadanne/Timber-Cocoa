@@ -13,7 +13,7 @@ root w = class
     dropdown2 = new mkCocoaDropDown env
     
     applicationDidFinishLaunching app = action                         
-        app.showWindow w1
+        app.addWindow w1
         app.setEnv env
         
     result action

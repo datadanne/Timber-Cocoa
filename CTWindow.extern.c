@@ -6,7 +6,7 @@
 extern pthread_mutex_t rts;
 extern pthread_mutex_t envmut;
 extern int rootsDirty;
-CocoaEvent_CTCommon receivedEvent;
+InputEvent_CTCommon receivedEvent;
 
 pthread_mutex_t eventMutex;
 
@@ -43,7 +43,7 @@ bool dispatchEventToTimber(NSEvent* event) {
 	    x_5111->Tag = 3;
 	    x_5111->a = x_5110;
 	   
-	    NEW (CocoaEvent_CTCommon, receivedEvent, WORDS(sizeof(struct _MouseEvent_CTCommon)));
+	    NEW (InputEvent_CTCommon, receivedEvent, WORDS(sizeof(struct _MouseEvent_CTCommon)));
 	    ((_MouseEvent_CTCommon)receivedEvent)->GCINFO = __GC___MouseEvent_CTCommon;
 	    ((_MouseEvent_CTCommon)receivedEvent)->Tag = 1;
 	    ((_MouseEvent_CTCommon)receivedEvent)->a = (MouseEventType_CTCommon)x_5111;
@@ -59,7 +59,7 @@ bool dispatchEventToTimber(NSEvent* event) {
 
         x_1652->a = (CocoaKey_CTCommon)(POLY)(126 - [event keyCode]);
                 
-        NEW (CocoaEvent_CTCommon, receivedEvent, WORDS(sizeof(struct _KeyEvent_CTCommon)));
+        NEW (InputEvent_CTCommon, receivedEvent, WORDS(sizeof(struct _KeyEvent_CTCommon)));
         ((_KeyEvent_CTCommon)receivedEvent)->GCINFO = __GC___KeyEvent_CTCommon;
         ((_KeyEvent_CTCommon)receivedEvent)->Tag = 0;
         ((_KeyEvent_CTCommon)receivedEvent)->a = (KeyEventType_CTCommon)x_1652;
@@ -106,14 +106,14 @@ bool dispatchEventToTimber(NSEvent* event) {
         x_1074->b = deltaX;
         x_1074->c = deltaY;
 
-        //CocoaEvent_CTCommon test_12;
-        NEW (CocoaEvent_CTCommon, receivedEvent, WORDS(sizeof(struct _MouseEvent_CTCommon)));
+        //InputEvent_CTCommon test_12;
+        NEW (InputEvent_CTCommon, receivedEvent, WORDS(sizeof(struct _MouseEvent_CTCommon)));
         ((_MouseEvent_CTCommon)receivedEvent)->GCINFO = __GC___MouseEvent_CTCommon;
         ((_MouseEvent_CTCommon)receivedEvent)->Tag = 1;
         ((_MouseEvent_CTCommon)receivedEvent)->a = (MouseEventType_CTCommon)x_1074;     
 
     	App_CTCommon app = getApp();
-        app->sendInputEvent_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0);      
+        app->sendInputEvent_CTCommon(app, (InputEvent_CTCommon)receivedEvent, [event windowNumber], 0);      
         return true;
 	} else {
         printf("Event of type %d was discarded\n", [event type]);
@@ -133,7 +133,7 @@ bool dispatchEventToTimber(NSEvent* event) {
     ENABLE(rts);
 	
     assert(b1 == b2);
-    bool timberResult = app->sendInputEvent_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, [event windowNumber], 0);
+    bool timberResult = app->sendInputEvent_CTCommon(app, (InputEvent_CTCommon)receivedEvent, [event windowNumber], 0);
     return timberResult;
 }
 
@@ -153,7 +153,7 @@ TUP0 windowSetContentView_CTWindow(CocoaWindow_CTCommon window, CocoaID_CTCommon
 void scanEventReceived() {
 	DISABLE(envmut);
 	if(receivedEvent)
-		receivedEvent = (CocoaEvent_CTCommon)copy((ADDR)receivedEvent);
+		receivedEvent = (InputEvent_CTCommon)copy((ADDR)receivedEvent);
 	ENABLE(envmut);
 }
 
@@ -168,7 +168,7 @@ Int initCocoaWindow_CTWindow(CocoaWindow_CTCommon wnd, App_CTCommon app, Int dum
     dispatch_sync(dispatch_get_main_queue(), ^{
     	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
 
-        NSRect frameRect = NSMakeRect(0, 0, 200, 200);
+        NSRect frameRect = NSMakeRect(0, 0, 0, 0);
         NSUInteger styleMask = (NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask);
         window = [[CocoaWindow alloc] initWithContentRect:frameRect styleMask:styleMask  backing:NSBackingStoreBuffered defer:NO]; 
 

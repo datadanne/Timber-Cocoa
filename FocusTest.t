@@ -16,14 +16,14 @@ root w = class
     dropDown = new mkCocoaDropDown env
     
     tabKeyResponder app wid = class
-        handleEvent event modifiers = request
+        respondToInputEvent event modifiers = request
             env.stdout.write ("Sending KeyPressed \"Tab\" to window which has ID: " ++ (show wid) ++ "\n")
             result True
         result RespondsToInputEvents {..}
     
     tabStopResponder = class
         block := False
-        handleEvent event modifiers = request
+        respondToInputEvent event modifiers = request
             button.setTitle ("Consume: " ++ (show (not block)))
             block := not block
             env.stdout.write (if (block) then
@@ -34,7 +34,7 @@ root w = class
         result RespondsToInputEvents {..}
         
     applicationDidFinishLaunching app = action                         
-        app.showWindow w1
+        app.addWindow w1
         app.setEnv env
         tabButton = new mkCocoaButton env
         tabButton.setTitle "Tab (nofocus)"

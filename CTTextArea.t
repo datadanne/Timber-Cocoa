@@ -29,7 +29,7 @@ mkCocoaTextArea env = class
     getState = base.getState
     setState = base.setState
     getAllComponents = base.getAllComponents
-    handleEvent = base.handleEvent
+    respondToInputEvent = base.respondToInputEvent
 
     scrollable := (False, True)
     getScrollable = request
@@ -112,7 +112,7 @@ defaultTextScrollResponder textArea env = class
         scrolledState := (deltaX, deltaY)
         textAreaScrollTo textArea.id deltaX deltaY
     
-    handleEvent (MouseEvent t) modifiers = request
+    respondToInputEvent (MouseEvent t) modifiers = request
         case t of
             MouseMoved pos ->
             MouseWheelScroll pos deltaX deltaY -> 
@@ -122,7 +122,7 @@ defaultTextScrollResponder textArea env = class
             
         result True
     
-    handleEvent _ modifiers = request
+    respondToInputEvent _ modifiers = request
         result False
     
     result RespondsToInputEvents {..}

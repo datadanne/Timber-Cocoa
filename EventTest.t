@@ -23,7 +23,7 @@ root w = class
      
     applicationDidFinishLaunching app = action
         app.setEnv env
-        app.showWindow w1
+        app.addWindow w1
     
     result action
         label.setSize ({width=300;height=50})

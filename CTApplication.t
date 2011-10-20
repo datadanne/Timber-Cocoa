@@ -8,7 +8,7 @@ import CTCommon
 cocoaApplication = class
     activeWindows := []
 
-    showWindow w = request
+    addWindow w = request
         w.initWindow this
         activeWindows := w:activeWindows
 
@@ -23,11 +23,8 @@ cocoaApplication = class
         (KeyPressed name) = k
 
         case (name) of
-            Tab ->  updateList name
-            Shift ->
-                    --if (isJust env) then 
-                    --    (fromJust env).stdout.write ("shift " ++ (if (elem Shift modifiers) then "down" else "up") ++ "\n")
-                    updateList name
+            Tab -> updateList name
+            Shift -> updateList name
             Control -> updateList name
             Command -> updateList name
             _ ->
@@ -45,9 +42,9 @@ cocoaApplication = class
             if (<- window.getId == windowId) then
                 window.onWindowResize toSize modifiers
 
-    shouldClose := False
+    shouldClose := True
     sendWindowCloseRequest windowId = request
-        shouldClose := False
+        shouldClose := True
         forall window <- activeWindows do
             if (<- window.getId == windowId) then
                 shouldClose := (<- window.onWindowCloseRequest modifiers)
@@ -74,7 +71,7 @@ cocoaApplication = class
         
         forall window <- activeWindows do
             if (<- window.getId == windowId) then
-                resultState := (<- window.handleEvent recvEvent modifiers)
+                resultState := (<- window.respondToInputEvent recvEvent modifiers)
         
         result resultState
 

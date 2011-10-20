@@ -3,7 +3,7 @@ module Tutorial4ColorPicker where
 import COCOA
 
 struct ColorPickerTile where
-    initTile :: CocoaWindow -> (Color -> Request ()) -> Request ()
+    initTile :: CocoaWindow -> (Color -> Action) -> Request ()
     
 struct ColorGrid where
     initGrid :: Request ()
@@ -23,11 +23,11 @@ colorPickerTile colorPickerX colorPickerY env = class
         parent.addComponent container
         
     tileResponder tileColor setColor env = class
-        handleEvent (MouseEvent event) modifiers = request
+        respondToInputEvent (MouseEvent event) modifiers = request
             setColor tileColor
             result False
 
-        handleEvent _ modifiers = request
+        respondToInputEvent _ modifiers = request
             result False
 
         result RespondsToInputEvents {..}

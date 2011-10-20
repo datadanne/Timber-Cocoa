@@ -107,9 +107,9 @@ mkCocoaContainer env = class
                 cmp.init app
                 containerAddComponent id cmp.id
     inithelper = do
-       containerSetSize id (<- base.getSize)
-       containerSetBackgroundColor id color
-       containerSetPosition id (<- base.getPosition)
+            containerSetSize id (<- base.getSize)
+            containerSetBackgroundColor id color
+            containerSetPosition id (<- base.getPosition)
        
     this := Container{..}  
 

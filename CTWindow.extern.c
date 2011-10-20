@@ -168,7 +168,7 @@ Int initCocoaWindow_CTWindow(CocoaWindow_CTCommon wnd, App_CTCommon app, Int dum
     dispatch_sync(dispatch_get_main_queue(), ^{
     	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
 
-        NSRect frameRect = NSMakeRect(0, 0, 0, 0);
+        NSRect frameRect = NSMakeRect(0, 0, 200, 200);
         NSUInteger styleMask = (NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask);
         window = [[CocoaWindow alloc] initWithContentRect:frameRect styleMask:styleMask  backing:NSBackingStoreBuffered defer:NO]; 
 

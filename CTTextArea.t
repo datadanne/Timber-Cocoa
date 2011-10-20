@@ -69,6 +69,10 @@ mkCocoaTextArea env = class
         result position
 
     setSize s = request
+        case (<- base.getState) of
+            Active -> textAreaSetSize id s
+            _ -> 
+        
         size := s
 
     getSize = request

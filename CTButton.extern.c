@@ -24,6 +24,26 @@ Msg buttonSetPosition_CTButton(CocoaID_CTCommon id, Position_CTCommon pos, Time 
 	[thisButton performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
    	[pool drain]; 
 }
+Msg buttonSetSize_CTButton(CocoaID_CTCommon id, Size_CTCommon size, Time start, Time stop) {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	NSButton *thisButton = (NSButton*) COCOA_REF(id);
+                 
+    NSRect rr = [thisButton frame];
+    NSLog(@"%f, %f, %f, %f--bounds\n", rr.origin.x, rr.origin.y, rr.size.width, rr.size.height);
+    
+    //[thisButton setBounds: NSMakeRect(rr.origin.x, rr.origin.y, size->width_CTCommon, size->height_CTCommon)];
+    //[thisButton setFrame: NSMakeRect(rr.origin.x, rr.origin.y, size->width_CTCommon, size->height_CTCommon)];
+    
+    NSSize newS = NSMakeSize(size->width_CTCommon, rr.size.height);
+    [thisButton setFrameSize: newS];
+    //for(int i=0;i<1000;i++);
+    
+    rr = [thisButton frame];
+    NSLog(@"--%f, %f, %f, %f\n", rr.origin.x, rr.origin.y, rr.size.width, rr.size.height);
+
+
+   	[pool drain];     
+}
 
 Msg buttonHighlight_CTButton(CocoaID_CTCommon id, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];

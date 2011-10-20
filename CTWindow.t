@@ -6,7 +6,8 @@ import CTContainer
     
 --------------------------------------------------------------------------------------------------
 ------          ** WINDOW **            ---------------------------------------------------------- 
-mkWindow env = class    
+mkCocoaWindow :: Env -> Class CocoaWindow
+mkCocoaWindow env = class    
     position := {x=0;y=0}
     windowId = new mkCocoaID
     state := Inactive
@@ -26,10 +27,24 @@ mkWindow env = class
     getResponders = handlers.getResponders
     handleEvent = handlers.handleEvent
        
-    dwh = new defaultWindowResponder this env
+{-    dwh = new defaultWindowResponder this env
     onWindowResize = dwh.onWindowResize
-    onWindowCloseRequest = dwh.onWindowCloseRequest
-    setWindowResponder = dwh.setWindowResponder
+    onWindowCloseRequest = dwh.onWindowCloseRequest   
+    setWindowResponder = dwh.setWindowResponder    -}
+    
+    a = new defaultWindowResponder this env
+    
+    dwh := a
+    onWindowResize size modifiers = request
+        result (<- dwh.onWindowResize size modifiers)
+
+    onWindowCloseRequest modifiers = request
+        result (<- dwh.onWindowCloseRequest modifiers)
+
+    setWindowResponder resp = request 
+        dwh := resp  
+    
+
 
     getContainerID = request
         result rootContainer.id
@@ -98,7 +113,7 @@ mkWindow env = class
         else
             result False
                               
-    setVisible = request
+    show = request
         if (state == Active && isVisible == False) then
             windowSetVisible windowId
             isVisible := True

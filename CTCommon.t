@@ -85,6 +85,10 @@ struct HasResponders where
 struct RespondsToInputEvents where
     handleEvent :: CocoaEvent -> Modifiers -> Request Bool
 
+struct RespondsToSelectionEvents where
+    selectionChanged :: String -> Action
+    setSelectionResponder :: RespondsToSelectionEvents -> Request ()
+
 struct RespondsToWindowEvents where
     onWindowResize :: Size -> Modifiers -> Request ()
     onWindowCloseRequest :: Modifiers -> Request Bool
@@ -124,13 +128,13 @@ struct ContainsComponents where
     removeAllComponents :: Request ()
     getComponents :: Request [Component]
 
-struct CocoaWindow < HasSize, HasBackgroundColor, ContainsComponents, HasResponders, RespondsToWindowEvents, RespondsToInputEvents where 
+struct CocoaWindow < RespondsToWindowEvents, HasSize, HasBackgroundColor, ContainsComponents, HasResponders, RespondsToInputEvents where 
     windowId :: CocoaID
     getId :: Request WindowID
     initWindow :: App -> Request ()
     destroyWindow :: Request ()
     hide :: Request Bool
-    setVisible :: Request Bool
+    show :: Request Bool
     setFocus :: Component -> Request ()
     getFocus :: Request Component
     getContainerID :: Request CocoaID
@@ -159,19 +163,19 @@ basicHasResponders = class
         result handlers
     
     -- Return true (block cocoa) if any of the installed handlers say so.
-    returnVal := False
+    returnVal := False    
+    --res := False
     handleEvent cocoaEvent modifiers = request
         returnVal := False
         forall h <- handlers do
-            res <- h.handleEvent cocoaEvent modifiers
-            if (res == True) then
-                returnVal := True
-
+            if returnVal == False then
+                returnVal := <- h.handleEvent cocoaEvent modifiers
+            --if (res == True) then
+            --    returnVal := True
         result returnVal
     
 
     result DefaultEventResponder {..}
-
 
 basicComponent f p n = class
 

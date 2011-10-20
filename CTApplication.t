@@ -31,11 +31,17 @@ cocoaApplication = class
             _ ->
             
         sendInputToWindow (KeyEvent k) windowId
-        result blockDefaultCocoaBehavior
+        -- Block key events from Cocoa, since we want to deal with these in Timber.
+        result True
 
+    --crashEverythingForNoReason _ = True
+    
     sendInputEvent (MouseEvent m) windowId = request
         sendInputToWindow (MouseEvent m) windowId
-        result blockDefaultCocoaBehavior
+        
+        case m of
+            (MouseWheelScroll _ _ _) -> result True -- Block scroll since we control it in Timber instead.
+            _ -> result blockDefaultCocoaBehavior
   
     sendInputEvent _ _ = request
         result blockDefaultCocoaBehavior

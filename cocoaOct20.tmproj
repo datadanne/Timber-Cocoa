@@ -2,13 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>currentDocument</key>
+	<string>Tutorial4MultipleWindows.t</string>
 	<key>documents</key>
 	<array>
 		<dict>
 			<key>filename</key>
 			<string>COCOA.extern.c</string>
 			<key>lastUsed</key>
-			<date>2011-10-07T13:42:41Z</date>
+			<date>2011-10-20T16:19:16Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -20,27 +22,25 @@
 			<key>filename</key>
 			<string>COCOA.t</string>
 			<key>lastUsed</key>
-			<date>2011-09-29T17:50:33Z</date>
+			<date>2011-10-20T16:19:19Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTApplication.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-07T12:05:20Z</date>
+			<date>2011-10-20T17:14:54Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTButton.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-07T13:42:43Z</date>
+			<date>2011-10-20T13:23:46Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTButton.extern.c</string>
 			<key>lastUsed</key>
-			<date>2011-10-07T13:42:43Z</date>
-			<key>selected</key>
-			<true/>
+			<date>2011-10-20T09:04:17Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -52,13 +52,13 @@
 			<key>filename</key>
 			<string>CTContainer.extern.m</string>
 			<key>lastUsed</key>
-			<date>2011-09-29T16:11:01Z</date>
+			<date>2011-10-20T11:05:46Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTContainer.extern.c</string>
 			<key>lastUsed</key>
-			<date>2011-09-29T16:11:04Z</date>
+			<date>2011-10-20T16:18:34Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -70,61 +70,61 @@
 			<key>filename</key>
 			<string>CTContainer.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-07T11:42:31Z</date>
+			<date>2011-10-20T14:19:16Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTCommon.t</string>
 			<key>lastUsed</key>
-			<date>2011-09-29T17:10:30Z</date>
+			<date>2011-10-20T17:09:50Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTCommon.extern.c</string>
 			<key>lastUsed</key>
-			<date>2011-09-29T16:54:28Z</date>
+			<date>2011-10-20T17:09:39Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTCommon.extern.h</string>
 			<key>lastUsed</key>
-			<date>2011-09-29T15:48:45Z</date>
+			<date>2011-10-20T12:02:57Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTWindow.extern.m</string>
 			<key>lastUsed</key>
-			<date>2011-09-29T16:51:13Z</date>
+			<date>2011-10-20T16:54:25Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTWindow.extern.c</string>
 			<key>lastUsed</key>
-			<date>2011-10-07T11:25:58Z</date>
+			<date>2011-10-20T17:14:50Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTWindow.extern.h</string>
 			<key>lastUsed</key>
-			<date>2011-09-29T13:05:26Z</date>
+			<date>2011-10-20T11:17:33Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTWindow.t</string>
 			<key>lastUsed</key>
-			<date>2011-09-29T17:49:39Z</date>
+			<date>2011-10-20T17:14:24Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTLabel.extern.c</string>
 			<key>lastUsed</key>
-			<date>2011-09-29T14:51:29Z</date>
+			<date>2011-10-20T17:14:22Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTLabel.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-07T11:42:29Z</date>
+			<date>2011-10-20T11:36:18Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -136,7 +136,7 @@
 			<key>filename</key>
 			<string>Paint.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-07T11:59:36Z</date>
+			<date>2011-10-20T11:59:58Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -232,7 +232,7 @@
 			<key>filename</key>
 			<string>EventHandler.t</string>
 			<key>lastUsed</key>
-			<date>2011-09-20T08:38:13Z</date>
+			<date>2011-10-20T05:42:30Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -256,19 +256,54 @@
 			<key>filename</key>
 			<string>COCOA.extern.POSIX.cfg</string>
 			<key>lastUsed</key>
-			<date>2011-09-25T09:30:06Z</date>
+			<date>2011-10-20T12:32:56Z</date>
 		</dict>
 		<dict>
-			<key>filename</key>
-			<string>CTApplication.extern.POSIX.cfg</string>
-			<key>lastUsed</key>
-			<date>2011-09-25T09:30:09Z</date>
-		</dict>
-		<dict>
-			<key>filename</key>
-			<string>CTWindow.extern.POSIX.cfg</string>
-			<key>lastUsed</key>
-			<date>2011-10-07T13:42:42Z</date>
+			<key>children</key>
+			<array>
+				<dict>
+					<key>filename</key>
+					<string>Tutorial0App.t</string>
+					<key>lastUsed</key>
+					<date>2011-10-20T17:08:16Z</date>
+				</dict>
+				<dict>
+					<key>filename</key>
+					<string>Tutorial1ComponentsAndHierarchies.t</string>
+					<key>lastUsed</key>
+					<date>2011-10-20T12:43:03Z</date>
+				</dict>
+				<dict>
+					<key>filename</key>
+					<string>Tutorial2Resizing.t</string>
+					<key>lastUsed</key>
+					<date>2011-10-20T13:25:18Z</date>
+				</dict>
+				<dict>
+					<key>filename</key>
+					<string>Tutorial3TabResponder.t</string>
+					<key>lastUsed</key>
+					<date>2011-10-20T16:17:00Z</date>
+				</dict>
+				<dict>
+					<key>filename</key>
+					<string>Tutorial4ColorPicker.t</string>
+					<key>lastUsed</key>
+					<date>2011-10-20T17:09:55Z</date>
+				</dict>
+				<dict>
+					<key>filename</key>
+					<string>Tutorial4MultipleWindows.t</string>
+					<key>lastUsed</key>
+					<date>2011-10-20T17:14:54Z</date>
+					<key>selected</key>
+					<true/>
+				</dict>
+			</array>
+			<key>expanded</key>
+			<true/>
+			<key>name</key>
+			<string>Tutorials</string>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -321,6 +356,204 @@
 	<integer>200</integer>
 	<key>metaData</key>
 	<dict>
+		<key>COCOA.extern.POSIX.cfg</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>32</integer>
+				<key>line</key>
+				<integer>2</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>COCOA.extern.c</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>110</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>71</integer>
+		</dict>
+		<key>COCOA.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>36</integer>
+				<key>line</key>
+				<integer>16</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>CTApplication.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>37</integer>
+				<key>line</key>
+				<integer>9</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>2</integer>
+		</dict>
+		<key>CTButton.extern.c</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>27</integer>
+				<key>line</key>
+				<integer>50</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>3</integer>
+		</dict>
+		<key>CTButton.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>4</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>CTCommon.extern.c</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>1</integer>
+				<key>line</key>
+				<integer>29</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>4</integer>
+		</dict>
+		<key>CTCommon.extern.h</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>19</integer>
+				<key>line</key>
+				<integer>7</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>CTCommon.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>20</integer>
+				<key>line</key>
+				<integer>169</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>139</integer>
+		</dict>
+		<key>CTContainer.extern.c</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>17</integer>
+				<key>line</key>
+				<integer>13</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>24</integer>
+		</dict>
+		<key>CTContainer.extern.m</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>38</integer>
+				<key>line</key>
+				<integer>27</integer>
+			</dict>
+			<key>columnSelection</key>
+			<false/>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>63</integer>
+				<key>line</key>
+				<integer>27</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>38</integer>
+				<key>line</key>
+				<integer>27</integer>
+			</dict>
+		</dict>
+		<key>CTContainer.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>17</integer>
+				<key>line</key>
+				<integer>19</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>CTLabel.extern.c</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>40</integer>
+				<key>line</key>
+				<integer>44</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>19</integer>
+		</dict>
 		<key>CTLabel.extern.h</key>
 		<dict>
 			<key>caret</key>
@@ -335,10 +568,237 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
+		<key>CTLabel.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>22</integer>
+		</dict>
+		<key>CTWindow.extern.c</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>87</integer>
+				<key>line</key>
+				<integer>241</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>28</integer>
+		</dict>
+		<key>CTWindow.extern.h</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>CTWindow.extern.m</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>9</integer>
+				<key>line</key>
+				<integer>9</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>CTWindow.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>19</integer>
+				<key>line</key>
+				<integer>126</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>92</integer>
+		</dict>
+		<key>EventHandler.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>Paint.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>40</integer>
+		</dict>
+		<key>Tutorial0App.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>58</integer>
+				<key>line</key>
+				<integer>17</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>Tutorial1ComponentsAndHierarchies.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>49</integer>
+				<key>line</key>
+				<integer>30</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>Tutorial2Resizing.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>72</integer>
+				<key>line</key>
+				<integer>88</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>58</integer>
+		</dict>
+		<key>Tutorial3TabResponder.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>31</integer>
+				<key>line</key>
+				<integer>124</integer>
+			</dict>
+			<key>columnSelection</key>
+			<false/>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>88</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>37</integer>
+				<key>line</key>
+				<integer>137</integer>
+			</dict>
+		</dict>
+		<key>Tutorial4ColorPicker.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>19</integer>
+				<key>line</key>
+				<integer>40</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>Tutorial4MultipleWindows.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>19</integer>
+				<key>line</key>
+				<integer>165</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>138</integer>
+		</dict>
 	</dict>
+	<key>openDocuments</key>
+	<array>
+		<string>EventHandler.t</string>
+		<string>Paint.t</string>
+		<string>COCOA.t</string>
+		<string>CTLabel.t</string>
+		<string>Tutorial1ComponentsAndHierarchies.t</string>
+		<string>Tutorial4MultipleWindows.t</string>
+		<string>Tutorial2Resizing.t</string>
+		<string>Tutorial3TabResponder.t</string>
+		<string>Tutorial0App.t</string>
+		<string>CTWindow.extern.m</string>
+		<string>CTApplication.t</string>
+		<string>Tutorial4ColorPicker.t</string>
+		<string>CTContainer.extern.c</string>
+		<string>CTContainer.extern.m</string>
+		<string>CTLabel.extern.c</string>
+		<string>CTWindow.extern.h</string>
+		<string>CTWindow.t</string>
+		<string>CTCommon.extern.h</string>
+		<string>CTCommon.extern.c</string>
+		<string>CTWindow.extern.c</string>
+		<string>COCOA.extern.POSIX.cfg</string>
+		<string>CTContainer.t</string>
+		<string>CTCommon.t</string>
+		<string>CTButton.extern.c</string>
+		<string>CTButton.t</string>
+		<string>COCOA.extern.c</string>
+	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{374, 547}, {481, 496}}</string>
+	<string>{{314, 109}, {1157, 941}}</string>
 </dict>
 </plist>

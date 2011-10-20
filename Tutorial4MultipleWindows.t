@@ -175,12 +175,12 @@ colorPickerToggle this window env = class
     toggle := True
     respondToInputEvent (MouseEvent event) modifiers = request
         _ <- window.setVisible toggle
-        send action this.setTitle ((if (toggle) then "Open" else "Close") ++ " ColorPicker")
+        --send action this.setTitle ((if (toggle) then "Open" else "Close") ++ " ColorPicker")
         
         toggle := not toggle
         result True
         
-    respondToInputEvent _ _ = request
+    respondToInputEvent _ modifiers = request
         result False
         
     result RespondsToInputEvents {..}

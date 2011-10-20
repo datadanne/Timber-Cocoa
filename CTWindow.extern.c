@@ -83,6 +83,7 @@ bool dispatchEventToTimber(NSEvent* event) {
         x_1073->GCINFO = __GC__Position_CTCommon;
         x_1073->x_CTCommon = p.x;
         x_1073->y_CTCommon = p.y;
+        
         _MouseWheelScroll_CTCommon x_1074;
         NEW (_MouseWheelScroll_CTCommon, x_1074, WORDS(sizeof(struct _MouseWheelScroll_CTCommon)));
         x_1074->GCINFO = __GC___MouseWheelScroll_CTCommon;

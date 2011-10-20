@@ -6,11 +6,12 @@ import CTContainer
     
 --------------------------------------------------------------------------------------------------
 ------          ** WINDOW **            ---------------------------------------------------------- 
-mkWindow env = class    
+mkCocoaWindow :: Env -> Class CocoaWindow
+mkCocoaWindow env = class    
     position := {x=0;y=0}
     windowId = new mkCocoaID
     state := Inactive
-        
+
     rootContainer = new mkCocoaContainer env
     addComponent = rootContainer.addComponent
     getComponents = rootContainer.getComponents
@@ -24,12 +25,19 @@ mkWindow env = class
     setResponders = handlers.setResponders
     getResponders = handlers.getResponders
     handleEvent = handlers.handleEvent
-       
-    dwh = new defaultWindowResponder this env
-    onWindowResize = dwh.onWindowResize
-    onWindowCloseRequest = dwh.onWindowCloseRequest
-    setWindowResponder = dwh.setWindowResponder
+    
+    a = new defaultWindowResponder this env
+    
+    dwh := a
+    onWindowResize size modifiers = request
+        result (<- dwh.onWindowResize size modifiers)
 
+    onWindowCloseRequest modifiers = request
+        result (<- dwh.onWindowCloseRequest modifiers)
+
+    setWindowResponder resp = request 
+        dwh := resp  
+    
     getContainerID = request
         result rootContainer.id
         
@@ -87,7 +95,6 @@ mkWindow env = class
          
     getFocus = request
         result currentFocus
-             
 
     isVisible := True
     setVisible b = request

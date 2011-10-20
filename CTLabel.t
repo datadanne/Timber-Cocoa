@@ -58,6 +58,10 @@ mkCocoaLabel = class
     getPosition = base.getPosition
 
     setSize s = request
+        case (<- base.getState) of
+            Active -> labelSetSize id s
+            _ ->
+
         size := s
 
     getSize = request

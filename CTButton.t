@@ -56,7 +56,11 @@ mkCocoaButton env = class
         result position
 
     setSize s = request
-        size := s
+        case (<- base.getState) of
+            Active -> buttonSetSize id s
+            _ -> 
+        oldSize = size
+        size := {width=s.width;height=oldSize.height}
 
     getSize = request
         result size
@@ -73,6 +77,7 @@ mkCocoaButton env = class
     inithelper = do
         buttonSetTitle id title
         buttonSetPosition id position
+        buttonSetSize id size
             
     this = Button{..}
 
@@ -86,4 +91,4 @@ private
 extern initButton :: Button -> App -> Request ()
 extern buttonSetTitle :: CocoaID -> String -> Action
 extern buttonSetPosition :: CocoaID -> Position -> Action
-extern buttonHighlight:: CocoaID -> Action
+extern buttonSetSize :: CocoaID -> Size -> Action

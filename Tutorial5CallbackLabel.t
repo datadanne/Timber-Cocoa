@@ -26,7 +26,7 @@ mkCocoaCallbackLabel = class
     getState = baseLabel.getState
     setState = baseLabel.setState
     getAllComponents = baseLabel.getAllComponents
-    handleEvent = baseLabel.handleEvent
+    respondToInputEvent = baseLabel.respondToInputEvent
     
     setText s = request
         baseLabel.setText s
@@ -51,6 +51,6 @@ mkCocoaCallbackLabel = class
     installOnTextChangeCallback a = request
         textChangeCallback := Just a
     
-    this = CTCallbackLabel{..}
+    this = Tutorial5CallbackLabel{..}
 
     result this

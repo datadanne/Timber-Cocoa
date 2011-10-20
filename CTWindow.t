@@ -8,7 +8,6 @@ import CTContainer
 ------          ** WINDOW **            ---------------------------------------------------------- 
 mkCocoaWindow :: Env -> Class CocoaWindow
 mkCocoaWindow env = class    
-    position := {x=0;y=0}
     windowId = new mkCocoaID
     state := Inactive
 
@@ -24,11 +23,11 @@ mkCocoaWindow env = class
     addResponder = handlers.addResponder
     setResponders = handlers.setResponders
     getResponders = handlers.getResponders
-    handleEvent = handlers.handleEvent
+    respondToInputEvent = handlers.respondToInputEvent
     
-    a = new defaultWindowResponder this env
     
-    dwh := a
+    dwh := new defaultWindowResponder this env
+    
     onWindowResize size modifiers = request
         result (<- dwh.onWindowResize size modifiers)
 
@@ -41,6 +40,7 @@ mkCocoaWindow env = class
     getContainerID = request
         result rootContainer.id
         
+    position := {x=0;y=0}
     getPosition = request
         result position
 
@@ -66,12 +66,13 @@ mkCocoaWindow env = class
             inithelper 
         
     inithelper = do
+        _ <- internalSetVisible
+    
         rsize = (<- rootContainer.getSize)
         foo = ({width = rsize.width+20;height=rsize.height+20})
         windowSetPosition windowId position
-        windowSetSize windowId (<- rootContainer.getSize)
         windowSetContentView this rootContainer.id
-        _ <- internalSetVisible
+        windowSetSize windowId (<- rootContainer.getSize)
         
         wh = new defaultInputResponder this rootContainer env
         handlers.addResponder wh
@@ -147,13 +148,13 @@ defaultInputResponder window rootContainer env = class
     currentFocus := rootContainer
 
     focusables := []
-    handleEvent (KeyEvent keyEventType) modifiers = request
+    respondToInputEvent (KeyEvent keyEventType) modifiers = request
         currentFocus := <- window.getFocus
         
         if ((<- currentFocus.getState) == Destroyed) then
             window.setFocus rootContainer
 
-        consumed = (<- currentFocus.handleEvent (KeyEvent keyEventType) modifiers)
+        consumed = (<- currentFocus.respondToInputEvent (KeyEvent keyEventType) modifiers)
     
         if (consumed == False) then
             env.stdout.write "moving focus" 
@@ -178,10 +179,10 @@ defaultInputResponder window rootContainer env = class
         -- TODO: Resolve menu key event capture. No listener if consumed.    
         result False
 
-    handleEvent (MouseEvent me) modifiers = request
+    respondToInputEvent (MouseEvent me) modifiers = request
         cmps <- rootContainer.getAllComponents
         scanList cmps (findMouseFocus me modifiers)
-        result (<- rootContainer.handleEvent (MouseEvent me) modifiers)
+        result (<- rootContainer.respondToInputEvent (MouseEvent me) modifiers)
     
     scanList [] _ = do 
         result False 
@@ -218,7 +219,7 @@ defaultInputResponder window rootContainer env = class
         if (clickInsideBox relativePosition cmpPos cmpSize) then
             if ( <- cmp.getIsFocusable ) then
                 window.setFocus cmp
-            result (<- cmp.handleEvent (MouseEvent eventInLocalCoords) modifiers)
+            result (<- cmp.respondToInputEvent (MouseEvent eventInLocalCoords) modifiers)
         else
             result False
         

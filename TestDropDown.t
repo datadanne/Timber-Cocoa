@@ -8,9 +8,9 @@ root w = class
     
     w1 = new mkCocoaWindow env
     dropD = new mkCocoaDropDown env
-    
-    applicationDidFinishLaunching app = action            
-        app.showWindow w1
+
+    applicationDidFinishLaunching app = action                         
+        app.addWindow w1
         app.setEnv env
         
     result action

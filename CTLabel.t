@@ -26,7 +26,7 @@ mkCocoaLabel = class
     getState = base.getState
     setState = base.setState
     getAllComponents = base.getAllComponents
-    handleEvent = base.handleEvent
+    respondToInputEvent = base.respondToInputEvent
 
     setText s = request
         text := s
@@ -58,10 +58,6 @@ mkCocoaLabel = class
     getPosition = base.getPosition
 
     setSize s = request
-        case (<- base.getState) of
-            Active -> labelSetSize id s
-            _ ->
-
         size := s
 
     getSize = request

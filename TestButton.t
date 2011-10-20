@@ -13,7 +13,7 @@ root w = class
     button2 = new mkCocoaButton env
     
     applicationDidFinishLaunching app = action                         
-        app.showWindow w1
+        app.addWindow w1
         app.setEnv env
     
         
@@ -34,7 +34,7 @@ root w = class
         osx.startApplication applicationDidFinishLaunching
         
 buttonClickHandler btn = class
-    handleEvent (MouseEvent ev) modifiers = request
+    respondToInputEvent (MouseEvent ev) modifiers = request
         case ev of
             MouseClicked pos ->
                 btn.setSize ({width=200;height=150})
@@ -42,7 +42,7 @@ buttonClickHandler btn = class
             _ ->
                 result False
             
-    handleEvent _ _ = request 
+    respondToInputEvent _ _ = request 
         result False
     
     result RespondsToInputEvents {..}

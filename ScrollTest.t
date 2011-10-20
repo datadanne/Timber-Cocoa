@@ -11,7 +11,7 @@ root w = class
     textA = new mkCocoaTextArea env
     
     applicationDidFinishLaunching app = action                         
-        app.showWindow w1
+        app.addWindow w1
         app.setEnv env
         env.stdout.write "Step 3\n"
         

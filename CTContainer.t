@@ -10,11 +10,8 @@ struct Container < Component, ContainsComponents, HasBackgroundColor
 mkCocoaContainer env = class
     myComponents := []        
     color := {r=255; g=255; b=255}
-
     appRef := Nothing
-    mouseEventResponder := Nothing
-    keyEventResponder := Nothing
-
+    
     id = new mkCocoaID
     base = new basicComponent False Nothing "Container"
     addResponder = base.addResponder
@@ -28,7 +25,7 @@ mkCocoaContainer env = class
     getName = base.getName
     getState = base.getState
     setState = base.setState
-    handleEvent = base.handleEvent
+    respondToInputEvent = base.respondToInputEvent
 
     setPosition p = request
         case (<- base.getState) of
@@ -64,7 +61,6 @@ mkCocoaContainer env = class
         if (state == Active && isJust appRef) then
             c.init (fromJust appRef)
             containerAddComponent id c.id    
-        env.stdout.write ("Adding " ++ (<- c.getName) ++ "\n")
             
     removeComponent c = request
         myComponents := [x | x <- myComponents, not (x == c)]
@@ -107,9 +103,9 @@ mkCocoaContainer env = class
                 cmp.init app
                 containerAddComponent id cmp.id
     inithelper = do
-            containerSetSize id (<- base.getSize)
-            containerSetBackgroundColor id color
-            containerSetPosition id (<- base.getPosition)
+       containerSetSize id (<- base.getSize)
+       containerSetBackgroundColor id color
+       containerSetPosition id (<- base.getPosition)
        
     this := Container{..}  
 

@@ -24,7 +24,7 @@ root w = class
      
     applicationDidFinishLaunching app = action
         app.setEnv env
-        app.showWindow w1
+        app.addWindow w1
         
         toSize = {width=167;height=133}
         foo = ResultSize toSize

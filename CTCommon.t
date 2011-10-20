@@ -5,13 +5,9 @@ import POSIX
 data ApplicationState = Running | Stopped
 data CocoaState = Active | Inactive | Destroyed
 
-data WindowEventType = WindowClose | WindowResize Size
 data MouseEventType = MouseWheelScroll Position Float Float | MouseClicked Position | MousePressed Position | MouseReleased Position | MouseMoved Position
 data KeyEventType  = KeyPressed CocoaKey | KeyReleased CocoaKey
-
-data CocoaEvent = WindowEvent WindowEventType | MouseEvent MouseEventType | KeyEvent KeyEventType
-
-data TimberResult = ResultBool Bool | ResultSize Size | ResultPosition Position
+data InputEvent = MouseEvent MouseEventType | KeyEvent KeyEventType
 
 data CocoaKey = A | S | D | F | H | G | Z | X | C | V | Dummy1 | 
                 B | Q | W | E | R | Y | T | Num1 | Num2 | Num3 | Num4 | 
@@ -83,7 +79,7 @@ struct HasResponders where
     getResponders :: Request [RespondsToInputEvents]
 
 struct RespondsToInputEvents where
-    handleEvent :: CocoaEvent -> Modifiers -> Request Bool
+    respondToInputEvent :: InputEvent -> Modifiers -> Request Bool
 
 struct RespondsToSelectionEvents where
     selectionChanged :: String -> Action
@@ -139,9 +135,9 @@ struct CocoaWindow < RespondsToWindowEvents, HasSize, HasBackgroundColor, Contai
     getContainerID :: Request CocoaID
 
 struct App where
-    showWindow              :: CocoaWindow -> Request () 
+    addWindow              :: CocoaWindow -> Request () 
     getApplicationState     :: Request ApplicationState 
-    sendInputEvent          :: CocoaEvent -> WindowID -> Request Bool
+    sendInputEvent          :: InputEvent -> WindowID -> Request Bool
     sendWindowResize        :: Size -> WindowID -> Request ()
     sendWindowCloseRequest  :: WindowID -> Request Bool
     setEnv  :: Env -> Request ()
@@ -164,11 +160,11 @@ basicHasResponders = class
     -- Return true (block cocoa) if any of the installed handlers say so.
     returnVal := False    
     --res := False
-    handleEvent cocoaEvent modifiers = request
+    respondToInputEvent inputEvent modifiers = request
         returnVal := False
         forall h <- handlers do
             if returnVal == False then
-                returnVal := <- h.handleEvent cocoaEvent modifiers
+                returnVal := <- h.respondToInputEvent inputEvent modifiers
             --if (res == True) then
             --    returnVal := True
         result returnVal
@@ -182,7 +178,7 @@ basicComponent f p n = class
     addResponder = baseResponder.addResponder
     setResponders = baseResponder.setResponders
     getResponders = baseResponder.getResponders
-    handleEvent = baseResponder.handleEvent
+    respondToInputEvent = baseResponder.respondToInputEvent
 
     nameWrap = new wrapper n
     getName = nameWrap.get
@@ -236,15 +232,15 @@ wrapper s = class
     result Wrapper {..}
 
 
-dynamicHandleEvent :: a -> Maybe (a -> Request Bool) -> Cmd _ Bool
+{-dynamicHandleEvent :: a -> Maybe (a -> Request Bool) -> Cmd _ Bool
 dynamicHandleEvent event (Just handler) = do
     result (<- handler event)
 
 dynamicHandleEvent _ Nothing = do
-    result False
+    result False-}
 
-showName Nothing = do result "Nothing"
-showName (Just c) = do result <- c.getName
+--showName Nothing = do result "Nothing"
+--showName (Just c) = do result <- c.getName
 
 --other stuff
 extern mkCocoaID :: Class CocoaID

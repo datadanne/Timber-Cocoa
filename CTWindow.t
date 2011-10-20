@@ -66,16 +66,16 @@ mkCocoaWindow env = class
             inithelper 
         
     inithelper = do
-        _ <- internalSetVisible
-    
-        rsize = (<- rootContainer.getSize)
-        foo = ({width = rsize.width+20;height=rsize.height+20})
+        _ <- internalSetVisible isVisible
+        
         windowSetPosition windowId position
         windowSetContentView this rootContainer.id
         windowSetSize windowId (<- rootContainer.getSize)
         
         wh = new defaultInputResponder this rootContainer env
         handlers.addResponder wh
+            
+
 
     getId = request
         result nr
@@ -101,14 +101,14 @@ mkCocoaWindow env = class
     setVisible b = request
         if (isVisible /= b)  then
             isVisible := b
-            result (<- internalSetVisible)
+            result (<- internalSetVisible isVisible)
         else
             result False
             
-    internalSetVisible = do
+    internalSetVisible vis = do
         isActive = (state == Active)
         if (isActive) then
-            if (isVisible) then
+            if (vis) then
                 windowSetVisible windowId
             else
                 windowSetHidden windowId

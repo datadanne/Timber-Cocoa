@@ -7,8 +7,7 @@
 	
 	/* Ask Timber whether or not the window should close */
 	App_CTCommon app = getApp();
-	app->sendWindowCloseRequest_CTCommon(app, [sender windowNumber], 0);
-	return 0;
+	return app->sendWindowCloseRequest_CTCommon(app, [sender windowNumber], 0);
 }
 - (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)toSize {    
     Size_CTCommon toSize_22;

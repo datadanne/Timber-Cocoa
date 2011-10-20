@@ -183,7 +183,7 @@ Int initCocoaWindow_CTWindow(CocoaWindow_CTCommon wnd, App_CTCommon app, Int dum
         	delegate = [[WindowDelegate alloc] init];
 
         [window setDelegate:delegate];
-        [window makeKeyAndOrderFront:window];
+       // [window makeKeyAndOrderFront:window];
 
         // NOTE: Can't use COCOA_ID macro here due to windowId, not Id
         internal_CocoaID_CTCommon thisWindow = (internal_CocoaID_CTCommon)(wnd->windowId_CTCommon);
@@ -196,10 +196,14 @@ Int initCocoaWindow_CTWindow(CocoaWindow_CTCommon wnd, App_CTCommon app, Int dum
 }
 
 TUP0 destroyCocoaWindow_CTWindow(CocoaID_CTCommon wnd, Int dummy) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
-	[thisWindow close];
-	[pool drain];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+    
+	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	    CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
+	    [thisWindow close];
+	    [pool drain];
+        });
 }
    
 Msg windowSetVisible_CTWindow(CocoaID_CTCommon wnd, Time start, Time stop) {  
@@ -225,13 +229,14 @@ TUP0 windowSetFocus_CTWindow(CocoaID_CTCommon wnd, CocoaID_CTCommon cmp, Int dum
 }
 
 Msg windowSetSize_CTWindow (CocoaID_CTCommon wnd, Size_CTCommon pos, Time start, Time stop) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("setting containerSize ext!");
 	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
 	
-	[thisWindow setContentSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon)];
-	
-	[pool drain];
+	dispatch_async(dispatch_get_main_queue(), ^{
+	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	    [thisWindow setContentSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon)];
+		[pool drain];
+    });
 }
 
 Msg windowSetPosition_CTWindow (CocoaID_CTCommon wnd, Position_CTCommon pos, Time start, Time stop) {

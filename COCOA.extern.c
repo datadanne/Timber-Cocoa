@@ -108,14 +108,14 @@ TUP0 startApplication_COCOA (CocoaEnv_COCOA env, CLOS clos, Int poly) {
 
         runAsMainContinuation(createCocoaApplication);
         pthread_cond_signal(&sleepVar);
-        
-        printf("sent main continuation\n");
 	}
 	
     return 0;
 }
 
 void _init_external_COCOA(void) {
-    addRootScanner(&appScanner);
-    // Nothing
+    DISABLE(envmut);
+	addRootScanner(&appScanner);
+	rootsDirty = 1;
+	ENABLE(envmut);
 }

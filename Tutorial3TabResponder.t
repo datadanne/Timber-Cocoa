@@ -1,42 +1,36 @@
-module Tutorial4MultipleWindows where
+module Tutorial3TabResponder where
 
+import COCOA
 import POSIX
-
-import Tutorial4ColorPicker 
 
 root w = class
     env = new posix w
     osx = new cocoa w
     
     w1 = new mkCocoaWindow env
-    colorWindow = new mkCocoaWindow env
     
-    applicationDidFinishLaunching app = action
-        after (sec 1) send action
-            w1.setSize ({width=400;height=400}) 
-            w1.setBackgroundColor ({r=200;g=200;b=200})
-	
-            createComponentHierarchy
-    
-            app.addWindow w1
-            app.addWindow colorWindow
-    
-            addButtonResponder
-            addWindowResponder
-    
-            addColorPicker
+    applicationDidFinishLaunching app = action                         
+        w1.setSize ({width=400;height=400}) 
+        w1.setBackgroundColor ({r=200;g=200;b=200})
+  	
+        createComponentHierarchy
+        
+        app.addWindow w1
+        
+        addButtonResponder
+        addWindowResponder
            
     label = new mkCocoaLabel
     tabCountLabel = new mkCocoaLabel
     button = new mkCocoaButton env
-    leftContainer = new mkCocoaContainer env 
-    rightContainer = new mkCocoaContainer env
     
     createComponentHierarchy = do
+        leftContainer = new mkCocoaContainer env 
         leftContainer.setSize ({width=200; height=200})
         leftContainer.setBackgroundColor ({r=100;g=100;b=200})
         leftContainer.setPosition ({x=0;y=0})
 
+        rightContainer = new mkCocoaContainer env
         rightContainer.setSize ({width=200; height=200})
         rightContainer.setBackgroundColor ({r=100;g=200;b=100})
         rightContainer.setPosition ({x=200; y=0})    
@@ -46,12 +40,14 @@ root w = class
         button.setPosition ({x=40; y=100})
 
         label.setText "Click counter"
-        label.setSize ({width=150; height=36})
+        label.setSize ({width=100; height=36})
         label.setPosition ({x=40; y=100})
+        --label.setTextColor ({r=80; b=140; g=90})
         
         tabCountLabel.setText "TextArea Tab counter"
-        tabCountLabel.setSize ({width=150; height=36})
+        tabCountLabel.setSize ({width=100; height=36})
         tabCountLabel.setPosition ({x=40; y=70})
+        --tabCountLabel.setTextColor ({r=80; b=140; g=90})
 
         leftContainer.addComponent button
         rightContainer.addComponent label
@@ -60,7 +56,6 @@ root w = class
         w1.addComponent leftContainer
         w1.addComponent rightContainer
 
-    -- Tutorial 2 : Respond to button clicks. Add a text area
     addButtonResponder = do
         handler = new buttonHandler label
         button.addResponder handler
@@ -76,43 +71,14 @@ root w = class
         windowResponderObj = new windowResponder ta env
         w1.setWindowResponder windowResponderObj
         replaceTabResponder
-
-   -- Tutorial 3 : Consume tab event in text area.
+        
     replaceTabResponder = do
         tabResponder = new myTabResponder tabCountLabel
         ta.setResponders [tabResponder]
 
-    -- Tutorial 4 : Add a color picker window
-    rgbLabel = new mkCocoaLabel
-
-    setColor color = request
-        rgbLabel.setText ("R:" ++ (show (color.r)) ++ " G: " ++ (show (color.g)) ++ " B: " ++ (show (color.b)) ++ "\n") 
-        leftContainer.setBackgroundColor color
-
-    addColorPicker = do
-        rgbLabel.setText "R: 0; G=0; B=0"
-        rgbLabel.setSize ({width=150; height=36})
-        rgbLabel.setPosition ({x=40; y=40})
-        rightContainer.addComponent rgbLabel
-        
-        colorButton = new mkCocoaButton env   
-        colorButton.setTitle "Open Color Picker"
-        colorButton.setSize ({width=110;height=21})
-        colorButton.setPosition ({x=40; y=75})
-        colorButton.addResponder (new colorPickerToggle colorButton colorWindow env)
-        w1.addComponent colorButton
-        
-        colorWindow.setSize ({width=215;height=215})
-        colorWindow.setPosition ({x=430;y=300})
-        colorWindow.setVisible False
-        
-        initColorGrid = new colorPickerGrid colorWindow setColor env
-        initColorGrid
-
     result action
         osx.startApplication applicationDidFinishLaunching  
-
--- Tutorial 2 : Responder for button click
+        
 buttonHandler label = class
     clickCount := 0
 
@@ -130,8 +96,7 @@ buttonHandler label = class
         result False
     
     result RespondsToInputEvents {..}
-                      
--- Tutorial 2 : Responder to resize a component on window resize 
+                       
 windowResponder :: TextArea -> POSIX.Env -> Class RespondsToWindowEvents
 windowResponder textarea env = class
     onWindowResize size modifiers = request
@@ -153,7 +118,7 @@ windowResponder textarea env = class
     
     result RespondsToWindowEvents {..}
     
--- Tutorial 3 : Responder to overload TAB key
+    
 myTabResponder label = class
     tabCount := 0
     
@@ -171,19 +136,3 @@ myTabResponder label = class
         result False
 
     result RespondsToInputEvents {..}
-
--- Tutorial4 : Responder to toggle visibility the color picker window 
-colorPickerToggle this window env = class
-    toggle := True
-    respondToInputEvent (MouseEvent event) modifiers = request
-        _ <- window.setVisible toggle
-        send action this.setTitle ((if (toggle) then "Open" else "Close") ++ " Color picker")
-        
-        toggle := not toggle
-        result False
-        
-    respondToInputEvent _ _ = request
-        result False
-        
-    result RespondsToInputEvents {..}
-        

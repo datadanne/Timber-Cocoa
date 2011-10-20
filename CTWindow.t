@@ -124,7 +124,7 @@ defaultWindowResponder window env = class
         env.stdout.write ("Resizing window to width: " ++ (show toSize.width) ++ ", height: " ++ (show toSize.height) ++ "\n")
 
     onWindowCloseRequest modifiers = request
-        result False
+        result True
 
     setWindowResponder responder = request
 

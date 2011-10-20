@@ -178,7 +178,7 @@ colorPickerToggle this window env = class
         send action this.setTitle ((if (toggle) then "Open" else "Close") ++ " ColorPicker")
         
         toggle := not toggle
-        result False
+        result True
         
     respondToInputEvent _ _ = request
         result False

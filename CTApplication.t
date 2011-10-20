@@ -7,6 +7,7 @@ import CTCommon
 -- do not create an object of this class!                       
 cocoaApplication = class
     activeWindows := []
+    blockDefaultCocoaBehavior := False
 
     addWindow w = request
         w.initWindow this
@@ -29,13 +30,20 @@ cocoaApplication = class
             Command -> updateList name
             _ ->
             
-        result (<- sendInputToWindow (KeyEvent k) windowId)
+        sendInputToWindow (KeyEvent k) windowId
+        result blockDefaultCocoaBehavior
 
     sendInputEvent (MouseEvent m) windowId = request
-        result (<- sendInputToWindow (MouseEvent m) windowId)
+        sendInputToWindow (MouseEvent m) windowId
+        result blockDefaultCocoaBehavior
   
     sendInputEvent _ _ = request
-        result False
+        result blockDefaultCocoaBehavior
+        
+    sendInputToWindow recvEvent windowId = do
+        forall window <- activeWindows do
+            if (<- window.getId == windowId) then
+                _ <- window.respondToInputEvent recvEvent modifiers
     
     sendWindowResize toSize windowId = request
         forall window <- activeWindows do
@@ -66,14 +74,6 @@ cocoaApplication = class
                 (fromJust env).stdout.write " COMMAND"
             (fromJust env).stdout.write "\n"
 
-    resultState := False
-    sendInputToWindow recvEvent windowId = do
-        
-        forall window <- activeWindows do
-            if (<- window.getId == windowId) then
-                resultState := (<- window.respondToInputEvent recvEvent modifiers)
-        
-        result resultState
 
     getApplicationState = request
         result Running

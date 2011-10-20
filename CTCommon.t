@@ -167,7 +167,7 @@ basicHasResponders = class
                 returnVal := <- h.respondToInputEvent inputEvent modifiers
             --if (res == True) then
             --    returnVal := True
-        result returnVal
+        result False
     
 
     result DefaultEventResponder {..}

@@ -11,12 +11,6 @@ struct DropDown < Component, RespondsToSelectionEvents where
 
 --------------------------------------------------------------------------------------------------
 ------          ** CTDropDown **            ----------------------------------------------------------
-indexOf :: Int -> [a] -> a -> Int \\ Eq a
-indexOf count (x:xs) elem
-    | x == elem     = count
-    | otherwise     = indexOf (count+1) xs elem
-indexOf count [] _  = count
-        
 mkCocoaDropDown env = class
     size := {width=108; height=17}
     extendedSize := {width=108; height=17}
@@ -24,19 +18,6 @@ mkCocoaDropDown env = class
     
     title := ""
     position := {x=0; y=0}
-
-    --extendedPosition := {x=0; y=0} 
-    --tempSize := {width=0; height=0}
-    --tempPosition := {x=0; y=0}    
-    -- constants
-    --topAndBottomOffset = 4                        
-    --rightOffset = 6 
-    --expandedOptionHeight = 18
-    --            
-    
-    --keyEventHandler := Nothing
-    --mouseEventHandler := Nothing 
-    --selectionEventHandler := Nothing
     
     id = new mkCocoaID
     base = new basicComponent True Nothing "DropDown"
@@ -70,14 +51,11 @@ mkCocoaDropDown env = class
     insertOption o = do
         options := o : options
         
-        --extendedSize := <- calculateExtendedSize
-        --extendedPosition := <- calculateExtendedPosition
-        env.stdout.write ("adding option " ++ (show o))
+        -- env.stdout.write ("adding option " ++ (show o))
         case (<- base.getState) of
             Active ->   dropDownAddOption id o  
                         currentOption := <- dropDownGetSelectedOption id
             _ ->
-        
         
     setOptions os = action
         forall o <- os do
@@ -93,7 +71,7 @@ mkCocoaDropDown env = class
         send selectionChanged currentOption
         
     getCurrentOption = request
-        --opt <- cocoaGetCurrentOption id
+        --opt <- cocoaGetCurrentOption id     TODO: do we ever need this? no should be the answer ...
         result currentOption
 
     -- setPosition
@@ -119,18 +97,6 @@ mkCocoaDropDown env = class
     destroy = request
         base.setState Destroyed
         
-{-    installKeyListener kl = request
-        keyEventHandler := Just kl
-
-    installMouseListener ml = request
-        mouseEventHandler := Just ml
-        
-    installSelectionListener sl = request
-        selectionEventHandler := Just sl
--}    
-    
-
-    -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request
             base.setState Active
             initDropDown this app
@@ -152,15 +118,10 @@ mkCocoaDropDown env = class
 
     result this
 
-
 defaultSelectionResponder env = class
     selectionChanged str = action
-        env.stdout.write ("selection changed to: " ++ str)
-        
-    setSelectionResponder _ = request -- not used ..
-    
+    setSelectionResponder _ = request
     result RespondsToSelectionEvents {..}
-
 
 
 data SizeState = Small | Expanded
@@ -176,13 +137,10 @@ defaultHandler dropdownUpdateMethod = class
         case t of
             MouseClicked pos ->
                 if (sizeState == Small) then
-                                        --dropDownSetLastClickPosition id pos 
                     sizeState := Expanded
                 else
                     sizeState := Small
                     dropdownUpdateMethod
-                                        --currentOption := <- dropDownGetSelectedOption id
-                                        --dynamicHandleEvent currentOption selectionEventHandler
             _ ->    
         result True 
 
@@ -191,56 +149,6 @@ defaultHandler dropdownUpdateMethod = class
         
     result RespondsToInputEvents {..}
     
-    
-    
-    
-    
-    
-    
-{-calculateExtendedPosition = do
-
-        numberOfOptions = length options
-        currentIndex = indexOf 0 options currentOption
-        
-        env.stdout.write ("nrOfOptions: " ++ (show numberOfOptions) ++ " - currentIndex: " ++ (show currentIndex) ++ "\n")
-        
-        x = position.x
-        y = position.y - topAndBottomOffset                                                                       
-        
-        
-        
-        toReturn = {x = x; y = (y - currentIndex*expandedOptionHeight)}
-
-        --updateExpandedPos toReturn
-
-        env.stdout.write ("calculated extpos to " ++ (show toReturn.x) ++ ", " ++ (show toReturn.y) ++ "\n")
-        result toReturn
-        
-    calculateExtendedSize = do
-        numberOfOptions = length options
-        
-        env.stdout.write ("nr of options: " ++ (show numberOfOptions))
-        
-        baseWidth = (<- base.getSize).width                                                              
-                         
-        env.stdout.write ("basewidth: " ++ (show baseWidth))
-        
-        width = baseWidth - rightOffset    
-        
-        env.stdout.write ("width " ++ (show width))
-        
-        height = 2*topAndBottomOffset + (numberOfOptions)*expandedOptionHeight
-                                         
-        env.stdout.write ("height" ++ (show height))
-        
-        result {width=width; height=height}
-    
-    adjustUpwards pos count = do
-        if (count == 0) then
-            result pos
-        else
-            result <- adjustUpwards ({x=pos.x-topAndBottomOffset;y=pos.y}) (count-1)
-    -}                  
 --------------------------------------------------------------------------------------------------
 ------          ** EXTERN **            ----------------------------------------------------------  
 
@@ -251,5 +159,5 @@ extern initDropDown :: DropDown -> App -> Request ()
 extern dropDownAddOption :: CocoaID -> String -> Action
 extern dropDownSetPosition :: CocoaID -> Position -> Action
 extern dropDownSetSize :: CocoaID -> Size -> Action
-extern dropDownSetLastClickPosition :: CocoaID -> Position -> Action
+--extern dropDownSetLastClickPosition :: CocoaID -> Position -> Action
 extern dropDownGetSelectedOption :: CocoaID -> Request String

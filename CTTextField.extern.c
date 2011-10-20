@@ -7,7 +7,7 @@ Msg textFieldSetText_CTTextField(CocoaID_CTCommon id, LIST s, Time start, Time s
 	NSTextField *thisTextField = (NSTextField*) COCOA_REF(id);
 	DEBUG("TextField OK %p!", thisTextField);
 	char* buf = listToChars(s);
-	[thisTextField setStringValue:[NSString stringWithFormat:@"%s", buf]];
+	[thisTextField setStringValue: [NSString stringWithFormat:@"%s", buf]];
 	[thisTextField setNeedsDisplay];
 	[pool drain];
 } 

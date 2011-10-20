@@ -7,7 +7,7 @@ root w = class
     env = new posix w
     osx = new cocoa w
 
-    w1 = new mkWindow env
+    w1 = new mkCocoaWindow env
     textA = new mkCocoaTextArea env
     
     applicationDidFinishLaunching app = action                         

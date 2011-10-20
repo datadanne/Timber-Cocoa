@@ -15,7 +15,7 @@
 } 
 - (void) setCoordsX: (float) xarg andY: (float) yarg;
 - (void) setWidth: (float) w andHeight: (float) h;
-- (void) setLastEventX: (float) xarg andY: (float) yarg;
+//- (void) setLastEventX: (float) xarg andY: (float) yarg;
 
 /*@property (assign) float x;
 @property (assign) float y;

@@ -2,9 +2,6 @@
  
 @implementation DropDownClickHandler   
 
-//@synthesize x;
-//@synthesize y;
-
 - (id) init {
     if (self = [super init]) {
         lastEventX = -1;
@@ -32,16 +29,16 @@
     float eventX;
     float eventY;    
     
-    if (lastEventX != -1 && lastEventY != -1) {
+    /*if (lastEventX != -1 && lastEventY != -1) {
         eventX = lastEventX;
         lastEventX = -1;
         
         eventY = lastEventY;
         lastEventY = -1;
-    } else {
+    } else {  */
         eventX = x + width/2;
         eventY = y + height/2;
-    }
+    //}
 
     NSInteger windowId = [[sender window] windowNumber];
      
@@ -68,24 +65,6 @@
     ((_MouseEvent_CTCommon)receivedEvent)->Tag = 1;
     ((_MouseEvent_CTCommon)receivedEvent)->a = (MouseEventType_CTCommon)x_5111;    
     
-    
-    // string event!
-    /*_SelectedItem_CTCommon x_1144;
-    NEW (_SelectedItem_CTCommon, x_1144, WORDS(sizeof(struct _SelectedItem_CTCommon)));
-    x_1144->GCINFO = __GC___SelectedItem_CTCommon;         
-    
-    char *buf;
-    [[pop titleOfSelectedItem] getCString:buf maxLength: 10000 encoding:NSUTF8StringEncoding];
-
-    x_1144->a = getStr(buf); 
-    
-    CocoaEvent_CTCommon zuperEvent_11;
-    NEW (CocoaEvent_CTCommon, zuperEvent_11, WORDS(sizeof(struct _SelectionEvent_CTCommon)));
-    ((_SelectionEvent_CTCommon)zuperEvent_11)->GCINFO = __GC___SelectionEvent_CTCommon;
-    ((_SelectionEvent_CTCommon)zuperEvent_11)->Tag = 0;
-    ((_SelectionEvent_CTCommon)zuperEvent_11)->a = (SelectionEventType_CTCommon)x_1144;*/
-
-    
     app->sendInputEvent_CTCommon(app, (CocoaEvent_CTCommon)receivedEvent, windowId, 0);
 }  
 
@@ -99,10 +78,10 @@
     height = h;
 }
 
-- (void) setLastEventX: (float) xarg andY: (float) yarg {
+/*- (void) setLastEventX: (float) xarg andY: (float) yarg {
     lastEventX = xarg;
     lastEventY = yarg;
-}            
+} */           
 
 @end
                     
@@ -153,7 +132,7 @@ Msg dropDownSetSize_CTDropDown(CocoaID_CTCommon id, Size_CTCommon size, Time sta
 - (void) setWidth: (float) w andHeight: (float) h;
 - (void) setLastEventX: (float) xarg andY: (float) yarg;
 */
-Msg dropDownSetLastClickPosition_CTDropDown(CocoaID_CTCommon id, Position_CTCommon pos, Time start, Time stop) {
+/*Msg dropDownSetLastClickPosition_CTDropDown(CocoaID_CTCommon id, Position_CTCommon pos, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("setting POS externally..");
 	
@@ -162,7 +141,7 @@ Msg dropDownSetLastClickPosition_CTDropDown(CocoaID_CTCommon id, Position_CTComm
     [[thisDropDown target] setLastEventX: pos->x_CTCommon andY: pos->y_CTCommon];
    
    	[pool drain]; 
-}
+} */
 
 LIST dropDownGetSelectedOption_CTDropDown(CocoaID_CTCommon id, Int dummy) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	

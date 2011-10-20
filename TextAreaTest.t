@@ -8,7 +8,7 @@ root w = class
     env = new dummyPosix w
     osx = new cocoa w
 
-    w1 = new mkWindow env
+    w1 = new mkCocoaWindow env
     c2 = new mkCocoaContainer env
     label = new mkCocoaLabel
     tarea = new mkCocoaTextArea env

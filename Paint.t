@@ -80,7 +80,7 @@ root w = class
     env = new posix w
     osx = new cocoa w
 
-    w1 = new mkWindow env
+    w1 = new mkCocoaWindow env
     bg = new mkPaintBackdrop env
     label = new mkCocoaLabel
 

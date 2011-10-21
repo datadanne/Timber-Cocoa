@@ -22,19 +22,19 @@
 			<key>filename</key>
 			<string>COCOA.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T16:19:19Z</date>
+			<date>2011-10-20T17:52:17Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTApplication.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T17:14:54Z</date>
+			<date>2011-10-20T18:32:42Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTButton.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T13:23:46Z</date>
+			<date>2011-10-20T18:10:12Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -58,7 +58,7 @@
 			<key>filename</key>
 			<string>CTContainer.extern.c</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T16:18:34Z</date>
+			<date>2011-10-20T17:22:07Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -70,13 +70,13 @@
 			<key>filename</key>
 			<string>CTContainer.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T14:19:16Z</date>
+			<date>2011-10-20T17:49:59Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTCommon.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T17:09:50Z</date>
+			<date>2011-10-20T18:13:53Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -100,19 +100,19 @@
 			<key>filename</key>
 			<string>CTWindow.extern.c</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T17:14:50Z</date>
+			<date>2011-10-20T18:14:40Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTWindow.extern.h</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T11:17:33Z</date>
+			<date>2011-10-20T18:13:54Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTWindow.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T17:14:24Z</date>
+			<date>2011-10-20T18:15:03Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -250,7 +250,7 @@
 			<key>filename</key>
 			<string>ScrollTest.t</string>
 			<key>lastUsed</key>
-			<date>2011-09-27T10:26:05Z</date>
+			<date>2011-10-20T18:33:22Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -265,13 +265,13 @@
 					<key>filename</key>
 					<string>Tutorial0App.t</string>
 					<key>lastUsed</key>
-					<date>2011-10-20T17:08:16Z</date>
+					<date>2011-10-20T17:44:43Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>Tutorial1ComponentsAndHierarchies.t</string>
 					<key>lastUsed</key>
-					<date>2011-10-20T12:43:03Z</date>
+					<date>2011-10-20T18:30:12Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
@@ -283,19 +283,19 @@
 					<key>filename</key>
 					<string>Tutorial3TabResponder.t</string>
 					<key>lastUsed</key>
-					<date>2011-10-20T16:17:00Z</date>
+					<date>2011-10-20T17:58:21Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>Tutorial4ColorPicker.t</string>
 					<key>lastUsed</key>
-					<date>2011-10-20T17:09:55Z</date>
+					<date>2011-10-20T17:57:43Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>Tutorial4MultipleWindows.t</string>
 					<key>lastUsed</key>
-					<date>2011-10-20T17:14:54Z</date>
+					<date>2011-10-20T18:33:22Z</date>
 					<key>selected</key>
 					<true/>
 				</dict>
@@ -309,7 +309,7 @@
 			<key>filename</key>
 			<string>windowTest.m</string>
 			<key>lastUsed</key>
-			<date>2011-10-07T13:42:42Z</date>
+			<date>2011-10-20T17:55:57Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -403,14 +403,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>37</integer>
+				<integer>6</integer>
 				<key>line</key>
-				<integer>9</integer>
+				<integer>36</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>2</integer>
+			<integer>26</integer>
 		</dict>
 		<key>CTButton.extern.c</key>
 		<dict>
@@ -473,14 +473,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>20</integer>
+				<integer>50</integer>
 				<key>line</key>
-				<integer>169</integer>
+				<integer>7</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>139</integer>
+			<integer>0</integer>
 		</dict>
 		<key>CTContainer.extern.c</key>
 		<dict>
@@ -494,7 +494,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>24</integer>
+			<integer>0</integer>
 		</dict>
 		<key>CTContainer.extern.m</key>
 		<dict>
@@ -538,7 +538,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>35</integer>
 		</dict>
 		<key>CTLabel.extern.c</key>
 		<dict>
@@ -587,14 +587,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>87</integer>
+				<integer>8</integer>
 				<key>line</key>
-				<integer>241</integer>
+				<integer>85</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>28</integer>
+			<integer>76</integer>
 		</dict>
 		<key>CTWindow.extern.h</key>
 		<dict>
@@ -629,14 +629,30 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>19</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>126</integer>
+				<integer>136</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>92</integer>
+			<integer>109</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>70</integer>
+				<key>line</key>
+				<integer>140</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>136</integer>
+			</dict>
 		</dict>
 		<key>EventHandler.t</key>
 		<dict>
@@ -666,33 +682,79 @@
 			<key>firstVisibleLine</key>
 			<integer>40</integer>
 		</dict>
-		<key>Tutorial0App.t</key>
+		<key>ScrollTest.t</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>58</integer>
+				<integer>23</integer>
 				<key>line</key>
-				<integer>17</integer>
+				<integer>32</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
+		<key>Tutorial0App.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>columnSelection</key>
+			<false/>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>58</integer>
+				<key>line</key>
+				<integer>17</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+		</dict>
 		<key>Tutorial1ComponentsAndHierarchies.t</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>49</integer>
+				<integer>48</integer>
 				<key>line</key>
-				<integer>30</integer>
+				<integer>42</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>7</integer>
+				<key>line</key>
+				<integer>35</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>48</integer>
+				<key>line</key>
+				<integer>42</integer>
+			</dict>
 		</dict>
 		<key>Tutorial2Resizing.t</key>
 		<dict>
@@ -743,9 +805,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>19</integer>
+				<integer>18</integer>
 				<key>line</key>
-				<integer>40</integer>
+				<integer>32</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -757,14 +819,28 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>19</integer>
+				<integer>26</integer>
 				<key>line</key>
-				<integer>165</integer>
+				<integer>170</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>138</integer>
+			<integer>131</integer>
+		</dict>
+		<key>windowTest.m</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>16</integer>
+				<key>line</key>
+				<integer>3</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
@@ -780,7 +856,9 @@
 		<string>Tutorial0App.t</string>
 		<string>CTWindow.extern.m</string>
 		<string>CTApplication.t</string>
+		<string>ScrollTest.t</string>
 		<string>Tutorial4ColorPicker.t</string>
+		<string>windowTest.m</string>
 		<string>CTContainer.extern.c</string>
 		<string>CTContainer.extern.m</string>
 		<string>CTLabel.extern.c</string>
@@ -799,6 +877,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{314, 109}, {1157, 941}}</string>
+	<string>{{253, 82}, {1157, 941}}</string>
 </dict>
 </plist>

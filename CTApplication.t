@@ -32,7 +32,7 @@ cocoaApplication = class
             
         sendInputToWindow (KeyEvent k) windowId
         -- Block key events from Cocoa, since we want to deal with these in Timber.
-        result True
+        result False
 
     --crashEverythingForNoReason _ = True
     

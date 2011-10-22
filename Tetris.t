@@ -18,7 +18,7 @@ root w = class
         theKey = getKey keyEventType
         case (theKey) of
             A -> currentPiece.movePiece (-1) 0
-            S -> currentPiece.movePiece 0 (-1)
+            S -> currentPiece.movePiece 0 1
             D -> currentPiece.movePiece 1 0
             _ -> 
 
@@ -32,7 +32,7 @@ root w = class
     getKey _ = raise 9
 
     gameLoop env = action
-        _ <- currentPiece.movePiece 0 (-1)
+        _ <- currentPiece.movePiece 0 1
         gameGrid.update        
         after (millisec 500) send gameLoop env
                 
@@ -70,7 +70,7 @@ tetrisPiece gameGrid env = class
         collides <- testCollision addX addY
         if (not collides) then
             position := {x=position.x+addX;y=position.y+addY}
-        elsif (addX == 0 && addY == -1) then
+        elsif (addX == 0 && addY == 1) then
             -- Sideway collision is ok but we now hit something while descending! Create a new piece.
             setPieceValues color
             createNextPiece
@@ -243,31 +243,31 @@ isTrue _ = True
 -}
 
 
-square = (4,18, array [0,0,0,0,0, 
+square = (4,(-2), array [0,0,0,0,0, 
                        0,0,0,0,0, 
                        0,0,2,1,0, 
                        0,0,1,1,0, 
                        0,0,0,0,0])
                
-linePiece0 = (3,18, array [0,0,0,0,0, 
+linePiece0 = (3,(-2), array [0,0,0,0,0, 
                            0,0,0,0,0, 
                            0,1,2,1,1, 
                            0,0,0,0,0, 
                            0,0,0,0,0])
 
-linePiece90 = (4,17, array [0,0,0,0,0, 
+linePiece90 = (4,(-1), array [0,0,0,0,0, 
                             0,0,1,0,0, 
                             0,0,2,0,0, 
                             0,0,1,0,0, 
                             0,0,1,0,0])
                      
-linePiece180 = (4,18, array [0,0,0,0,0, 
+linePiece180 = (2,(-2), array [0,0,0,0,0, 
                              0,0,0,0,0, 
                              1,1,2,1,0, 
                              0,0,0,0,0, 
                              0,0,0,0,0])
                      
-linePiece270 = (4,16, array [0,0,1,0,0, 
+linePiece270 = (4,0, array [0,0,1,0,0, 
                              0,0,1,0,0, 
                              0,0,2,0,0, 
                              0,0,1,0,0, 

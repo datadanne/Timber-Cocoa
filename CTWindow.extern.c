@@ -227,23 +227,28 @@ TUP0 windowSetFocus_CTWindow(CocoaID_CTCommon wnd, CocoaID_CTCommon cmp, Int dum
 TUP0 windowSetSize_CTWindow (CocoaID_CTCommon wnd, Size_CTCommon pos, Int dummy) {
 	DEBUG("setting containerSize ext!");
 	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
-	
+    int width = pos->width_CTCommon;
+    int height = pos->height_CTCommon;
+
 	dispatch_async(dispatch_get_main_queue(), ^{
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	    [thisWindow setContentSize: NSMakeSize(pos->width_CTCommon, pos->height_CTCommon)];
+	    [thisWindow setContentSize: NSMakeSize(width, height)];
 		[pool drain];
     });
 }
 
 TUP0 windowSetPosition_CTWindow (CocoaID_CTCommon wnd, Position_CTCommon pos, Int dummy) {
 
-	dispatch_async(dispatch_get_main_queue(), ^{	
+    CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
+    int y = pos->y_CTCommon;
+    int x = pos->x_CTCommon;
+    
+	dispatch_async(dispatch_get_main_queue(), ^{
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-		CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
 		int screenHeight = [[[NSScreen screens] objectAtIndex: 0] frame].size.height;
 		int windowHeight = [thisWindow frame].size.height;
-		int newY = screenHeight - pos->y_CTCommon - windowHeight;
-	    NSPoint p = NSMakePoint(pos->x_CTCommon,newY);
+		int newY = screenHeight - y - windowHeight;
+	    NSPoint p = NSMakePoint(x,newY);
 	    [thisWindow setFrameOrigin:p];
 	   	[pool drain]; 
 	});

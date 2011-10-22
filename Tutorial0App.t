@@ -9,7 +9,8 @@ root w = class
     
     w1 = new mkCocoaWindow env
 
-    applicationDidFinishLaunching app = action                         
+    applicationDidFinishLaunching app = action   
+        w1.setPosition({x=100;y=300})
     	w1.setSize ({width=400;height=400})
     	w1.setBackgroundColor ({r=200;g=200;b=200})
     	app.addWindow w1

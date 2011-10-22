@@ -3,6 +3,9 @@
     ------------- CocoaView ----------------------------       
 */        
 @implementation CocoaView
+- (BOOL)isFlipped {
+    return YES;
+}
 - (id)init {
     if ((self = [super init])) {
         r = 100; 

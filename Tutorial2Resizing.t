@@ -2,6 +2,9 @@ module Tutorial2Resizing where
 
 import COCOA
 import POSIX
+import CTButton
+import CTLabel
+import CTTextArea
 
 root w = class
     env = new posix w

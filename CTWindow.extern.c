@@ -169,16 +169,10 @@ Int initCocoaWindow_CTWindow(CocoaWindow_CTCommon wnd, App_CTCommon app, Int dum
     __block CocoaWindow *window;
     dispatch_sync(dispatch_get_main_queue(), ^{
     	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
-
-        NSRect frameRect = NSMakeRect(0, 0, 0, 0);
+        NSRect frameRect = NSMakeRect(0, [[[NSScreen screens] objectAtIndex: 0] frame].size.height, 1, 1);
         NSUInteger styleMask = (NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask);
         window = [[CocoaWindow alloc] initWithContentRect:frameRect styleMask:styleMask  backing:NSBackingStoreBuffered defer:NO]; 
-
-        // Move window to the top left corner
-        [window cascadeTopLeftFromPoint:NSMakePoint(10,10)];
-
         [window setTitle:@"new WINDOW!"];
-
         [window setEventDispatcher:dispatchEventToTimber];
 
         if (!delegate)
@@ -242,11 +236,17 @@ TUP0 windowSetSize_CTWindow (CocoaID_CTCommon wnd, Size_CTCommon pos, Int dummy)
 }
 
 TUP0 windowSetPosition_CTWindow (CocoaID_CTCommon wnd, Position_CTCommon pos, Int dummy) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
-    NSPoint p = NSMakePoint(pos->x_CTCommon,pos->y_CTCommon);
-    [thisWindow setFrameOrigin:p];
-   	[pool drain]; 
+
+	dispatch_async(dispatch_get_main_queue(), ^{	
+		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+		CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
+		int screenHeight = [[[NSScreen screens] objectAtIndex: 0] frame].size.height;
+		int windowHeight = [thisWindow frame].size.height;
+		int newY = screenHeight - pos->y_CTCommon - windowHeight;
+	    NSPoint p = NSMakePoint(pos->x_CTCommon,newY);
+	    [thisWindow setFrameOrigin:p];
+	   	[pool drain]; 
+	});
 }
 
 void _init_external_CTWindow(void) {

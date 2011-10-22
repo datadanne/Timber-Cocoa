@@ -4,6 +4,9 @@ import POSIX
 
 import Tutorial4ColorPicker 
 import Tutorial5CallbackLabel
+import CTButton
+import CTLabel
+import CTTextArea
 
 root w = class
     env = new posix w

@@ -3,6 +3,9 @@ module Tutorial4MultipleWindows where
 import POSIX
 
 import Tutorial4ColorPicker 
+import CTButton
+import CTLabel
+import CTTextArea
 
 root w = class
     env = new posix w

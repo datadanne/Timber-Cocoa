@@ -1,6 +1,7 @@
 module TestDropDown where
 
 import COCOA
+import CTDropDown
 
 root w = class
     env = new posix w

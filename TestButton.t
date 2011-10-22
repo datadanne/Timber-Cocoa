@@ -2,6 +2,7 @@ module TestButton where
 
 import POSIX
 import COCOA
+import CTButton
 
 root w = class
     env = new posix w

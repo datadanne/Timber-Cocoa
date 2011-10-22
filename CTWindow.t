@@ -67,10 +67,10 @@ mkCocoaWindow env = class
         
     inithelper = do
         _ <- internalSetVisible isVisible
-        
+
+        windowSetSize windowId (<- rootContainer.getSize)        
         windowSetPosition windowId position
         windowSetContentView this rootContainer.id
-        windowSetSize windowId (<- rootContainer.getSize)
         
         wh = new defaultInputResponder this rootContainer env
         handlers.addResponder wh

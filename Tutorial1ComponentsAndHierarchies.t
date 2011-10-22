@@ -2,6 +2,8 @@ module Tutorial1ComponentsAndHierarchies where
 
 import COCOA
 import POSIX
+import CTButton
+import CTLabel
 
 root w = class
     env = new posix w

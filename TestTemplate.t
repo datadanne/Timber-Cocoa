@@ -2,18 +2,19 @@ module TestTemplate where
 
 import POSIX
 import COCOA
+import CTButton
 
 root w = class
     env = new posix w
     osx = new cocoa w
 
-    w1 = new mkWindow env
+    w1 = new mkCocoaWindow env
     c2 = new mkCocoaContainer env
     button = new mkCocoaButton env
     button2 = new mkCocoaButton env
     
     applicationDidFinishLaunching app = action                         
-        app.showWindow w1
+        app.addWindow w1
         app.setEnv env
         
     result action

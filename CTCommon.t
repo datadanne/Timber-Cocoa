@@ -165,9 +165,7 @@ basicHasResponders = class
         forall h <- handlers do
             if returnVal == False then
                 returnVal := <- h.respondToInputEvent inputEvent modifiers
-            --if (res == True) then
-            --    returnVal := True
-        result False
+        result returnVal
     
 
     result DefaultEventResponder {..}

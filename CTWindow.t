@@ -154,9 +154,9 @@ defaultInputResponder window rootContainer env = class
         if ((<- currentFocus.getState) == Destroyed) then
             window.setFocus rootContainer
 
-        consumed = (<- currentFocus.respondToInputEvent (KeyEvent keyEventType) modifiers)
+        consumed <- currentFocus.respondToInputEvent (KeyEvent keyEventType) modifiers
     
-        if (consumed == False) then
+        if (not consumed) then
             env.stdout.write "moving focus" 
             theKey = getKey keyEventType
             if (theKey == Tab) then

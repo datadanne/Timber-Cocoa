@@ -11,11 +11,9 @@ root w = class
     
     gameWindow = new mkCocoaWindow env
     gameGrid = new tetrisGrid 10 20 env
+    currentPiece = new tetrisPiece gameGrid env
     
-    getKey (KeyPressed key) = key
-    getKey _ = raise 9
-
-    
+    -- Responder for keyboard events
     testResponder (KeyEvent keyEventType) modifiers = request
         theKey = getKey keyEventType
         case (theKey) of
@@ -25,28 +23,27 @@ root w = class
             _ -> 
 
         gameGrid.update
-        
         result False
-    
+
     testResponder _ modifiers = request
         result False
 
-    currentPiece := new tetrisPiece gameGrid env
+    getKey (KeyPressed key) = key
+    getKey _ = raise 9
 
     gameLoop env = action
-        moved <- currentPiece.movePiece 0 (-1)
-        isAt <- currentPiece.getPosition
-        --env.stdout.write ("moving piece: " ++ (show isAt.x) ++ "," ++ (show isAt.y) ++ ":" ++ (show moved) ++ "\n")
-            
+        _ <- currentPiece.movePiece 0 (-1)
         gameGrid.update        
         after (millisec 500) send gameLoop env
                 
     applicationDidFinishLaunching app = action
         app.addWindow gameWindow
         send gameLoop env
+
     result action
+        gameGrid.setPosition ({x=30;y=20})
         gameWindow.addResponder ({respondToInputEvent=testResponder}) 
-        gameWindow.setSize ({width=300;height=500}) 
+        gameWindow.setSize ({width=300;height=500})
         gameWindow.setBackgroundColor ({r=100;g=100;b=100})
         gameWindow.addComponent gameGrid
 
@@ -56,58 +53,63 @@ struct TetrisPiece < HasPosition where
     movePiece :: Int -> Int -> Request Bool
     
 tetrisPiece gameGrid env = class
-    position := {x=0;y=0}
-    shape := array []
-    collision := False
     randomizer = new baseGen 31415926
     
+    -- These default values are not used.
+    shape := array []
     color := 1
+    position := {x=0;y=0}
 
     movePiece addX addY = request
-        if (size shape == 0) then
-            next
-            
-        setPieceValues 0 -- remove from grid temporarily so as to not interfere with collision test
-
+        -- Ensure we have a valid piece.
+        if (size shape <= 0 || size shape > 25) then
+            createNextPiece
+        
+        -- Perform collision test. Begin by removing the piece to avoid it interfering.
+        setPieceValues 0
         collides <- testCollision addX addY
         if (not collides) then
             position := {x=position.x+addX;y=position.y+addY}
-        else
-            if (addX == 0 && addY == -1) then
-                setPieceValues color
-                next
-        
+        elsif (addX == 0 && addY == -1) then
+            -- Sideway collision is ok but we now hit something while descending! Create a new piece.
+            setPieceValues color
+            createNextPiece
         setPieceValues color
+        
         result (not collides)  
         
     nextShape := linePiece90
-    next = do
+    createNextPiece = do
         (startX,startY, newShape) = nextShape
-        
-        position := {x=startX;y=startY}
         shape := newShape
-        color := (<- randomizer.next) `mod` 2 +1
+        position := {x=startX;y=startY}
+        color := (<- randomizer.next) `mod` 3 +1
         
-        nextShapeId = <- (randomizer.next) `mod` 2 +1
-        nextShape := case (nextShapeId) of
-                        1 -> square
-                        _ -> linePiece90
+        nextShapeId = <- (randomizer.next) `mod` 3 + 1
+        env.stdout.write ("NEXT:" ++ (show nextShapeId) ++ "\n")
+        case (nextShapeId) of
+            1 -> nextShape := square
+            2 -> nextShape := linePiece0
+            _ -> nextShape := linePiece90
 
+    collision := False
     testCollision offsetX offsetY = do
         collision := False
 
-        forall tx <- [0..4] do
-            forall ty <- [0..4] do
-                if (shape!(5*tx+ty) > 0) then
+        forall ty <- [0..4] do
+            forall tx <- [0..4] do
+                env.stdout.write ("shape " ++ (show tx) ++ "," ++ (show ty) ++ ":" ++ (show shape!(5*tx+ty) ++ "\n"))
+                if (shape!(5*ty+tx) > 0) then
                     gridValue <- gameGrid.getValueAt (tx+position.x+offsetX) (ty+position.y+offsetY)
-                    env.stdout.write ("grid value: " ++ (show gridValue) ++ "\n")
+                    env.stdout.write ((show gridValue) ++ "\n")
+
                     collision := collision || (isTrue gridValue)
         result collision
     
     setPieceValues val = do
-        forall tx <- [0..4] do
-            forall ty <- [0..4] do
-                if (shape!(5*tx+ty) > 0) then
+        forall ty <- [0..4] do
+            forall tx <- [0..4] do
+                if (shape!(5*ty+tx) > 0) then
                     gameGrid.setValueAt (tx+position.x) (ty+position.y) val
     
     setPosition s = request
@@ -134,15 +136,15 @@ tetrisGrid width height env = class
     greenTile = 2
     blueTile = 3
 
-    -- Grid of tiles. Each tile has (X,Y, Value, Container)
+    -- Grid of tiles. Each tile has (X,Y,Value,Container)
     grid :: [(Int, Int, Int, Container)]
     grid := []
     
-    color := (0,0,0)
     update = request
         forall (tx,ty,val,container) <- grid do
             case (val) of
-                2 -> container.setBackgroundColor ({r=100;g=250;b=100})
+                3 -> container.setBackgroundColor ({r=70;g=170;b=250})
+                2 -> container.setBackgroundColor ({r=170;g=250;b=70})
                 1 -> container.setBackgroundColor ({r=250;g=100;b=100})
                 _ -> container.setBackgroundColor ({r=50;g=50;b=50})
 
@@ -188,7 +190,8 @@ tetrisGrid width height env = class
     init app = request
         tileSize = 20
         backgroundColor = ({r=0;g=0;b=0})
-        base.setSize ({width=tileSize*12;height=tileSize*34})
+        base.setSize ({width=1+(tileSize+1)*width;height=1+(tileSize+1)*height})
+        base.setBackgroundColor ({r=200;g=200;b=200})
         base.init app
         
         forall row <- [1..height] do
@@ -196,7 +199,7 @@ tetrisGrid width height env = class
                tile = new mkCocoaContainer env
                tile.setSize ({width=tileSize;height=tileSize})
                tile.setBackgroundColor backgroundColor
-               tile.setPosition ({x=col*(tileSize+1);y=(row+1)*(tileSize+1)})
+               tile.setPosition ({x=(col-1)*(tileSize+1)+1;y=(row-1)*(tileSize+1)+1})
                grid := (col,row, emptyTile, tile) : grid
                base.addComponent tile
                
@@ -249,13 +252,13 @@ square = (4,18, array [0,0,0,0,0,
                        0,0,1,1,0, 
                        0,0,0,0,0])
                
-linePiece0 = (3,18, array [0,0,0,0,0, 
+linePiece0 = (3,21, array [0,0,0,0,0, 
                            0,0,0,0,0, 
                            0,1,2,1,1, 
                            0,0,0,0,0, 
                            0,0,0,0,0])
 
-linePiece90 = (4,18, array [0,0,0,0,0, 
+linePiece90 = (4,17, array [0,0,0,0,0, 
                             0,0,1,0,0, 
                             0,0,2,0,0, 
                             0,0,1,0,0, 
@@ -267,7 +270,7 @@ linePiece180 = (4,18, array [0,0,0,0,0,
                              0,0,0,0,0, 
                              0,0,0,0,0])
                      
-linePiece270 = (4,18, array [0,0,1,0,0, 
+linePiece270 = (4,16, array [0,0,1,0,0, 
                              0,0,1,0,0, 
                              0,0,2,0,0, 
                              0,0,1,0,0, 

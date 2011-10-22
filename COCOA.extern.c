@@ -44,8 +44,9 @@ void scanAppInit(void) {
 	
 	if (app)
 		app = (App_CTCommon)copy((ADDR)app);
-
 	ENABLE(envmut);
+	
+    printf("GC in scanAppInit: Scanning app something something, done?\n");
 }
 
 struct Scanner appScanner = {scanAppInit, NULL};
@@ -114,8 +115,8 @@ TUP0 startApplication_COCOA (CocoaEnv_COCOA env, CLOS clos, Int poly) {
 }
 
 void _init_external_COCOA(void) {
-    DISABLE(envmut);
+    DISABLE(rts);
 	addRootScanner(&appScanner);
 	rootsDirty = 1;
-	ENABLE(envmut);
+	ENABLE(rts);
 }

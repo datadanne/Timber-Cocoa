@@ -156,6 +156,7 @@ void scanEventReceived() {
 	if(receivedEvent)
 		receivedEvent = (InputEvent_CTCommon)copy((ADDR)receivedEvent);
 	ENABLE(envmut);
+    printf("GC in scanEventReceived: done with copy?\n");
 }
 
 struct Scanner eventScanner = {scanEventReceived, NULL};
@@ -251,8 +252,9 @@ TUP0 windowSetPosition_CTWindow (CocoaID_CTCommon wnd, Position_CTCommon pos, In
 void _init_external_CTWindow(void) {
 	// Install event scanner to keep track of delegate address.
 	pthread_mutex_init(&eventMutex, &glob_mutexattr);
-	DISABLE(envmut);
+
+    DISABLE(rts);
 	addRootScanner(&eventScanner);
 	rootsDirty = 1;
-	ENABLE(envmut);
+	ENABLE(rts);
 }

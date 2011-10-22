@@ -167,6 +167,8 @@ Int initCocoaWindow_CTWindow(CocoaWindow_CTCommon wnd, App_CTCommon app, Int dum
 	DEBUG("Initializing window...");
     
     __block CocoaWindow *window;
+    // Keep this as sync to ensure window is completely created before use.
+    // Also, with async there would be a risk of GC moving wnd before it is accessed.
     dispatch_sync(dispatch_get_main_queue(), ^{
     	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
         NSRect frameRect = NSMakeRect(0, [[[NSScreen screens] objectAtIndex: 0] frame].size.height, 1, 1);

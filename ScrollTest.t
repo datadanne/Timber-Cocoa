@@ -2,6 +2,7 @@ module ScrollTest where
 
 import POSIX
 import COCOA
+import CTTextArea
 
 root w = class
     env = new posix w

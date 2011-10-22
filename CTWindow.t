@@ -207,7 +207,9 @@ defaultInputResponder window rootContainer env = class
             result False
 
     findMouseFocus event modifiers cmp = do
-        eventPosition = posget event
+        originBottomLeft = posget event
+        windowSize = <- window.getSize
+        eventPosition = ({x=originBottomLeft.x;y=windowSize.height-originBottomLeft.y})
         parentPosition <- (getParentPosition cmp)
         relativePosition = getRelativePosition parentPosition eventPosition
 

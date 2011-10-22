@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>CTCommon.extern.h</string>
+	<string>Tetris.t</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -88,9 +88,7 @@
 			<key>filename</key>
 			<string>CTCommon.extern.h</string>
 			<key>lastUsed</key>
-			<date>2011-10-22T12:45:41Z</date>
-			<key>selected</key>
-			<true/>
+			<date>2011-10-22T19:38:46Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -102,7 +100,7 @@
 			<key>filename</key>
 			<string>CTWindow.extern.c</string>
 			<key>lastUsed</key>
-			<date>2011-10-22T12:29:37Z</date>
+			<date>2011-10-22T19:51:11Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -252,13 +250,15 @@
 			<key>filename</key>
 			<string>COCOA.extern.POSIX.cfg</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T12:32:56Z</date>
+			<date>2011-10-22T19:48:47Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>Tetris.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-22T12:45:39Z</date>
+			<date>2011-10-22T19:51:11Z</date>
+			<key>selected</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>children</key>
@@ -323,7 +323,7 @@
 			<key>filename</key>
 			<string>/usr/local/share/timberc-1.0.3/rtsPOSIX/gc.c</string>
 			<key>lastUsed</key>
-			<date>2011-10-07T13:42:42Z</date>
+			<date>2011-10-22T19:48:00Z</date>
 			<key>saveAsAbsolutePath</key>
 			<true/>
 		</dict>
@@ -358,6 +358,20 @@
 	<integer>200</integer>
 	<key>metaData</key>
 	<dict>
+		<key>/usr/local/share/timberc-1.0.3/rtsPOSIX/gc.c</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>158</integer>
+		</dict>
 		<key>COCOA.extern.POSIX.cfg</key>
 		<dict>
 			<key>caret</key>
@@ -433,9 +447,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>19</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>7</integer>
+				<integer>9</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -505,14 +519,28 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>28</integer>
+				<integer>21</integer>
 				<key>line</key>
-				<integer>172</integer>
+				<integer>174</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>145</integer>
+			<integer>159</integer>
+		</dict>
+		<key>Tetris.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>25</integer>
+				<key>line</key>
+				<integer>33</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
@@ -520,6 +548,8 @@
 		<string>CTCommon.extern.h</string>
 		<string>CTCommon.extern.c</string>
 		<string>CTWindow.extern.c</string>
+		<string>/usr/local/share/timberc-1.0.3/rtsPOSIX/gc.c</string>
+		<string>Tetris.t</string>
 		<string>COCOA.extern.POSIX.cfg</string>
 		<string>CTContainer.t</string>
 		<string>CTCommon.t</string>
@@ -530,6 +560,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{210, 70}, {1710, 1108}}</string>
+	<string>{{210, 73}, {1710, 985}}</string>
 </dict>
 </plist>

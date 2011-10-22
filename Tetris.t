@@ -84,7 +84,7 @@ tetrisPiece gameGrid env = class
         shape := newShape
         position := {x=startX;y=startY}
         color := (<- randomizer.next) `mod` 3 +1
-        
+
         nextShapeId = <- (randomizer.next) `mod` 3 + 1
         env.stdout.write ("NEXT:" ++ (show nextShapeId) ++ "\n")
         case (nextShapeId) of
@@ -98,17 +98,14 @@ tetrisPiece gameGrid env = class
 
         forall ty <- [0..4] do
             forall tx <- [0..4] do
-                env.stdout.write ("shape " ++ (show tx) ++ "," ++ (show ty) ++ ":" ++ (show shape!(5*tx+ty) ++ "\n"))
                 if (shape!(5*ty+tx) > 0) then
                     gridValue <- gameGrid.getValueAt (tx+position.x+offsetX) (ty+position.y+offsetY)
-                    env.stdout.write ((show gridValue) ++ "\n")
-
                     collision := collision || (isTrue gridValue)
         result collision
     
     setPieceValues val = do
-        forall ty <- [0..4] do
-            forall tx <- [0..4] do
+        forall tx <- [0..4] do
+            forall ty <- [0..4] do
                 if (shape!(5*ty+tx) > 0) then
                     gameGrid.setValueAt (tx+position.x) (ty+position.y) val
     
@@ -252,7 +249,7 @@ square = (4,18, array [0,0,0,0,0,
                        0,0,1,1,0, 
                        0,0,0,0,0])
                
-linePiece0 = (3,21, array [0,0,0,0,0, 
+linePiece0 = (3,18, array [0,0,0,0,0, 
                            0,0,0,0,0, 
                            0,1,2,1,1, 
                            0,0,0,0,0, 

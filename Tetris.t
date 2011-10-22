@@ -3,6 +3,7 @@ module Tetris where
 import POSIX
 import COCOA
 import CTContainer  -- Compiler panic if this redundant import of CTContainer is removed
+import RandomGenerator
 
 root w = class
     env = new posix w
@@ -35,9 +36,7 @@ root w = class
     gameLoop env = action
         moved <- currentPiece.movePiece 0 (-1)
         isAt <- currentPiece.getPosition
-        env.stdout.write ("moving piece: " ++ (show isAt.x) ++ "," ++ (show isAt.y) ++ ":" ++ (show moved) ++ "\n")
-        if (not moved) then
-            currentPiece.setShape square
+        --env.stdout.write ("moving piece: " ++ (show isAt.x) ++ "," ++ (show isAt.y) ++ ":" ++ (show moved) ++ "\n")
             
         gameGrid.update        
         after (millisec 500) send gameLoop env
@@ -46,9 +45,6 @@ root w = class
         app.addWindow gameWindow
         send gameLoop env
     result action
-        currentPiece.setShape square
-        currentPiece.addToGrid
-
         gameWindow.addResponder ({respondToInputEvent=testResponder}) 
         gameWindow.setSize ({width=300;height=500}) 
         gameWindow.setBackgroundColor ({r=100;g=100;b=100})
@@ -57,31 +53,45 @@ root w = class
         osx.startApplication applicationDidFinishLaunching
 
 struct TetrisPiece < HasPosition where
-    removeFromGrid :: Request ()
-    addToGrid :: Request ()
-    setShape :: (Int,Int, Array Int) -> Request ()
     movePiece :: Int -> Int -> Request Bool
     
 tetrisPiece gameGrid env = class
     position := {x=0;y=0}
-    shape := array [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    shape := array []
     collision := False
-        
-    setShape s = request
-        (startX,startY, newShape) = s
-        
-        position := {x=startX;y=startY}
-        shape := newShape
-                    
+    randomizer = new baseGen 31415926
+    
+    color := 1
+
     movePiece addX addY = request
+        if (size shape == 0) then
+            next
+            
         setPieceValues 0 -- remove from grid temporarily so as to not interfere with collision test
 
         collides <- testCollision addX addY
         if (not collides) then
             position := {x=position.x+addX;y=position.y+addY}
+        else
+            if (addX == 0 && addY == -1) then
+                setPieceValues color
+                next
         
-        setPieceValues 1
-        result (not collides)    
+        setPieceValues color
+        result (not collides)  
+        
+    nextShape := linePiece90
+    next = do
+        (startX,startY, newShape) = nextShape
+        
+        position := {x=startX;y=startY}
+        shape := newShape
+        color := (<- randomizer.next) `mod` 2 +1
+        
+        nextShapeId = <- (randomizer.next) `mod` 2 +1
+        nextShape := case (nextShapeId) of
+                        1 -> square
+                        _ -> linePiece90
 
     testCollision offsetX offsetY = do
         collision := False
@@ -90,17 +100,9 @@ tetrisPiece gameGrid env = class
             forall ty <- [0..4] do
                 if (shape!(5*tx+ty) > 0) then
                     gridValue <- gameGrid.getValueAt (tx+position.x+offsetX) (ty+position.y+offsetY)
-                    --env.stdout.write ("grid value: " ++ (show gridValue) ++ "\n")
+                    env.stdout.write ("grid value: " ++ (show gridValue) ++ "\n")
                     collision := collision || (isTrue gridValue)
-                    
-
         result collision
-
-    removeFromGrid = request
-        setPieceValues 0
-    
-    addToGrid = request
-        setPieceValues 1
     
     setPieceValues val = do
         forall tx <- [0..4] do
@@ -140,6 +142,7 @@ tetrisGrid width height env = class
     update = request
         forall (tx,ty,val,container) <- grid do
             case (val) of
+                2 -> container.setBackgroundColor ({r=100;g=250;b=100})
                 1 -> container.setBackgroundColor ({r=250;g=100;b=100})
                 _ -> container.setBackgroundColor ({r=50;g=50;b=50})
 

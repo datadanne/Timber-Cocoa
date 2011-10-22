@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>Tutorial4MultipleWindows.t</string>
+	<string>Tetris.t</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -28,7 +28,7 @@
 			<key>filename</key>
 			<string>CTApplication.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T18:32:42Z</date>
+			<date>2011-10-21T18:57:53Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -58,7 +58,7 @@
 			<key>filename</key>
 			<string>CTContainer.extern.c</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T17:22:07Z</date>
+			<date>2011-10-21T17:14:08Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -70,13 +70,13 @@
 			<key>filename</key>
 			<string>CTContainer.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T17:49:59Z</date>
+			<date>2011-10-21T18:07:26Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTCommon.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T18:13:53Z</date>
+			<date>2011-10-21T17:20:35Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -112,7 +112,7 @@
 			<key>filename</key>
 			<string>CTWindow.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T18:15:03Z</date>
+			<date>2011-10-21T18:07:18Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -136,7 +136,7 @@
 			<key>filename</key>
 			<string>Paint.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-20T11:59:58Z</date>
+			<date>2011-10-21T17:28:33Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -259,6 +259,14 @@
 			<date>2011-10-20T12:32:56Z</date>
 		</dict>
 		<dict>
+			<key>filename</key>
+			<string>Tetris.t</string>
+			<key>lastUsed</key>
+			<date>2011-10-21T18:57:53Z</date>
+			<key>selected</key>
+			<true/>
+		</dict>
+		<dict>
 			<key>children</key>
 			<array>
 				<dict>
@@ -277,27 +285,33 @@
 					<key>filename</key>
 					<string>Tutorial2Resizing.t</string>
 					<key>lastUsed</key>
-					<date>2011-10-20T13:25:18Z</date>
+					<date>2011-10-21T18:11:18Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>Tutorial3TabResponder.t</string>
 					<key>lastUsed</key>
-					<date>2011-10-20T17:58:21Z</date>
+					<date>2011-10-21T18:46:48Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>Tutorial4ColorPicker.t</string>
 					<key>lastUsed</key>
-					<date>2011-10-20T17:57:43Z</date>
+					<date>2011-10-21T17:14:06Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>Tutorial4MultipleWindows.t</string>
 					<key>lastUsed</key>
-					<date>2011-10-20T18:33:22Z</date>
-					<key>selected</key>
-					<true/>
+					<date>2011-10-21T17:07:41Z</date>
+				</dict>
+				<dict>
+					<key>filename</key>
+					<string>Tutorial5CallbackLabel.t</string>
+				</dict>
+				<dict>
+					<key>filename</key>
+					<string>Tutorial5ComponentCreation.t</string>
 				</dict>
 			</array>
 			<key>expanded</key>
@@ -403,14 +417,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>6</integer>
+				<integer>20</integer>
 				<key>line</key>
-				<integer>36</integer>
+				<integer>34</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>26</integer>
+			<integer>13</integer>
 		</dict>
 		<key>CTButton.extern.c</key>
 		<dict>
@@ -531,14 +545,30 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>17</integer>
+				<integer>50</integer>
 				<key>line</key>
-				<integer>19</integer>
+				<integer>65</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>35</integer>
+			<integer>48</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>65</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>66</integer>
+			</dict>
 		</dict>
 		<key>CTLabel.extern.c</key>
 		<dict>
@@ -638,7 +668,7 @@
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>109</integer>
+			<integer>22</integer>
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
@@ -673,14 +703,30 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>7</integer>
 				<key>line</key>
-				<integer>0</integer>
+				<integer>4</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>40</integer>
+			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>4</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>5</integer>
+			</dict>
 		</dict>
 		<key>ScrollTest.t</key>
 		<dict>
@@ -695,6 +741,20 @@
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+		</dict>
+		<key>Tetris.t</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>27</integer>
+				<key>line</key>
+				<integer>75</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>56</integer>
 		</dict>
 		<key>Tutorial0App.t</key>
 		<dict>
@@ -775,9 +835,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>31</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>124</integer>
+				<integer>122</integer>
 			</dict>
 			<key>columnSelection</key>
 			<false/>
@@ -790,7 +850,7 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>0</integer>
+				<integer>122</integer>
 			</dict>
 			<key>selectTo</key>
 			<dict>
@@ -805,14 +865,30 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>18</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>32</integer>
+				<integer>4</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>19</integer>
+				<key>line</key>
+				<integer>40</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>4</integer>
+			</dict>
 		</dict>
 		<key>Tutorial4MultipleWindows.t</key>
 		<dict>
@@ -847,6 +923,7 @@
 	<array>
 		<string>EventHandler.t</string>
 		<string>Paint.t</string>
+		<string>Tetris.t</string>
 		<string>COCOA.t</string>
 		<string>CTLabel.t</string>
 		<string>Tutorial1ComponentsAndHierarchies.t</string>
@@ -877,6 +954,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{253, 82}, {1157, 941}}</string>
+	<string>{{721, 98}, {1157, 941}}</string>
 </dict>
 </plist>

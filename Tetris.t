@@ -18,56 +18,104 @@ root w = class
     testResponder (KeyEvent keyEventType) modifiers = request
         theKey = getKey keyEventType
         case (theKey) of
-            W -> iteration := iteration +1
-            A -> iteration := iteration -20
-            S -> iteration := iteration -1
-            D -> iteration := iteration +20
+            A -> currentPiece.movePiece (-1) 0
+            S -> currentPiece.movePiece 0 (-1)
+            D -> currentPiece.movePiece 1 0
             _ -> 
-            
-        if (iteration < 0) then
-            iteration := (-iteration)
-        if (iteration > 200) then
-            iteration := iteration - 200
-            
+
         result False
     
     testResponder _ modifiers = request
         result False
-        
-    iteration := 0
-    tileX := 0
-    tileY := 0
-    currentPiece := square
+
+    currentPiece := new tetrisPiece gameGrid env
 
     gameLoop env = action
-        gameGrid.clear
-        
-        (currentX,currentY, currentShape) = currentPiece
-        tileX := 0
-        tileY := 0
-        forall tx <- [0..4] do
-            forall ty <- [0..4] do
-                if (currentShape!(5*tx+ty) > 0) then
-                    gameGrid.setValueAt (1+tx+currentX) (1+ty+currentY) 1        
-        
-        currentPiece := (currentX,currentY-1,currentShape)
-        
-        gameGrid.update                
-        after (millisec 1250) send gameLoop env
+        moved <- currentPiece.movePiece 0 (-1)
+        isAt <- currentPiece.getPosition
+        env.stdout.write ("moving piece: " ++ (show isAt.x) ++ "," ++ (show isAt.y) ++ ":" ++ (show moved) ++ "\n")
+        if (not moved) then
+            currentPiece.setShape square
+            
+        gameGrid.update        
+        after (millisec 500) send gameLoop env
+
                 
     applicationDidFinishLaunching app = action
+        app.addWindow gameWindow
+        send gameLoop env
+    result action
+        currentPiece.setShape square
+        currentPiece.addToGrid
 
-        gameWindow.addResponder ({respondToInputEvent=testResponder})
-        
+        gameWindow.addResponder ({respondToInputEvent=testResponder}) 
         gameWindow.setSize ({width=300;height=500}) 
         gameWindow.setBackgroundColor ({r=100;g=100;b=100})
         gameWindow.addComponent gameGrid
-        app.addWindow gameWindow
-        
-        send gameLoop env
-    result action
+
         osx.startApplication applicationDidFinishLaunching
 
+struct TetrisPiece < HasPosition where
+    removeFromGrid :: Request ()
+    addToGrid :: Request ()
+    setShape :: (Int,Int,Array Int) -> Request ()
+    movePiece :: Int -> Int -> Request Bool
+    
+tetrisPiece gameGrid env = class
+    position := {x=0;y=0}
+    shape := array [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    collision := False
+
+    
+    setShape s = request
+        (startX,startY, newShape) = s
+        
+        position := {x=startX;y=startY}
+        shape := newShape
+
+    movePiece addX addY = request
+        setPieceValues 0 -- remove from grid temporarily to not interfere with collision test
+
+        collides <- testCollision addX addY
+        if (not collides) then
+            position := {x=position.x+addX;y=position.y+addY}
+        
+        setPieceValues 1
+        result (not collides)
+
+    testCollision offsetX offsetY = do
+        collision := False
+
+        forall tx <- [0..4] do
+            forall ty <- [0..4] do
+                if (shape!(5*tx+ty) > 0) then
+                    gridValue <- gameGrid.getValueAt (tx+position.x+offsetX) (ty+position.y+offsetY)
+                    env.stdout.write ("grid value: " ++ (show gridValue) ++ "\n")
+                    collision := collision || (isTrue gridValue)
+                    
+
+        result collision
+
+    removeFromGrid = request
+        setPieceValues 0
+    
+    addToGrid = request
+        setPieceValues 1
+        
+    setPieceValues val = do
+        forall tx <- [0..4] do
+            forall ty <- [0..4] do
+                if (shape!(5*tx+ty) > 0) then
+                    gameGrid.setValueAt (tx+position.x) (ty+position.y) val
+    
+    setPosition s = request
+        position := s
+        
+    getPosition = request
+        result position
+        
+    result TetrisPiece {..}
+    
 struct GameGrid < Container where
     setValueAt :: Int -> Int -> Int -> Request Bool
     getValueAt :: Int -> Int -> Request Int
@@ -129,7 +177,7 @@ tetrisGrid width height env = class
         base.init app
         
         forall row <- [1..height] do
-            forall col <- [1..width] do    
+            forall col <- [1..width] do
                tile = new mkCocoaContainer env
                tile.setSize ({width=tileSize;height=tileSize})
                tile.setBackgroundColor ({r=10*row;g=10*col;b=128})--backgroundColor
@@ -170,7 +218,9 @@ tetrisGrid width height env = class
     getComponents = base.getComponents
                
     result GameGrid {..}
-    
+  
+isTrue 0 = False
+isTrue _ = True  
     
 {- 
     Tetris shapes!

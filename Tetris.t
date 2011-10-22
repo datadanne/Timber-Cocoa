@@ -23,6 +23,8 @@ root w = class
             D -> currentPiece.movePiece 1 0
             _ -> 
 
+        gameGrid.update
+        
         result False
     
     testResponder _ modifiers = request
@@ -57,31 +59,28 @@ root w = class
 struct TetrisPiece < HasPosition where
     removeFromGrid :: Request ()
     addToGrid :: Request ()
-    setShape :: (Int,Int,(Int,Int,Int), Array Int) -> Request ()
+    setShape :: (Int,Int, Array Int) -> Request ()
     movePiece :: Int -> Int -> Request Bool
     
 tetrisPiece gameGrid env = class
     position := {x=0;y=0}
     shape := array [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     collision := False
-    color := (250,150,150)
-    
+        
     setShape s = request
-        (startX,startY, (r,g,b), newShape) = s
+        (startX,startY, newShape) = s
         
         position := {x=startX;y=startY}
         shape := newShape
-        color := (r,g,b)
                     
     movePiece addX addY = request
-        setPieceValues 0 -- remove from grid temporarily to not interfere with collision test
+        setPieceValues 0 -- remove from grid temporarily so as to not interfere with collision test
 
         collides <- testCollision addX addY
         if (not collides) then
             position := {x=position.x+addX;y=position.y+addY}
         
         setPieceValues 1
-        setPieceColors
         result (not collides)    
 
     testCollision offsetX offsetY = do
@@ -91,7 +90,7 @@ tetrisPiece gameGrid env = class
             forall ty <- [0..4] do
                 if (shape!(5*tx+ty) > 0) then
                     gridValue <- gameGrid.getValueAt (tx+position.x+offsetX) (ty+position.y+offsetY)
-                    env.stdout.write ("grid value: " ++ (show gridValue) ++ "\n")
+                    --env.stdout.write ("grid value: " ++ (show gridValue) ++ "\n")
                     collision := collision || (isTrue gridValue)
                     
 
@@ -102,13 +101,7 @@ tetrisPiece gameGrid env = class
     
     addToGrid = request
         setPieceValues 1
-
-    setPieceColors = do
-        forall tx <- [0..4] do
-            forall ty <- [0..4] do
-                if (shape!(5*tx+ty) > 0) then
-                    gameGrid.setColorAt (tx+position.x) (ty+position.y) color
-        
+    
     setPieceValues val = do
         forall tx <- [0..4] do
             forall ty <- [0..4] do
@@ -133,37 +126,43 @@ struct GameGrid < Container where
 tetrisGrid width height env = class
     base = new mkCocoaContainer env
     id = base.id
+    
+    emptyTile = 0
+    redTile = 1
+    greenTile = 2
+    blueTile = 3
 
+    -- Grid of tiles. Each tile has (X,Y, Value, Container)
+    grid :: [(Int, Int, Int, Container)]
+    grid := []
+    
     color := (0,0,0)
     update = request
-        forall (tx,ty,val,(r,g,b),container) <- grid do
+        forall (tx,ty,val,container) <- grid do
             case (val) of
-                1 -> container.setBackgroundColor ({r=r;g=g;b=b})
-
+                1 -> container.setBackgroundColor ({r=250;g=100;b=100})
                 _ -> container.setBackgroundColor ({r=50;g=50;b=50})
-
-        
-    -- Remove a tile and replace it with a tile with the new value.
 
     setColorAt x y newColor = request
         newGrid := []
-        forall (tx,ty,val,tileColor,container) <- grid do
+        forall (tx,ty,val,container) <- grid do
             if (tx == x && ty == y) then
-                newGrid := (tx,ty,val,tileColor,container) : newGrid
+                newGrid := (tx,ty,val,container) : newGrid
             else
-                newGrid := (tx,ty,val,newColor,container) : newGrid
+                newGrid := (tx,ty,val,container) : newGrid
         grid := newGrid
         result False
-        
+
+    -- Remove a tile and replace it with a tile with the new value.        
     newGrid := []
     setValueAt x y val = request
         newGrid := []
         
-        forall (tileX,tileY,oldVal,tileColor,container) <- grid do
+        forall (tileX,tileY,oldVal,container) <- grid do
             if (tileX == x && tileY == y) then
-                newGrid := (tileX,tileY,val,tileColor,container) : newGrid
+                newGrid := (tileX,tileY,val,container) : newGrid
             else
-                newGrid := (tileX,tileY,oldVal,tileColor,container) : newGrid
+                newGrid := (tileX,tileY,oldVal,container) : newGrid
 
         grid := newGrid
 
@@ -172,21 +171,15 @@ tetrisGrid width height env = class
     value := -1
     getValueAt x y = request
         value := -1
-        forall (tileX,tileY,val, c, container) <- grid do
+        forall (tileX,tileY,val, container) <- grid do
             if (tileX == x && tileY == y) then
                 value := val
         result value
     
-    grid :: [(Int, Int, Int, (Int,Int,Int), Container)]
-    grid := []
-    
-    clearColor = (100,100,100)
-    clearValue = 0
-    
     clear = request
         newGrid := []
-        forall (x,y,val,c, container) <- grid do
-            newGrid := (x,y,clearValue,clearColor,container) : newGrid
+        forall (x,y,val, container) <- grid do
+            newGrid := (x,y,emptyTile,container) : newGrid
         grid := newGrid
                 
     init app = request
@@ -199,9 +192,9 @@ tetrisGrid width height env = class
             forall col <- [1..width] do
                tile = new mkCocoaContainer env
                tile.setSize ({width=tileSize;height=tileSize})
-               tile.setBackgroundColor ({r=10*row;g=10*col;b=128})--backgroundColor
-               tile.setPosition ({x=col*tileSize;y=(row+1)*tileSize})
-               grid := (col,row, clearValue, clearColor, tile) : grid
+               tile.setBackgroundColor backgroundColor
+               tile.setPosition ({x=col*(tileSize+1);y=(row+1)*(tileSize+1)})
+               grid := (col,row, emptyTile, tile) : grid
                base.addComponent tile
                
     destroy = request
@@ -247,31 +240,31 @@ isTrue _ = True
 -}
 
 
-square = (4,18, (150,0,0), array [0,0,0,0,0, 
+square = (4,18, array [0,0,0,0,0, 
                        0,0,0,0,0, 
                        0,0,2,1,0, 
                        0,0,1,1,0, 
                        0,0,0,0,0])
                
-linePiece0 = (3,18, (0,150,0), array [0,0,0,0,0, 
+linePiece0 = (3,18, array [0,0,0,0,0, 
                            0,0,0,0,0, 
                            0,1,2,1,1, 
                            0,0,0,0,0, 
                            0,0,0,0,0])
 
-linePiece90 = (4,18, (0,150,0), array [0,0,0,0,0, 
+linePiece90 = (4,18, array [0,0,0,0,0, 
                             0,0,1,0,0, 
                             0,0,2,0,0, 
                             0,0,1,0,0, 
                             0,0,1,0,0])
                      
-linePiece180 = (4,18, (0,150,0), array [0,0,0,0,0, 
+linePiece180 = (4,18, array [0,0,0,0,0, 
                              0,0,0,0,0, 
                              1,1,2,1,0, 
                              0,0,0,0,0, 
                              0,0,0,0,0])
                      
-linePiece270 = (4,18, (0,150,0), array [0,0,1,0,0, 
+linePiece270 = (4,18, array [0,0,1,0,0, 
                              0,0,1,0,0, 
                              0,0,2,0,0, 
                              0,0,1,0,0, 

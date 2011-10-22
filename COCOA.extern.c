@@ -46,7 +46,7 @@ void scanAppInit(void) {
 		app = (App_CTCommon)copy((ADDR)app);
 	ENABLE(envmut);
 	
-    printf("GC in scanAppInit: Scanning app something something, done?\n");
+    DEBUG("GC in scanAppInit: Scanning app something something, done?\n");
 }
 
 struct Scanner appScanner = {scanAppInit, NULL};

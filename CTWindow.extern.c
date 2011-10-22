@@ -156,7 +156,7 @@ void scanEventReceived() {
 	if(receivedEvent)
 		receivedEvent = (InputEvent_CTCommon)copy((ADDR)receivedEvent);
 	ENABLE(envmut);
-    printf("GC in scanEventReceived: done with copy?\n");
+    DEBUG("GC in scanEventReceived: done with copy?\n");
 }
 
 struct Scanner eventScanner = {scanEventReceived, NULL};

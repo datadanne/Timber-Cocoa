@@ -3,11 +3,11 @@
 
 
 // --------- Container ----------------------------------------------
-Msg containerAddComponent_CTContainer (CocoaID_COCOA container, CocoaID_COCOA button, Time start, Time stop) {
+Msg containerAddComponent_CTContainer (CocoaID_COCOA container, Int buttonRef, Time start, Time stop) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	CocoaView *thisView = (CocoaView*) COCOA_REF(container);
-	NSObject *object = (NSObject*) COCOA_REF(button);
+	NSObject *object = (NSObject*) buttonRef;
 
 	[thisView performSelectorOnMainThread:@selector(addSubview:) withObject:object waitUntilDone:YES];
     [thisView setNeedsDisplay:YES];

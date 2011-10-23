@@ -83,13 +83,10 @@ struct Wrapper a where
     get :: Request a
     
 wrapper s = class
+
     a := s
-    
-    set b = request
-        a := b
-        
-    get = request
-        result a
+    set b = request a := b
+    get = request result a
         
     result Wrapper {..}
 

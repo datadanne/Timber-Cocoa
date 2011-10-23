@@ -13,6 +13,9 @@ mkCocoaTextField env = class
     position := {x=0; y=0}
     keyEventResponder := Nothing
     mouseEventResponder := Nothing
+    cocoaRef := defaultCocoaRef   
+    getCocoaRef = request
+        result cocoaRef
     
     id = new mkCocoaID
     base = new basicComponent True Nothing "TEXT_AREA"

@@ -10,7 +10,8 @@ mkCocoaContainer env = class
     myComponents := []        
     color := {r=255; g=255; b=255}
     appRef := Nothing
-    
+    cocoaRef := defaultCocoaRef
+
     id = new mkCocoaID
     base = new basicComponent False Nothing "Container"
     addResponder = base.addResponder
@@ -59,7 +60,8 @@ mkCocoaContainer env = class
         state <- base.getState
         if (state == Active && isJust appRef) then
             c.init (fromJust appRef)
-            containerAddComponent id c.id    
+--            containerAddComponent id c.id    
+            containerAddComponent id (<-c.getCocoaRef)
             
     removeComponent c = request
         myComponents := [x | x <- myComponents, not (x == c)]
@@ -100,11 +102,15 @@ mkCocoaContainer env = class
 
             forall cmp <- myComponents do
                 cmp.init app
-                containerAddComponent id cmp.id
+--                containerAddComponent id cmp.id
+                containerAddComponent id (<-cmp.getCocoaRef)
     inithelper = do
        containerSetSize id (<- base.getSize)
        containerSetBackgroundColor id color
        containerSetPosition id (<- base.getPosition)
+    
+    getCocoaRef = request
+        result cocoaRef
        
     this := Container{id_temp = self; ..}  
 
@@ -122,5 +128,5 @@ extern destroyContainer :: CocoaID -> Action
 extern containerSetBackgroundColor :: CocoaID -> Color -> Action
 extern containerSetSize :: CocoaID -> Size -> Action
 extern containerSetPosition :: CocoaID -> Position -> Action
-extern containerAddComponent :: CocoaID -> CocoaID -> Action                    -- external method for doing the actual cocoa add-call!
+extern containerAddComponent :: CocoaID -> CocoaRef -> Action                    -- external method for doing the actual cocoa add-call!
 extern containerRemoveComponent :: CocoaID -> CocoaID -> Action

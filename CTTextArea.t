@@ -14,6 +14,9 @@ mkCocoaTextArea env = class
     position := {x=0; y=0}
     keyEventResponder := Nothing
     mouseEventResponder := Nothing
+    cocoaRef := defaultCocoaRef   
+    getCocoaRef = request
+        result cocoaRef
 
     dts = new defaultTextScrollResponder this env
     

@@ -1,5 +1,8 @@
 module COCOA where
 
+struct CocoaID where
+	dummy :: Int
+
 struct CocoaWindow < RespondsToWindowEvents, HasSize, HasBackgroundColor, ContainsComponents, HasResponders, RespondsToInputEvents where 
     windowId :: CocoaID
     getId :: Request WindowID
@@ -70,14 +73,12 @@ struct BaseComponent < IsFocusable, HasSize, HasResponders, RespondsToInputEvent
     getState :: Request ComponentState
     getAllComponents :: Request [Component]
 
-{- This is a hack. We expose id to be able to access the id on each component because this
-   is where we hide the pointer into Cocoa! Not used as a "static variable" -}
-
-struct CocoaID where
-    dummy :: Int
+type CocoaRef = Int
+defaultCocoaRef = 0 :: CocoaRef
        
 struct Component < BaseComponent where   
     id :: CocoaID          
+    getCocoaRef :: Request CocoaRef
     init :: App -> Request ()
     destroy :: Request ()
     id_temp :: OID

@@ -11,6 +11,9 @@ mkCocoaLabel = class
     mouseEventResponder := Nothing          
     textColor := {r=0;g=0;b=0}
     text := "Default Label"
+    cocoaRef := defaultCocoaRef   
+    getCocoaRef = request
+        result cocoaRef
 
     id = new mkCocoaID
     base = new basicComponent False Nothing "Label"

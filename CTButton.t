@@ -11,12 +11,14 @@ struct Button < Component where
 ------          ** BUTTON **            ----------------------------------------------------------
 mkCocoaButton env = class
     size := {width=108; height=21}
-    title := ""
+    title := "Click me!"
     position := {x=0; y=0}
     keyEventResponder := Nothing
     mouseEventResponder := Nothing
-    
-    id = new mkCocoaID
+    cocoaRef := defaultCocoaRef   
+    getCocoaRef = request
+        result cocoaRef 
+
     base = new basicComponent True Nothing "BUTTON"
     addResponder = base.addResponder
     setResponders = base.setResponders
@@ -37,7 +39,7 @@ mkCocoaButton env = class
         title := s
         setName s
         case (<- base.getState) of
-            Active -> buttonSetTitle id s
+            Active -> _ = buttonSetTitle cocoaRef s
             _ ->
    
     -- getTitle
@@ -47,7 +49,7 @@ mkCocoaButton env = class
     -- setPosition
     setPosition p = request
         case (<- base.getState) of
-            Active -> buttonSetPosition id p
+            Active -> _= buttonSetPosition cocoaRef p
             _ -> 
         position := p       
     
@@ -56,7 +58,9 @@ mkCocoaButton env = class
         result position
 
     setSize s = request
-        size := s
+        case (<- base.getState) of
+            Active -> size := buttonSetSize cocoaRef s
+            _ -> size := s
 
     getSize = request
         result size
@@ -66,13 +70,12 @@ mkCocoaButton env = class
 
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request
-            base.setState Active
-            initButton this app
-            inithelper
-    
-    inithelper = do
-        buttonSetTitle id title
-        buttonSetPosition id position
+        base.setState Active
+        cocoaRef := initButton title
+        size := buttonSetSize cocoaRef size
+        _ = buttonSetPosition cocoaRef position
+
+    id = new mkCocoaID
             
     this = Button{id_temp=self;..}
 
@@ -83,7 +86,7 @@ mkCocoaButton env = class
 
 --button     
 private 
-extern initButton :: Button -> App -> Request ()
-extern buttonSetTitle :: CocoaID -> String -> Action
-extern buttonSetPosition :: CocoaID -> Position -> Action
-extern buttonHighlight:: CocoaID -> Action
+extern initButton :: String -> CocoaRef
+extern buttonSetTitle :: CocoaRef -> String -> ()
+extern buttonSetPosition :: CocoaRef -> Position -> ()
+extern buttonSetSize :: CocoaRef -> Size -> Size

@@ -14,11 +14,15 @@ mkCocoaTextArea env = class
     position := {x=0; y=0}
     keyEventResponder := Nothing
     mouseEventResponder := Nothing
+
+    dts = new defaultTextScrollResponder this env
     
     id = new mkCocoaID
     base = new basicComponent True Nothing "TEXT_AREA"
     addResponder = base.addResponder
-    setResponders = base.setResponders
+    setResponders :: [RespondsToInputEvents] -> Request ()
+    setResponders rs = request
+        base.setResponders (dts:rs)
     getResponders = base.getResponders
     setParent = base.setParent
     getParent = base.getParent
@@ -96,8 +100,7 @@ mkCocoaTextArea env = class
         (hoz,vert) = scrollable
         textAreaSetHorizontalScroll id hoz
         textAreaSetVerticalScroll id vert
-        
-        dts = new defaultTextScrollResponder this env
+       
         addResponder dts
             
     this = TextArea{..}

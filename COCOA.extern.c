@@ -123,7 +123,6 @@ void createCocoaApplication(void) {
 }
 
 extern pthread_cond_t sleepVar;
-extern App_COCOA cocoaApplication_CTApplication(int d);
 
 TUP0 startApplication_COCOA (CocoaEnv_COCOA env, CLOS clos, Int poly) {
 	printf("Initializing cocoa application: ");

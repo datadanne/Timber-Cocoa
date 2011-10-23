@@ -74,6 +74,7 @@ root w = class
     addWindowResponder = do
         ta.setSize ({width=300; height=80})
         ta.setPosition ({x=50; y=250})  
+        ta.setScrollable (True,True)
 
         w1.addComponent ta
 
@@ -84,7 +85,7 @@ root w = class
    -- Tutorial 3 : Consume tab event in text area.
     replaceTabResponder = do
         tabResponder = new myTabResponder tabCountLabel
-        ta.addResponder tabResponder
+        ta.setResponders [tabResponder]
 
     -- Tutorial 4 : Add a color picker window
     rgbLabel = new mkCocoaLabel

@@ -3,8 +3,6 @@ rm *.o
 rm *.js
 rm COCOA.c
 rm COCOA.h
-rm CTApplication.h
-rm CTApplication.c
 rm CTButton.c
 rm CTButton.h
 rm CTCommon.c
@@ -13,8 +11,6 @@ rm CTContainer.c
 rm CTContainer.h
 rm CTWindow.c
 rm CTWindow.h
-rm NewTest.h
-rm NewTest.c
 mv $(ls | grep -v "extern.c$" | grep ".c$") tmp
 mv $(ls | grep -v "extern.h$" | grep ".h$") tmp
 mv $(ls | egrep -v "\.|makeTest|cleanFolder|tmp|Old|stuff") tmp

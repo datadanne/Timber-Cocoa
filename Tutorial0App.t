@@ -1,7 +1,6 @@
 module Tutorial0App where
 
-import COCOA
-import POSIX
+import CTWindow
 
 root w = class
     env = new posix w
@@ -12,7 +11,7 @@ root w = class
     applicationDidFinishLaunching app = action   
         w1.setPosition({x=100;y=300})
     	w1.setSize ({width=400;height=400})
-    	w1.setBackgroundColor ({r=200;g=200;b=200})
+    	w1.setBackgroundColor ({r=200;g=200;b=100})
     	app.addWindow w1
 
     result action

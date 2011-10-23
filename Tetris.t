@@ -2,6 +2,7 @@ module Tetris where
 
 import POSIX
 import COCOA
+import CTWindow
 import CTContainer  -- Compiler panic if this redundant import of CTContainer is removed
 import RandomGenerator
 

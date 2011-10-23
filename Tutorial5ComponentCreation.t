@@ -84,7 +84,7 @@ root w = class
    -- Tutorial 3 : Consume tab event in text area.
     replaceTabResponder = do
         tabResponder = new myTabResponder tabCountLabel
-        ta.setResponders [tabResponder]
+        ta.addResponder tabResponder
 
     -- Tutorial 4 : Add a color picker window
     rgbLabel = new mkCocoaLabel

@@ -1,7 +1,8 @@
 module TestDropDown where
 
-import COCOA
+import CTWindow
 import CTDropDown
+
 
 root w = class
     env = new posix w
@@ -12,7 +13,6 @@ root w = class
 
     applicationDidFinishLaunching app = action                         
         app.addWindow w1
-        app.setEnv env
         
     result action
         w1.setSize ({width=700;height=500})

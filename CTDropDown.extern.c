@@ -42,30 +42,30 @@
 
     NSInteger windowId = [[sender window] windowNumber];
      
-   	App_CTCommon app = getApp(); 
+   	App_COCOA app = getApp(); 
 
     // FIRE AWAY EVENT =DDD  
-    Position_CTCommon x_5110 = NULL;
-    NEW (Position_CTCommon, x_5110, WORDS(sizeof(struct Position_CTCommon)));
-    x_5110->GCINFO = __GC__Position_CTCommon;
-    x_5110->x_CTCommon = eventX;
-	x_5110->y_CTCommon = eventY;
+    Position_COCOA x_5110 = NULL;
+    NEW (Position_COCOA, x_5110, WORDS(sizeof(struct Position_COCOA)));
+    x_5110->GCINFO = __GC__Position_COCOA;
+    x_5110->x_COCOA = eventX;
+	x_5110->y_COCOA = eventY;
 	
 	DEBUG("PopUp creating new mouseclick at: %f , %f\n", eventX, eventY);
     
-    _MouseClicked_CTCommon x_5111;
-    NEW (_MouseClicked_CTCommon, x_5111, WORDS(sizeof(struct _MouseClicked_CTCommon)));
-    x_5111->GCINFO = __GC___MouseClicked_CTCommon;
+    _MouseClicked_COCOA x_5111;
+    NEW (_MouseClicked_COCOA, x_5111, WORDS(sizeof(struct _MouseClicked_COCOA)));
+    x_5111->GCINFO = __GC___MouseClicked_COCOA;
     x_5111->Tag = 3;
     x_5111->a = x_5110;
     
-    InputEvent_CTCommon receivedEvent;
-    NEW (InputEvent_CTCommon, receivedEvent, WORDS(sizeof(struct _MouseEvent_CTCommon)));
-    ((_MouseEvent_CTCommon)receivedEvent)->GCINFO = __GC___MouseEvent_CTCommon;
-    ((_MouseEvent_CTCommon)receivedEvent)->Tag = 1;
-    ((_MouseEvent_CTCommon)receivedEvent)->a = (MouseEventType_CTCommon)x_5111;    
+    InputEvent_COCOA receivedEvent;
+    NEW (InputEvent_COCOA, receivedEvent, WORDS(sizeof(struct _MouseEvent_COCOA)));
+    ((_MouseEvent_COCOA)receivedEvent)->GCINFO = __GC___MouseEvent_COCOA;
+    ((_MouseEvent_COCOA)receivedEvent)->Tag = 1;
+    ((_MouseEvent_COCOA)receivedEvent)->a = (MouseEventType_COCOA)x_5111;    
  
-    app->sendInputEvent_CTCommon(app, (InputEvent_CTCommon)receivedEvent, windowId, 0);
+    app->l_App_COCOA_AppImpl_COCOA_COCOA->sendInputEvent_COCOA(app->l_App_COCOA_AppImpl_COCOA_COCOA, (InputEvent_COCOA)receivedEvent, windowId, 0);
 }  
 
 - (void) setCoordsX: (float) xarg andY: (float) yarg {
@@ -86,7 +86,7 @@
 @end
                     
 // --------- DropDown ----------------------------------------------
-Msg dropDownAddOption_CTDropDown(CocoaID_CTCommon id, LIST s, Time start, Time stop) {
+Msg dropDownAddOption_CTDropDown(CocoaID_COCOA id, LIST s, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("external method setTitle :DD");
 	NSPopUpButton *thisDropDown = (NSPopUpButton*) COCOA_REF(id);
@@ -96,7 +96,7 @@ Msg dropDownAddOption_CTDropDown(CocoaID_CTCommon id, LIST s, Time start, Time s
 	[thisDropDown setNeedsDisplay];
 	[pool drain];
 } 
-Msg dropDownSetPosition_CTDropDown(CocoaID_CTCommon id, Position_CTCommon pos, Time start, Time stop) {
+Msg dropDownSetPosition_CTDropDown(CocoaID_COCOA id, Position_COCOA pos, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("setting POS externally..");
 	
@@ -104,24 +104,24 @@ Msg dropDownSetPosition_CTDropDown(CocoaID_CTCommon id, Position_CTCommon pos, T
 	
 	DEBUG("DropDown(pos) OK %p!", thisDropDown);                                                    
 	
-    [[thisDropDown target] setCoordsX: pos->x_CTCommon andY: pos->y_CTCommon];
+    [[thisDropDown target] setCoordsX: pos->x_COCOA andY: pos->y_COCOA];
 	
-	NSPoint p = NSMakePoint(pos->x_CTCommon-5,pos->y_CTCommon-20); // TODO: Remove hardcoded offset.
+	NSPoint p = NSMakePoint(pos->x_COCOA-5,pos->y_COCOA-20); // TODO: Remove hardcoded offset.
 	
 	[thisDropDown setFrameOrigin: p];
 	[thisDropDown performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
    	[pool drain]; 
 } 
 
-Msg dropDownSetSize_CTDropDown(CocoaID_CTCommon id, Size_CTCommon size, Time start, Time stop) {
+Msg dropDownSetSize_CTDropDown(CocoaID_COCOA id, Size_COCOA size, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("dropdown setting SIZE externally..");
 	
 	NSPopUpButton *thisDropDown = (NSPopUpButton*) COCOA_REF(id);
 
-    [[thisDropDown target] setWidth: size->width_CTCommon andHeight: size->height_CTCommon];
+    [[thisDropDown target] setWidth: size->width_COCOA andHeight: size->height_COCOA];
 	
-    NSSize s = NSMakeSize(size->width_CTCommon, size->height_CTCommon);
+    NSSize s = NSMakeSize(size->width_COCOA, size->height_COCOA);
 
 	[thisDropDown setFrameSize: s];
 	[thisDropDown performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
@@ -132,18 +132,18 @@ Msg dropDownSetSize_CTDropDown(CocoaID_CTCommon id, Size_CTCommon size, Time sta
 - (void) setWidth: (float) w andHeight: (float) h;
 - (void) setLastEventX: (float) xarg andY: (float) yarg;
 */
-/*Msg dropDownSetLastClickPosition_CTDropDown(CocoaID_CTCommon id, Position_CTCommon pos, Time start, Time stop) {
+/*Msg dropDownSetLastClickPosition_CTDropDown(CocoaID_COCOA id, Position_COCOA pos, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("setting POS externally..");
 	
 	NSPopUpButton *thisDropDown = (NSPopUpButton*) COCOA_REF(id);
    
-    [[thisDropDown target] setLastEventX: pos->x_CTCommon andY: pos->y_CTCommon];
+    [[thisDropDown target] setLastEventX: pos->x_COCOA andY: pos->y_COCOA];
    
    	[pool drain]; 
 } */
 
-LIST dropDownGetSelectedOption_CTDropDown(CocoaID_CTCommon id, Int dummy) {
+LIST dropDownGetSelectedOption_CTDropDown(CocoaID_COCOA id, Int dummy) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
 	NSPopUpButton *thisDropDown = (NSPopUpButton*) COCOA_REF(id);
     
@@ -163,22 +163,22 @@ LIST dropDownGetSelectedOption_CTDropDown(CocoaID_CTCommon id, Int dummy) {
     LIST s = getStr((char *) optionStr);
     return s;
 }
-/*Msg updateExpandedPos_CTDropDown(CocoaID_CTCommon id, Position_CTCommon pos, Time start, Time stop) {
+/*Msg updateExpandedPos_CTDropDown(CocoaID_COCOA id, Position_COCOA pos, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
 	NSPopUpButton *thisDropDown = (NSPopUpButton*) COCOA_REF(id);
      
     DropDownClickHandler *ch = (DropDownClickHandler*) [thisDropDown target];
     
-    [ch setCoordsX: pos->x_CTCommon andY: pos->y_CTCommon];
+    [ch setCoordsX: pos->x_COCOA andY: pos->y_COCOA];
 
     [pool release];
 } */                                         
 
-TUP0 initDropDown_CTDropDown(DropDown_CTDropDown dropDown, App_CTCommon app, Int dummy) {
+TUP0 initDropDown_CTDropDown(DropDown_CTDropDown dropDown, App_COCOA app, Int dummy) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
 	DEBUG("Initializing NSDropDown: ");
-	internal_CocoaID_CTCommon thisDropDown = (internal_CocoaID_CTCommon)(dropDown->l_DropDown_CTDropDown_Component_CTCommon_CTDropDown->id_CTCommon);
+	internal_CocoaID_COCOA thisDropDown = (internal_CocoaID_COCOA)(dropDown->l_DropDown_CTDropDown_Component_COCOA_CTDropDown->id_COCOA);
 
 	NSPopUpButton *cocoaDropDown = [[NSPopUpButton alloc] initWithFrame: NSMakeRect(20.0, 20.0, 120.0, 60.0) pullsDown:FALSE];
 	[cocoaDropDown setBezelStyle:NSRoundedBezelStyle];

@@ -1,6 +1,5 @@
 module CTContainer where
 
-import POSIX
 import CTCommon
 
 struct Container < Component, ContainsComponents, HasBackgroundColor

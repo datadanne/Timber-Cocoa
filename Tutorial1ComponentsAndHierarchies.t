@@ -1,7 +1,6 @@
 module Tutorial1ComponentsAndHierarchies where
 
-import COCOA
-import POSIX
+import CTWindow
 import CTButton
 import CTLabel
 

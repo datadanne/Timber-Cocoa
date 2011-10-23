@@ -1,7 +1,6 @@
 module TestButton where
 
-import POSIX
-import COCOA
+import CTWindow
 import CTButton
 
 root w = class
@@ -15,8 +14,6 @@ root w = class
     
     applicationDidFinishLaunching app = action                         
         app.addWindow w1
-        app.setEnv env
-    
         
     result action
         w1.setSize ({width=500;height=500})

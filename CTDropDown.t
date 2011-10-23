@@ -1,6 +1,7 @@
 module CTDropDown where
 
-import CTCommon   
+import COCOA -- remove and it breaks even with CTCommon imported below?
+import CTCommon
 import POSIX
 
 struct DropDown < Component, RespondsToSelectionEvents where

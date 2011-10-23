@@ -1,6 +1,6 @@
 module Tutorial4ColorPicker where
 
-import COCOA
+import CTWindow
 
 colorPickerTile colorPickerX colorPickerY env = class
     color := ({r=128;g=16*colorPickerX;b=16*colorPickerY})

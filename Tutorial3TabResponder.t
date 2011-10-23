@@ -1,7 +1,6 @@
 module Tutorial3TabResponder where
 
-import COCOA
-import POSIX
+import CTWindow
 import CTButton
 import CTLabel
 import CTTextArea

@@ -1,7 +1,7 @@
 module CTWindow where
 
-import POSIX
-import CTCommon
+import POSIX -- temporary, only needed for Env
+import COCOA
 import CTContainer
     
 --------------------------------------------------------------------------------------------------
@@ -91,8 +91,6 @@ mkCocoaWindow env = class
          currentFocus := cmp
          if (state == Active) then
              windowSetFocus windowId cmp.id
-
-         --env.stdout.write ("FOCUS SET TO: " ++ (<- cmp.getName) ++ "\n")
          
     getFocus = request
         result currentFocus
@@ -157,7 +155,6 @@ defaultInputResponder window rootContainer env = class
         consumed <- currentFocus.respondToInputEvent (KeyEvent keyEventType) modifiers
     
         if (not consumed) then
-            env.stdout.write "moving focus" 
             theKey = getKey keyEventType
             if (theKey == Tab) then
                 cmps <- rootContainer.getAllComponents

@@ -1,8 +1,8 @@
 module Paint where
 
-import POSIX
-import COCOA
-import CTContainer 
+import CTWindow     -- <- this includes CTContainer
+import CTLabel
+import CTContainer  -- but still, removing this causes compiler panic
 
 mkPaintBackdrop env = class
     base = new mkCocoaContainer env
@@ -87,7 +87,6 @@ root w = class
     painter = new paintHandler bg label env
 
     applicationDidFinishLaunching app = action
-        app.setEnv env
         app.addWindow w1
         w1.addComponent label
         bg.addResponder painter

@@ -122,17 +122,13 @@ void createCocoaApplication(void) {
 
 }
 
-extern pthread_cond_t sleepVar;
-
 TUP0 startApplication_COCOA (CocoaEnv_COCOA env, CLOS clos, Int poly) {
 	printf("Initializing cocoa application: ");
 	toRunWhenAppFinished = (AppCallback)clos;
 
 	if (!app) {
 		app = cocoaApplication_COCOA(0);
-
         runAsMainContinuation(createCocoaApplication);
-        pthread_cond_signal(&sleepVar);
 	}
 	
     return 0;

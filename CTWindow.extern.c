@@ -194,11 +194,10 @@ Int initCocoaWindow_CTWindow(CocoaWindow_COCOA wnd, App_COCOA app, Int dummy) {
 }
 
 TUP0 destroyCocoaWindow_CTWindow(CocoaID_COCOA wnd, Int dummy) {
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
+    dispatch_async(dispatch_get_main_queue(), ^{
     
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	    CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
 	    [thisWindow close];
 	    [pool drain];
         });

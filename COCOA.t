@@ -23,8 +23,8 @@ struct RespondsToSelectionEvents where
     setSelectionResponder :: RespondsToSelectionEvents -> Request ()
 
 struct RespondsToWindowEvents where
-    onWindowResize :: Size -> Modifiers -> Request ()
-    onWindowCloseRequest :: Modifiers -> Request Bool
+    onWindowResize :: Size -> Request ()
+    onWindowCloseRequest :: Request Bool
     setWindowResponder :: RespondsToWindowEvents -> Request ()
 
 struct Position where
@@ -80,6 +80,7 @@ struct Component < BaseComponent where
     id :: CocoaID          
     init :: App -> Request ()
     destroy :: Request ()
+    id_temp :: OID
 
 struct ContainsComponents where
     addComponent :: Component -> Request ()
@@ -91,8 +92,8 @@ struct CocoaEnv where
 	startApplication	:: (App -> Action) -> Request ()   	-- what to do?           
 
 instance eqComponent :: Eq Component where
-  (==) = (compareComponents True)
-  (/=) = (compareComponents False)
+  (==) a b = (a.id_temp == b.id_temp)
+  (/=) a b = (a.id_temp /= b.id_temp)
   
 instance eqCocoaKey :: Eq CocoaKey where
   (==) = (compareKeys True)
@@ -139,8 +140,8 @@ type Modifiers = [CocoaKey]
 type WindowID = Int
 
 extern cocoa :: World -> Class CocoaEnv
-extern compareCocoaIDs :: CocoaID -> CocoaID -> Bool
-extern compareComponents :: Bool -> Component -> Component -> Bool
+--extern compareCocoaIDs :: CocoaID -> CocoaID -> Bool
+--extern compareComponents :: Bool -> Component -> Component -> Bool
 extern compareKeys :: Bool -> CocoaKey -> CocoaKey -> Bool
 extern compareState :: Bool -> ComponentState -> ComponentState -> Bool
 extern mkCocoaID :: Class CocoaID
@@ -163,14 +164,15 @@ cocoaApplication = class
     modifiers := []
 
     sendInputEvent (KeyEvent k) windowId = request
-        (KeyPressed name) = k
-
-        case (name) of
+        name = case k of 
+            (KeyPressed  n) -> n
+            (KeyReleased n) -> n
+        case name of 
             Tab -> updateList name
             Shift -> updateList name
             Control -> updateList name
             Command -> updateList name
-            _ ->
+            _ -> 
             
         sendInputToWindow (KeyEvent k) windowId
         result False -- Let keys pass through so that they appear in text fields etc.
@@ -193,14 +195,14 @@ cocoaApplication = class
     sendWindowResize toSize windowId = request
         forall window <- activeWindows do
             if (<- window.getId == windowId) then
-                window.onWindowResize toSize modifiers
+                window.onWindowResize toSize
 
     shouldClose := True
     sendWindowCloseRequest windowId = request
         shouldClose := True
         forall window <- activeWindows do
             if (<- window.getId == windowId) then
-                shouldClose := (<- window.onWindowCloseRequest modifiers)
+                shouldClose := (<- window.onWindowCloseRequest)
         result shouldClose
     
     updateList key = do

@@ -28,11 +28,11 @@ mkCocoaWindow env = class
     
     dwh := new defaultWindowResponder this env
     
-    onWindowResize size modifiers = request
-        result (<- dwh.onWindowResize size modifiers)
+    onWindowResize size = request
+        result (<- dwh.onWindowResize size)
 
-    onWindowCloseRequest modifiers = request
-        result (<- dwh.onWindowCloseRequest modifiers)
+    onWindowCloseRequest = request
+        result (<- dwh.onWindowCloseRequest)
 
     setWindowResponder resp = request 
         dwh := resp  
@@ -118,10 +118,10 @@ mkCocoaWindow env = class
 
 defaultWindowResponder window env = class
 
-    onWindowResize toSize modifiers = request
+    onWindowResize toSize = request
         env.stdout.write ("Resizing window to width: " ++ (show toSize.width) ++ ", height: " ++ (show toSize.height) ++ "\n")
 
-    onWindowCloseRequest modifiers = request
+    onWindowCloseRequest = request
         result True
 
     setWindowResponder responder = request
@@ -130,6 +130,7 @@ defaultWindowResponder window env = class
     
 defaultInputResponder window rootContainer env = class
     getKey (KeyPressed theKey) = theKey
+    getKey (KeyReleased theKey) = theKey
     getKey _ = raise 9
 
     mkNewEvent (MousePressed _) p = MousePressed p
@@ -156,7 +157,8 @@ defaultInputResponder window rootContainer env = class
     
         if (not consumed) then
             theKey = getKey keyEventType
-            if (theKey == Tab) then
+            isPressed = case keyEventType of (KeyPressed _) -> True; _ -> False
+            if (theKey == Tab && isPressed) then
                 cmps <- rootContainer.getAllComponents
                 foundFocus := False
                 focusables := []

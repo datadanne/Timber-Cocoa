@@ -115,7 +115,7 @@ mkCocoaDropDown env = class
         base.addResponder sh
 
             
-    this = DropDown{..}
+    this = DropDown{id_temp=self;..}
 
     result this
 

@@ -74,7 +74,7 @@ mkCocoaButton env = class
         buttonSetTitle id title
         buttonSetPosition id position
             
-    this = Button{..}
+    this = Button{id_temp=self;..}
 
     result this
 

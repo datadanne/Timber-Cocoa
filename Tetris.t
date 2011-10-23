@@ -30,6 +30,7 @@ root w = class
         result False
 
     getKey (KeyPressed key) = key
+    getKey (KeyReleased key) = key
     getKey _ = raise 9
 
     gameLoop env = action
@@ -232,7 +233,7 @@ tetrisGrid width height env = class
     getAllComponents = base.getAllComponents
     getComponents = base.getComponents
                
-    result GameGrid {..}
+    result GameGrid {id_temp=self;..}
   
 isTrue 0 = False
 isTrue _ = True  

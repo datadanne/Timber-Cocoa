@@ -79,7 +79,7 @@ mkCocoaLabel = class
         labelSetSize id size  
         labelSetTextColor id textColor
             
-    this = Label{..}
+    this = Label{id_temp=self;..}
 
     result this  
 

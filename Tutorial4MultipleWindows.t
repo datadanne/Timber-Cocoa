@@ -133,7 +133,7 @@ buttonHandler label = class
 -- Tutorial 2 : Responder to resize a component on window resize 
 windowResponder :: TextArea -> POSIX.Env -> Class RespondsToWindowEvents
 windowResponder textarea env = class
-    onWindowResize size modifiers = request
+    onWindowResize size = request
 
         newWidth = floor ((fromInt size.width) * 0.8)
         newTaSize = {width=newWidth; height=80}
@@ -145,7 +145,7 @@ windowResponder textarea env = class
         textarea.setPosition newTaPosition
         result ()
     
-    onWindowCloseRequest _ = request
+    onWindowCloseRequest = request
         result True
 
     setWindowResponder responder = request 
@@ -157,6 +157,7 @@ myTabResponder label = class
     tabCount := 0
     
     getKey (KeyPressed key) = key
+    getKey (KeyReleased key) = key
     getKey _ = raise 9
 
     respondToInputEvent (KeyEvent keyEventType) modifiers = request	

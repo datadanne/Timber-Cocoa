@@ -103,7 +103,7 @@ mkCocoaTextArea env = class
        
         addResponder dts
             
-    this = TextArea{..}
+    this = TextArea{id_temp=self;..}
 
     result this
 

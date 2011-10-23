@@ -20,10 +20,7 @@ extern ADDR base;
 int p = 0;
 bool dispatchEventToTimber(NSEvent* event) { 
 	DEBUG("C: Event received in dispatchEventToTimber\n"); 
-    int b1;
-    DISABLE(rts);
-    b1 = *base;
-    ENABLE(rts);
+
 	/* figure out event
 		flag 0,1,2 0 = windowEvent, etc. */
 	if ([event type] == NSLeftMouseDown || [event type] == NSLeftMouseDragged) {
@@ -49,11 +46,11 @@ bool dispatchEventToTimber(NSEvent* event) {
 	    ((_MouseEvent_COCOA)receivedEvent)->a = (MouseEventType_COCOA)x_5111;
 		
 		DEBUG("Event is to be sent for window nr %d", [event windowNumber]);
-	} else if ([event type] == NSFlagsChanged || [event type] == NSKeyUp || [event type] == NSKeyDown) {
-	    _KeyPressed_COCOA x_1652;
-        NEW (_KeyPressed_COCOA, x_1652, WORDS(sizeof(struct _KeyPressed_COCOA)));
-        x_1652->GCINFO = __GC___KeyPressed_COCOA;
-        x_1652->Tag = 1;
+	} else if ([event type] == NSKeyUp || [event type] == NSFlagsChanged) {
+	    _KeyReleased_COCOA x_1652;
+        NEW (_KeyReleased_COCOA, x_1652, WORDS(sizeof(struct _KeyReleased_COCOA)));
+        x_1652->GCINFO = __GC___KeyReleased_COCOA;
+        x_1652->Tag = 0;
 
         DEBUG("KEY CODE %d\n", [event keyCode]);
 
@@ -63,6 +60,21 @@ bool dispatchEventToTimber(NSEvent* event) {
         ((_KeyEvent_COCOA)receivedEvent)->GCINFO = __GC___KeyEvent_COCOA;
         ((_KeyEvent_COCOA)receivedEvent)->Tag = 0;
         ((_KeyEvent_COCOA)receivedEvent)->a = (KeyEventType_COCOA)x_1652;
+
+	} else if ([event type] == NSKeyDown || [event type] == NSFlagsChanged) {
+		    _KeyPressed_COCOA x_1652;
+	        NEW (_KeyPressed_COCOA, x_1652, WORDS(sizeof(struct _KeyPressed_COCOA)));
+	        x_1652->GCINFO = __GC___KeyPressed_COCOA;
+	        x_1652->Tag = 1;
+
+	        DEBUG("KEY CODE %d\n", [event keyCode]);
+
+	        x_1652->a = (CocoaKey_COCOA)(POLY)(126 - [event keyCode]);
+
+	        NEW (InputEvent_COCOA, receivedEvent, WORDS(sizeof(struct _KeyEvent_COCOA)));
+	        ((_KeyEvent_COCOA)receivedEvent)->GCINFO = __GC___KeyEvent_COCOA;
+	        ((_KeyEvent_COCOA)receivedEvent)->Tag = 0;
+	        ((_KeyEvent_COCOA)receivedEvent)->a = (KeyEventType_COCOA)x_1652;
 
 	} else if ([event type] == NSScrollWheel) {
   	    NSLog(@"Scroll Event: %@", event);
@@ -114,7 +126,8 @@ bool dispatchEventToTimber(NSEvent* event) {
         ((_MouseEvent_COCOA)receivedEvent)->a = (MouseEventType_COCOA)x_1074;     
 
     	App_COCOA app = getApp();
-        app->l_App_COCOA_AppImpl_COCOA_COCOA->sendInputEvent_COCOA(app->l_App_COCOA_AppImpl_COCOA_COCOA, (InputEvent_COCOA)receivedEvent, [event windowNumber], 0);      
+        app->l_App_COCOA_AppImpl_COCOA_COCOA->sendInputEvent_COCOA(app->l_App_COCOA_AppImpl_COCOA_COCOA, 
+			(InputEvent_COCOA)receivedEvent, [event windowNumber], 0);      
         return true;
 	} else {
         printf("Event of type %d was discarded\n", [event type]);
@@ -128,12 +141,6 @@ bool dispatchEventToTimber(NSEvent* event) {
 
 	App_COCOA app = getApp();
 	
-    int b2;
-    DISABLE(rts);
-    b2 = *base;
-    ENABLE(rts);
-	
-    assert(b1 == b2);
     bool timberResult = app->l_App_COCOA_AppImpl_COCOA_COCOA->sendInputEvent_COCOA(app->l_App_COCOA_AppImpl_COCOA_COCOA, (InputEvent_COCOA)receivedEvent, [event windowNumber], 0);
     return timberResult;
 }

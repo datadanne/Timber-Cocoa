@@ -106,7 +106,7 @@ mkCocoaContainer env = class
        containerSetBackgroundColor id color
        containerSetPosition id (<- base.getPosition)
        
-    this := Container{..}  
+    this := Container{id_temp = self; ..}  
 
     result this
         

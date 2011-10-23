@@ -3,6 +3,7 @@ module TestTemplate where
 import POSIX
 import COCOA
 import CTButton
+import CTWindow
 
 root w = class
     env = new posix w
@@ -15,7 +16,6 @@ root w = class
     
     applicationDidFinishLaunching app = action                         
         app.addWindow w1
-        app.setEnv env
         
     result action
         w1.setSize ({width=500;height=500})

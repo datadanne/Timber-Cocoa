@@ -51,6 +51,6 @@ mkCocoaCallbackLabel = class
     installOnTextChangeCallback a = request
         textChangeCallback := Just a
     
-    this = Tutorial5CallbackLabel{..}
+    this = Tutorial5CallbackLabel{id_temp=self;..}
 
     result this

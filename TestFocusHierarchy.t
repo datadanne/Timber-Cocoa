@@ -2,6 +2,7 @@ module TestFocusHierarchy where
 
 import POSIX
 import COCOA
+import CTWindow
 import CTButton
 
 root w = class
@@ -30,7 +31,6 @@ root w = class
     
     applicationDidFinishLaunching app = action                         
         app.addWindow w1
-        app.setEnv env  
         _ <- generateButtons
         
     result action

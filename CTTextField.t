@@ -82,7 +82,7 @@ mkCocoaTextField env = class
         textFieldSetText id text
         textFieldSetPosition id position
             
-    this = TextField{..}
+    this = TextField{id_temp=self;..}
 
     result this
 

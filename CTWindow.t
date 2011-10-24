@@ -8,9 +8,7 @@ import CTContainer
 ------          ** WINDOW **            ---------------------------------------------------------- 
 mkCocoaWindow :: Env -> Class CocoaWindow
 mkCocoaWindow env = class    
-    windowId = new mkCocoaID
     state := Inactive
-
     rootContainer = new mkCocoaContainer env
     addComponent = rootContainer.addComponent
     getComponents = rootContainer.getComponents
@@ -18,14 +16,13 @@ mkCocoaWindow env = class
     removeAllComponents = rootContainer.removeAllComponents
     setBackgroundColor = rootContainer.setBackgroundColor
     getBackgroundColor = rootContainer.getBackgroundColor
- 
+
     handlers = new basicHasResponders 
     addResponder = handlers.addResponder
     setResponders = handlers.setResponders
     getResponders = handlers.getResponders
     respondToInputEvent = handlers.respondToInputEvent
-    
-    
+
     dwh := new defaultWindowResponder this env
     
     onWindowResize size = request
@@ -36,9 +33,6 @@ mkCocoaWindow env = class
 
     setWindowResponder resp = request 
         dwh := resp  
-    
-    getContainerID = request
-        result rootContainer.id
         
     position := {x=0;y=0}
     getPosition = request
@@ -46,51 +40,52 @@ mkCocoaWindow env = class
 
     setPosition pos = request
         if (state == Active) then 
-            windowSetPosition windowId pos
+            _ = windowSetPosition cocoaRef pos
         position := pos
 
     getSize = rootContainer.getSize
     setSize size = request
         if (state == Active) then 
-            windowSetSize windowId size
+            _ = windowSetSize cocoaRef size
         rootContainer.setSize size
     
-    nr := 0
+    windowNr := 0
+    getId = request
+        env.stdout.write ("WINDOW NR: " ++ (show windowNr) ++ "\n")
+        result windowNr
+
     initWindow app = request
         if (state == Inactive) then
-            nr := <- initCocoaWindow this app
+            (ref,nr) = initCocoaWindow ()
+            cocoaRef := ref
+            windowNr := nr
+
             rootContainer.init app
             rootContainer.setName "rootContainer"
-            
             state := Active
             inithelper 
-        
+
     inithelper = do
         _ <- internalSetVisible isVisible
-
-        windowSetSize windowId (<- rootContainer.getSize)        
-        windowSetPosition windowId position
-        windowSetContentView this rootContainer.id
+        _ = windowSetContentView cocoaRef (<-rootContainer.getCocoaRef)
+        _ = windowSetSize cocoaRef (<- rootContainer.getSize)        
+        _ = windowSetPosition cocoaRef position
         
         wh = new defaultInputResponder this rootContainer env
         handlers.addResponder wh
-            
 
-
-    getId = request
-        result nr
 
     destroyWindow = request
         if (state == Active) then 
             state := Destroyed
             rootContainer.destroy
-            destroyCocoaWindow windowId
+            _ = destroyCocoaWindow cocoaRef
 
     currentFocus := rootContainer
     setFocus cmp = request
          currentFocus := cmp
          if (state == Active) then
-             windowSetFocus windowId cmp.id
+             _ = windowSetFocus cocoaRef (<-cmp.getCocoaRef)
          
     getFocus = request
         result currentFocus
@@ -107,17 +102,17 @@ mkCocoaWindow env = class
         isActive = (state == Active)
         if (isActive) then
             if (vis) then
-                windowSetVisible windowId
+                _ = windowSetVisible cocoaRef
             else
-                windowSetHidden windowId
+                _ = windowSetHidden cocoaRef
         result isActive
-    
+
+    cocoaRef := defaultCocoaRef
     this = CocoaWindow {..}
     
     result this
 
 defaultWindowResponder window env = class
-
     onWindowResize toSize = request
         env.stdout.write ("Resizing window to width: " ++ (show toSize.width) ++ ", height: " ++ (show toSize.height) ++ "\n")
 
@@ -125,7 +120,7 @@ defaultWindowResponder window env = class
         result True
 
     setWindowResponder responder = request
-
+    
     result RespondsToWindowEvents {..}
     
 defaultInputResponder window rootContainer env = class
@@ -243,11 +238,11 @@ inInterval x startPos width = (x >= startPos && x <= (startPos+width))
 
 --window
 private
-extern initCocoaWindow :: CocoaWindow -> App -> Request Int
-extern destroyCocoaWindow :: CocoaID -> Request ()
-extern windowSetContentView :: CocoaWindow -> CocoaID -> Request ()      -- external method for changing contentView for a window!
-extern windowSetHidden :: CocoaID -> Request ()
-extern windowSetVisible :: CocoaID -> Request ()
-extern windowSetSize :: CocoaID -> Size -> Request ()
-extern windowSetPosition :: CocoaID -> Position -> Request ()
-extern windowSetFocus :: CocoaID -> CocoaID -> Request ()
+extern initCocoaWindow :: () -> (CocoaRef, Int)
+extern destroyCocoaWindow :: CocoaRef -> ()
+extern windowSetContentView :: CocoaRef -> CocoaRef -> ()  -- external method for changing contentView for a window!
+extern windowSetHidden :: CocoaRef -> ()
+extern windowSetVisible :: CocoaRef -> ()
+extern windowSetSize :: CocoaRef -> Size -> ()
+extern windowSetPosition :: CocoaRef -> Position -> ()
+extern windowSetFocus :: CocoaRef -> CocoaRef -> ()

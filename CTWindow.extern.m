@@ -3,7 +3,7 @@
 */
 @implementation WindowDelegate
 -(BOOL) windowShouldClose:(id)sender {
-	printf("CLOSIN TIME for window nr %d \n", [sender windowNumber]);
+	//printf("CLOSIN TIME for window nr %d \n", [sender windowNumber]);
 	
 	/* Ask Timber whether or not the window should close */
 	App_COCOA app = getApp();

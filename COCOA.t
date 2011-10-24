@@ -4,14 +4,13 @@ struct CocoaID where
 	dummy :: Int
 
 struct CocoaWindow < RespondsToWindowEvents, HasSize, HasBackgroundColor, ContainsComponents, HasResponders, RespondsToInputEvents where 
-    windowId :: CocoaID
+    --windowId :: CocoaID
     getId :: Request WindowID
     initWindow :: App -> Request ()
     destroyWindow :: Request ()
     setVisible :: Bool -> Request Bool
     setFocus :: Component -> Request ()
     getFocus :: Request Component
-    getContainerID :: Request CocoaID
 
 struct HasResponders where
     addResponder :: RespondsToInputEvents -> Request ()
@@ -55,6 +54,11 @@ struct HasSize < HasPosition where
 struct HasBackgroundColor where
     setBackgroundColor :: Color -> Request ()
     getBackgroundColor :: Request Color
+
+struct HasText where
+    setText :: String -> Request ()
+    getText :: Request String
+    appendText :: String -> Request ()
     
 struct IsScrollable where
     setScrollable :: (Bool, Bool) -> Request ()

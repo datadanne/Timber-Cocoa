@@ -15,9 +15,6 @@ mkCocoaButton env = class
     position := {x=0; y=0}
     keyEventResponder := Nothing
     mouseEventResponder := Nothing
-    cocoaRef := defaultCocoaRef   
-    getCocoaRef = request
-        result cocoaRef 
 
     base = new basicComponent True Nothing "BUTTON"
     addResponder = base.addResponder
@@ -76,7 +73,10 @@ mkCocoaButton env = class
         _ = buttonSetPosition cocoaRef position
 
     id = new mkCocoaID
-            
+    cocoaRef := defaultCocoaRef   
+    getCocoaRef = request
+        result cocoaRef 
+        
     this = Button{id_temp=self;..}
 
     result this

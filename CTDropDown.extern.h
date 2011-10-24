@@ -1,5 +1,5 @@
-#ifndef _COCOA_NSDROPDOWN_TIMBER_
-#define _COCOA_NSDROPDOWN_TIMBER_
+#ifndef CTDROPDOWN_EXTERN_H_
+#define CTDROPDOWN_EXTERN_H_
 
 #import <Cocoa/Cocoa.h>
 
@@ -23,5 +23,12 @@
 @property (assign) float height;*/
 
 @end   
+
+Int initDropDown_CTDropDown(TUP0);
+TUP0 optionWasSelected_CTDropDown(Int, LIST);
+TUP0 dropDownAddOption_CTDropDown(Int,LIST);
+LIST dropDownGetSelectedOption_CTDropDown(Int);
+TUP0 dropDownSetPosition_CTDropDown(Int,Position_COCOA);
+TUP0 dropDownSetSize_CTDropDown(Int, Size_COCOA);
 
 #endif

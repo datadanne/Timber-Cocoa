@@ -171,7 +171,7 @@ tetrisGrid width height env = class
         grid := newGrid
 
         result False
-        
+
     value := -1
     getValueAt x y = request
         value := -1
@@ -217,6 +217,8 @@ tetrisGrid width height env = class
     getState = base.getState
     setState = base.setState
     respondToInputEvent = base.respondToInputEvent
+    
+    getCocoaRef = base.getCocoaRef
 
     setPosition = base.setPosition
     getPosition = base.getPosition

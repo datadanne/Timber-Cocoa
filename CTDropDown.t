@@ -5,7 +5,7 @@ import CTCommon
 import POSIX
 
 struct DropDown < Component, RespondsToSelectionEvents where
-    addOption :: String -> Action
+    addOption :: String -> Request ()
     setOptions :: [String] -> Action
     getOptions :: Request [String]
     getCurrentOption :: Request String
@@ -44,51 +44,47 @@ mkCocoaDropDown env = class
     getAllComponents = base.getAllComponents
     respondToInputEvent = base.respondToInputEvent
     
-    options := []
+    options := ["hello", "world"]
     
-    addOption o = action
+    addOption o = request
         _ <- insertOption o
-    
+        
+    setOptions opts = action
+        forall o <- opts do
+            _ <- insertOption o
+            
     insertOption o = do
         options := o : options
-        
-        -- env.stdout.write ("adding option " ++ (show o))
         case (<- base.getState) of
-            Active ->   dropDownAddOption id o  
-                        currentOption := <- dropDownGetSelectedOption id
+            Active ->
+                    _ = dropDownAddOption cocoaRef o  
+                    currentOption := dropDownGetSelectedOption cocoaRef
             _ ->
-        
-    setOptions os = action
-        forall o <- os do
-            _ <- insertOption o
-        
+
     getOptions = request
         result options
     
     currentOption := ""
-    
     refreshMyOptionAndPerformCallback = action 
-        currentOption := <- dropDownGetSelectedOption id
+        currentOption := dropDownGetSelectedOption cocoaRef
         send selectionChanged currentOption
         
     getCurrentOption = request
-        --opt <- cocoaGetCurrentOption id     TODO: do we ever need this? no should be the answer ...
+        --opt <- cocoaGetCurrentOption cocoaRef     TODO: do we ever need this? no should be the answer ...
         result currentOption
 
-    -- setPosition
     setPosition p = request
         case (<- base.getState) of
-            Active -> dropDownSetPosition id p
+            Active -> _= dropDownSetPosition cocoaRef p
             _ -> 
         position := p       
-    
-    -- getPosition  
+
     getPosition = request
         result position
 
     setSize s = request
         case (<- base.getState) of
-            Active -> dropDownSetSize id s
+            Active -> _= dropDownSetSize cocoaRef s
             _ ->
         size := s
 
@@ -100,21 +96,23 @@ mkCocoaDropDown env = class
         
     init app = request
             base.setState Active
-            initDropDown this app
-            
+            cocoaRef := initDropDown ()
             inithelper
     
     inithelper = do
         forall o <- options do
-            dropDownAddOption id o
+            _ = dropDownAddOption cocoaRef o
             
-        dropDownSetPosition id position
-        currentOption := <- dropDownGetSelectedOption id   
+        _= dropDownSetPosition cocoaRef position
+        currentOption := dropDownGetSelectedOption cocoaRef
 
         sh = new defaultHandler refreshMyOptionAndPerformCallback
         base.addResponder sh
 
-            
+    cocoaRef := defaultCocoaRef
+    getCocoaRef = request
+        result cocoaRef 
+        
     this = DropDown{id_temp=self;..}
 
     result this
@@ -155,10 +153,10 @@ defaultHandler dropdownUpdateMethod = class
 
 --dropDown  
 private
-extern optionWasSelected :: DropDown -> String -> Action      
-extern initDropDown :: DropDown -> App -> Request ()
-extern dropDownAddOption :: CocoaID -> String -> Action
-extern dropDownSetPosition :: CocoaID -> Position -> Action
-extern dropDownSetSize :: CocoaID -> Size -> Action
---extern dropDownSetLastClickPosition :: CocoaID -> Position -> Action
-extern dropDownGetSelectedOption :: CocoaID -> Request String
+--extern optionWasSelected :: DropDown -> String -> ()      
+extern initDropDown :: () -> Int
+extern dropDownAddOption :: CocoaRef -> String -> ()
+extern dropDownSetPosition :: CocoaRef -> Position -> ()
+extern dropDownSetSize :: CocoaRef -> Size -> ()
+--extern dropDownSetLastClickPosition :: CocoaRef -> Position -> Action
+extern dropDownGetSelectedOption :: CocoaRef -> String

@@ -1,13 +1,10 @@
 #include "CTWindow.extern.h"
 #import "CTWindow.extern.m"
 
-#include <assert.h>
-
 extern pthread_mutex_t rts;
-extern pthread_mutex_t envmut;
 extern int rootsDirty;
-InputEvent_COCOA receivedEvent;
 
+InputEvent_COCOA receivedEvent;
 pthread_mutex_t eventMutex;
 
 @interface NSEvent (DeviceDelta)
@@ -15,11 +12,8 @@ pthread_mutex_t eventMutex;
   - (float)deviceDeltaY;
 @end
 
-extern ADDR base;
-
-int p = 0;
 bool dispatchEventToTimber(NSEvent* event) { 
-	DEBUG("C: Event received in dispatchEventToTimber\n"); 
+	printf("C: Event received in dispatchEventToTimber\n"); 
 
 	/* figure out event
 		flag 0,1,2 0 = windowEvent, etc. */
@@ -133,46 +127,24 @@ bool dispatchEventToTimber(NSEvent* event) {
         printf("Event of type %d was discarded\n", [event type]);
         return false;
     }
- 	
- 	/*DISABLE(envmut);
-    printf("envRD1\n");
-	rootsDirty = 1;
-	ENABLE(envmut);*/
 
-	App_COCOA app = getApp();
-	
-    bool timberResult = app->l_App_COCOA_AppImpl_COCOA_COCOA->sendInputEvent_COCOA(app->l_App_COCOA_AppImpl_COCOA_COCOA, (InputEvent_COCOA)receivedEvent, [event windowNumber], 0);
-    return timberResult;
+	App_COCOA app = getApp();    
+    return app->l_App_COCOA_AppImpl_COCOA_COCOA->sendInputEvent_COCOA(app->l_App_COCOA_AppImpl_COCOA_COCOA, (InputEvent_COCOA)receivedEvent, [event windowNumber], 0);
 }
 
 // --------- Window ----------------------------------------------
-TUP0 windowSetContentView_CTWindow(CocoaWindow_COCOA window, CocoaID_COCOA id, Int dummy) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	internal_CocoaID_COCOA thisWindow = 		  
-		(internal_CocoaID_COCOA)(window->windowId_COCOA);
-	CocoaWindow *wind = (CocoaWindow*) thisWindow->this;
-	CocoaView *view = (CocoaView*) COCOA_REF(id);	
-	                                                                     
-	[wind setContentView: view];
-	[pool release];
-	return 0;
-}
-
 void scanEventReceived() {
-	DISABLE(envmut);
+	DISABLE(rts);
 	if(receivedEvent)
 		receivedEvent = (InputEvent_COCOA)copy((ADDR)receivedEvent);
-	ENABLE(envmut);
-    DEBUG("GC in scanEventReceived: done with copy?\n");
+	ENABLE(rts);
 }
 
 struct Scanner eventScanner = {scanEventReceived, NULL};
 static WindowDelegate *delegate;
 
-
-Int initCocoaWindow_CTWindow(CocoaWindow_COCOA wnd, App_COCOA app, Int dummy) {   
+TUP2 initCocoaWindow_CTWindow(TUP0 dummy) {   
 	DEBUG("Initializing window...");
-    
     __block CocoaWindow *window;
     // Keep this as sync to ensure window is completely created before use.
     // Also, with async there would be a risk of GC moving wnd before it is accessed.
@@ -181,27 +153,27 @@ Int initCocoaWindow_CTWindow(CocoaWindow_COCOA wnd, App_COCOA app, Int dummy) {
         NSRect frameRect = NSMakeRect(0, [[[NSScreen screens] objectAtIndex: 0] frame].size.height, 1, 1);
         NSUInteger styleMask = (NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask);
         window = [[CocoaWindow alloc] initWithContentRect:frameRect styleMask:styleMask  backing:NSBackingStoreBuffered defer:NO]; 
-        [window setTitle:@"new WINDOW!"];
+        [window setTitle:@"CocoaWindow"];
         [window setEventDispatcher:dispatchEventToTimber];
 
         if (!delegate)
         	delegate = [[WindowDelegate alloc] init];
 
         [window setDelegate:delegate];
-       // [window makeKeyAndOrderFront:window];
-
-        // NOTE: Can't use COCOA_ID macro here due to windowId, not Id
-        internal_CocoaID_COCOA thisWindow = (internal_CocoaID_COCOA)(wnd->windowId_COCOA);
-        thisWindow->this = (NSObject*) window;
-        DEBUG("Window OK!");
+        [window makeKeyAndOrderFront:window];
         [pool drain];
     });
-    
-	return [window windowNumber];
+
+    TUP2 initResult;
+    NEW (TUP2, initResult, WORDS(sizeof(struct TUP2)));
+    initResult->GCINFO = __GC__TUP2+((5 * (((BITS32)1 | (BITS32)2))));
+    initResult->a = (POLY)window;
+    initResult->b = (POLY)([window windowNumber]-1); // -1 needed from conversion? No?
+    return initResult;
 }
 
-TUP0 destroyCocoaWindow_CTWindow(CocoaID_COCOA wnd, Int dummy) {
-    CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
+TUP0 destroyCocoaWindow_CTWindow(Int cocoaRef) {
+    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
     dispatch_async(dispatch_get_main_queue(), ^{
     
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -209,34 +181,40 @@ TUP0 destroyCocoaWindow_CTWindow(CocoaID_COCOA wnd, Int dummy) {
 	    [pool drain];
         });
 }
-   
-TUP0 windowSetVisible_CTWindow(CocoaID_COCOA wnd, Int dummy) {  
+
+TUP0 windowSetContentView_CTWindow(Int windowRef, Int cmpRef) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
+    CocoaWindow *wnd = (CocoaWindow*) windowRef;
+    CocoaView *view = (CocoaView*) cmpRef;                                                  
+	[wnd setContentView: view];
+	[pool release];
+}
+
+TUP0 windowSetVisible_CTWindow(Int cocoaRef) {  
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
 	[thisWindow orderFront: NULL];
 	[pool drain];
 }
 
-TUP0 windowSetHidden_CTWindow(CocoaID_COCOA wnd, Int dummy) {
+TUP0 windowSetHidden_CTWindow(Int cocoaRef) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
+    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
 	[thisWindow orderOut: NULL];
 	[pool drain];
 }
 
-TUP0 windowSetFocus_CTWindow(CocoaID_COCOA wnd, CocoaID_COCOA cmp, Int dummy) {
+TUP0 windowSetFocus_CTWindow(Int cocoaRef, Int cmpRef) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
-	NSView *responder = (NSView*) COCOA_REF(cmp);
+    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
+    NSView *responder = (NSView*) cmpRef;
 	[thisWindow makeFirstResponder: responder];
 	[pool drain];
 }
 
-TUP0 windowSetSize_CTWindow (CocoaID_COCOA wnd, Size_COCOA pos, Int dummy) {
-	DEBUG("setting containerSize ext!");
-	CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
-    int width = pos->width_COCOA;
-    int height = pos->height_COCOA;
+TUP0 windowSetSize_CTWindow (Int cocoaRef, Size_COCOA size) {
+    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;    int width = size->width_COCOA;
+    int height = size->height_COCOA;
 
 	dispatch_async(dispatch_get_main_queue(), ^{
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -245,9 +223,8 @@ TUP0 windowSetSize_CTWindow (CocoaID_COCOA wnd, Size_COCOA pos, Int dummy) {
     });
 }
 
-TUP0 windowSetPosition_CTWindow (CocoaID_COCOA wnd, Position_COCOA pos, Int dummy) {
-
-    CocoaWindow *thisWindow = (CocoaWindow*) COCOA_REF(wnd);
+TUP0 windowSetPosition_CTWindow (Int cocoaRef, Position_COCOA pos) {
+    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
     int y = pos->y_COCOA;
     int x = pos->x_COCOA;
     
@@ -263,9 +240,7 @@ TUP0 windowSetPosition_CTWindow (CocoaID_COCOA wnd, Position_COCOA pos, Int dumm
 }
 
 void _init_external_CTWindow(void) {
-	// Install event scanner to keep track of delegate address.
 	pthread_mutex_init(&eventMutex, &glob_mutexattr);
-
     DISABLE(rts);
 	addRootScanner(&eventScanner);
 	rootsDirty = 1;

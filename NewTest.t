@@ -33,12 +33,8 @@ root w = class
         result True
      
     applicationDidFinishLaunching app = action
-    
-    
-        app.setEnv env
         app.addWindow w1
-        cid <- w1.getContainerID
-        w1.installMouseListener (drawPixel app cid)
+
 
     result action
         label.setSize ({width=300;height=50})

@@ -10,7 +10,6 @@ mkCocoaContainer env = class
     myComponents := []        
     color := {r=255; g=255; b=255}
     appRef := Nothing
-    cocoaRef := defaultCocoaRef
 
     id = new mkCocoaID
     base = new basicComponent False Nothing "Container"
@@ -29,7 +28,7 @@ mkCocoaContainer env = class
 
     setPosition p = request
         case (<- base.getState) of
-            Active -> containerSetPosition id p
+            Active -> _ = containerSetPosition cocoaRef p
             _ ->
         base.setPosition p
 
@@ -37,7 +36,7 @@ mkCocoaContainer env = class
 
     setSize s = request
         case (<- base.getState) of
-            Active -> containerSetSize id s
+            Active -> _ = containerSetSize cocoaRef s
             _ ->
         base.setSize s
 
@@ -45,7 +44,7 @@ mkCocoaContainer env = class
 
     setBackgroundColor c = request
         case (<- base.getState) of
-            Active -> containerSetBackgroundColor id c
+            Active -> _ = containerSetBackgroundColor cocoaRef c
             _ ->
         color := c
 
@@ -61,16 +60,16 @@ mkCocoaContainer env = class
         if (state == Active && isJust appRef) then
             c.init (fromJust appRef)
 --            containerAddComponent id c.id    
-            containerAddComponent id (<-c.getCocoaRef)
+            _ = containerAddComponent cocoaRef (<-c.getCocoaRef)
             
     removeComponent c = request
         myComponents := [x | x <- myComponents, not (x == c)]
-        containerRemoveComponent id c.id
+        _ = containerRemoveComponent cocoaRef (<-c.getCocoaRef)
         c.destroy
     
     internalRemoveAllComponents = do
         forall c <- myComponents do
-            containerRemoveComponent id c.id
+            _ = containerRemoveComponent cocoaRef (<-c.getCocoaRef)
             c.destroy
         myComponents := []
             
@@ -90,27 +89,28 @@ mkCocoaContainer env = class
     destroy = request
         if ((<- base.getState) == Active) then
             internalRemoveAllComponents
-            destroyContainer id
+            _ = destroyContainer cocoaRef
             base.setState Destroyed
         
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request
             appRef := Just app
             base.setState Active
-            initContainer id app
+            cocoaRef := initContainer ()
             inithelper
 
             forall cmp <- myComponents do
                 cmp.init app
 --                containerAddComponent id cmp.id
-                containerAddComponent id (<-cmp.getCocoaRef)
+                _ = containerAddComponent cocoaRef (<-cmp.getCocoaRef)
     inithelper = do
-       containerSetSize id (<- base.getSize)
-       containerSetBackgroundColor id color
-       containerSetPosition id (<- base.getPosition)
+       _ = containerSetSize cocoaRef (<- base.getSize)
+       _ = containerSetBackgroundColor cocoaRef color
+       _ = containerSetPosition cocoaRef (<- base.getPosition)
     
+    cocoaRef := defaultCocoaRef   
     getCocoaRef = request
-        result cocoaRef
+        result cocoaRef 
        
     this := Container{id_temp = self; ..}  
 
@@ -123,10 +123,10 @@ mkCocoaContainer env = class
 
 --container
 
-extern initContainer :: CocoaID -> App -> Request ()
-extern destroyContainer :: CocoaID -> Action
-extern containerSetBackgroundColor :: CocoaID -> Color -> Action
-extern containerSetSize :: CocoaID -> Size -> Action
-extern containerSetPosition :: CocoaID -> Position -> Action
-extern containerAddComponent :: CocoaID -> CocoaRef -> Action                    -- external method for doing the actual cocoa add-call!
-extern containerRemoveComponent :: CocoaID -> CocoaID -> Action
+extern initContainer :: () -> CocoaRef
+extern destroyContainer :: CocoaRef -> ()
+extern containerSetBackgroundColor :: CocoaRef -> Color -> ()
+extern containerSetSize :: CocoaRef -> Size -> ()
+extern containerSetPosition :: CocoaRef -> Position -> ()
+extern containerAddComponent :: CocoaRef -> CocoaRef -> ()                    -- external method for doing the actual cocoa add-call!
+extern containerRemoveComponent :: CocoaRef -> CocoaRef -> ()

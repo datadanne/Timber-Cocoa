@@ -11,11 +11,7 @@ mkCocoaTextField env = class
     size := {width=200; height=17}
     text := ""
     position := {x=0; y=0}
-    keyEventResponder := Nothing
-    mouseEventResponder := Nothing
-    cocoaRef := defaultCocoaRef   
-    getCocoaRef = request
-        result cocoaRef
+
     
     id = new mkCocoaID
     base = new basicComponent True Nothing "TEXT_AREA"
@@ -84,7 +80,11 @@ mkCocoaTextField env = class
     inithelper = do
         textFieldSetText id text
         textFieldSetPosition id position
-            
+    
+    cocoaRef := defaultCocoaRef   
+    getCocoaRef = request
+        result cocoaRef
+                
     this = TextField{id_temp=self;..}
 
     result this

@@ -1,16 +1,10 @@
 module CTCommon where
 
 import COCOA
-    
-struct HasText where
-    setText :: String -> Request ()
-    getText :: Request String
-    appendText :: String -> Request ()
 
 struct DefaultEventResponder < HasResponders, RespondsToInputEvents
 
 basicHasResponders = class
-
     handlers := []
     addResponder a = request
         handlers := a : handlers
@@ -23,7 +17,6 @@ basicHasResponders = class
     
     -- Return true (block cocoa) if any of the installed handlers say so.
     returnVal := False    
-    --res := False
     respondToInputEvent inputEvent modifiers = request
         returnVal := False
         forall h <- handlers do
@@ -35,7 +28,6 @@ basicHasResponders = class
     result DefaultEventResponder {..}
 
 basicComponent f p n = class
-
     baseResponder = new basicHasResponders
     addResponder = baseResponder.addResponder
     setResponders = baseResponder.setResponders
@@ -61,14 +53,7 @@ basicComponent f p n = class
     sizeWrap = new wrapper ({width=100; height=100})
     getSize = sizeWrap.get
     setSize = sizeWrap.set
-    
-    {-state := Inactive 
-    getState = request
-        result state
-        
-    setState s = request
-        if (state /= Destroyed) then
-            state := s -}
+
     stateWrap = new wrapper Inactive
     getState = stateWrap.get
     setState = stateWrap.set

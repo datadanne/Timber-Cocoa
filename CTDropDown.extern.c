@@ -84,26 +84,46 @@
 } */           
 
 @end
-                    
+
 // --------- DropDown ----------------------------------------------
-Msg dropDownAddOption_CTDropDown(CocoaID_COCOA id, LIST s, Time start, Time stop) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	DEBUG("external method setTitle :DD");
-	NSPopUpButton *thisDropDown = (NSPopUpButton*) COCOA_REF(id);
-	DEBUG("DropDown OK %p!", thisDropDown);
-	char* buf = listToChars(s);
+
+Int initDropDown_CTDropDown(TUP0 dummy) {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
+	NSPopUpButton *cocoaDropDown = [[NSPopUpButton alloc] initWithFrame: NSMakeRect(20.0, 20.0, 120.0, 60.0) pullsDown:FALSE];
+	[cocoaDropDown setBezelStyle:NSRoundedBezelStyle];
+	[cocoaDropDown setTitle: @"dropDownDefaultTitle"];
+	
+    // ACTION-handler
+    DropDownClickHandler *dropper = [[DropDownClickHandler alloc] init];
+    [cocoaDropDown setAction: @selector(dropDownClicked:)];
+    [cocoaDropDown setTarget: dropper];
+	[pool drain];
+	return (Int)cocoaDropDown;
+} 
+
+TUP0 dropDownAddOption_CTDropDown(Int cocoaRef,LIST str) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	NSPopUpButton *thisDropDown = (NSPopUpButton*) cocoaRef;
+	char* buf = listToChars(str);
 	[thisDropDown addItemWithTitle:[NSString stringWithFormat:@"%s", buf]];
 	[thisDropDown setNeedsDisplay];
 	[pool drain];
-} 
-Msg dropDownSetPosition_CTDropDown(CocoaID_COCOA id, Position_COCOA pos, Time start, Time stop) {
+}
+LIST dropDownGetSelectedOption_CTDropDown(Int cocoaRef) {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
+	NSPopUpButton *thisDropDown = (NSPopUpButton*) cocoaRef;
+
+    const char *optionStr = [[thisDropDown titleOfSelectedItem] UTF8String]; 
+    LIST s = getStr((char *) optionStr);
+    [pool drain]; 
+    
+    return s;
+}
+
+TUP0 dropDownSetPosition_CTDropDown(Int cocoaRef,Position_COCOA pos) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	DEBUG("setting POS externally..");
-	
-	NSPopUpButton *thisDropDown = (NSPopUpButton*) COCOA_REF(id);
-	
-	DEBUG("DropDown(pos) OK %p!", thisDropDown);                                                    
-	
+
+    NSPopUpButton *thisDropDown = (NSPopUpButton*) cocoaRef;
     [[thisDropDown target] setCoordsX: pos->x_COCOA andY: pos->y_COCOA];
 	
 	NSPoint p = NSMakePoint(pos->x_COCOA-5,pos->y_COCOA-20); // TODO: Remove hardcoded offset.
@@ -111,13 +131,11 @@ Msg dropDownSetPosition_CTDropDown(CocoaID_COCOA id, Position_COCOA pos, Time st
 	[thisDropDown setFrameOrigin: p];
 	[thisDropDown performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
    	[pool drain]; 
-} 
+}
 
-Msg dropDownSetSize_CTDropDown(CocoaID_COCOA id, Size_COCOA size, Time start, Time stop) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	DEBUG("dropdown setting SIZE externally..");
-	
-	NSPopUpButton *thisDropDown = (NSPopUpButton*) COCOA_REF(id);
+TUP0 dropDownSetSize_CTDropDown(Int cocoaRef, Size_COCOA size) {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
+	NSPopUpButton *thisDropDown = (NSPopUpButton*) cocoaRef;
 
     [[thisDropDown target] setWidth: size->width_COCOA andHeight: size->height_COCOA];
 	
@@ -136,67 +154,24 @@ Msg dropDownSetSize_CTDropDown(CocoaID_COCOA id, Size_COCOA size, Time start, Ti
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("setting POS externally..");
 	
-	NSPopUpButton *thisDropDown = (NSPopUpButton*) COCOA_REF(id);
+	NSPopUpButton *thisDropDown = (NSPopUpButton*) cocoaRef;
    
     [[thisDropDown target] setLastEventX: pos->x_COCOA andY: pos->y_COCOA];
    
    	[pool drain]; 
 } */
 
-LIST dropDownGetSelectedOption_CTDropDown(CocoaID_COCOA id, Int dummy) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
-	NSPopUpButton *thisDropDown = (NSPopUpButton*) COCOA_REF(id);
-    
-    //char *buf;
-
-    //*buf = [[thisDropDown titleOfSelectedItem] UTF8String];
-
-    DEBUG("EXT! DropDown - selected option %s\n", [[thisDropDown titleOfSelectedItem] UTF8String]);
-
-   	[pool drain]; 
-    
-    const char *optionStr = [[thisDropDown titleOfSelectedItem] UTF8String]; 
-          
-    
-    // LIST s = getStr([[thisDropDown titleOfSelectedItem] UTF8String]); 
-    
-    LIST s = getStr((char *) optionStr);
-    return s;
-}
 /*Msg updateExpandedPos_CTDropDown(CocoaID_COCOA id, Position_COCOA pos, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-	NSPopUpButton *thisDropDown = (NSPopUpButton*) COCOA_REF(id);
+	NSPopUpButton *thisDropDown = (NSPopUpButton*) cocoaRef;
      
     DropDownClickHandler *ch = (DropDownClickHandler*) [thisDropDown target];
     
     [ch setCoordsX: pos->x_COCOA andY: pos->y_COCOA];
 
     [pool release];
-} */                                         
-
-TUP0 initDropDown_CTDropDown(DropDown_CTDropDown dropDown, App_COCOA app, Int dummy) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
-	DEBUG("Initializing NSDropDown: ");
-	internal_CocoaID_COCOA thisDropDown = (internal_CocoaID_COCOA)(dropDown->l_DropDown_CTDropDown_Component_COCOA_CTDropDown->id_COCOA);
-
-	NSPopUpButton *cocoaDropDown = [[NSPopUpButton alloc] initWithFrame: NSMakeRect(20.0, 20.0, 120.0, 60.0) pullsDown:FALSE];
-	[cocoaDropDown setBezelStyle:NSRoundedBezelStyle];
-	[cocoaDropDown setTitle: @"KNAPP!"];
-	
-	thisDropDown->this = cocoaDropDown;
-	DEBUG("DropDown OK %p!", thisDropDown->this);
-    
-    // ACTION-handler
-    DropDownClickHandler *dropper = [[DropDownClickHandler alloc] init];
-    [cocoaDropDown setAction: @selector(dropDownClicked:)];
-    [cocoaDropDown setTarget: dropper];
-    
-    
-    
-	[pool drain];
-	return 0;
-} 
+} */ 
 
 void _init_external_CTDropDown(void) {
 }

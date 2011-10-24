@@ -27,14 +27,16 @@ char *listToChars(LIST str) {
     return buf;
 }
 
-struct AppCallback {
-	POLY GCINFO;
-	TUP0 (*Code)(AppCallback, App_COCOA, Time, Time); 
-};
-
 struct Callback {
 	WORD * GCINFO;
 	TUP0 (*Code) (Callback, Time, Time);
+};
+
+struct AppCallback {
+    POLY GCINFO;
+    Msg (*Code) (AppCallback, App_COCOA, Time, Time);
+    CocoaWindow_COCOA w1_8;
+    Ref self_4;
 };
 
 // place COCOA struct outisde the garbage collected heap by setting gcinfo to 0
@@ -63,14 +65,16 @@ App_COCOA getApp(void) {
 }
 
 void scanAppInit(void) {
-	DISABLE(envmut);
-	
-	if(toRunWhenAppFinished)
-		toRunWhenAppFinished = (AppCallback)copy((ADDR)toRunWhenAppFinished);
-	
-	if (app)
+    DISABLE(rts);
+	if (app) {
 		app = (App_COCOA)copy((ADDR)app);
-	ENABLE(envmut);
+	}
+		
+	if (toRunWhenAppFinished) {
+		toRunWhenAppFinished = (AppCallback)copy((ADDR)toRunWhenAppFinished);
+	    printf("CODE IS NOW AT %p\n", toRunWhenAppFinished->Code);
+	}
+	ENABLE(rts);
 }
 
 struct Scanner appScanner = {scanAppInit, NULL};
@@ -81,9 +85,19 @@ struct Scanner appScanner = {scanAppInit, NULL};
 
 @implementation CocoaDelegate
 -(void) applicationDidFinishLaunching:(NSNotification*)aNotification {
-	printf("Application OK!\n");
-	toRunWhenAppFinished->Code(toRunWhenAppFinished, app, 0,0);
-	toRunWhenAppFinished = NULL;
+	printf("AND CODE IS NOW AT %p\n", toRunWhenAppFinished->Code);
+
+    DISABLE(rts);
+
+    if (toRunWhenAppFinished->Code == NULL) {
+        printf("CRITICAL ERROR in applicationDidFinishLaunching: Nothing to run!\n");
+    } else {
+        ENABLE(rts);
+	    toRunWhenAppFinished->Code(toRunWhenAppFinished, app, 0,0);
+	    toRunWhenAppFinished = NULL;
+        DISABLE(rts);
+	}
+    ENABLE(rts);
 }
 @end
 
@@ -124,10 +138,11 @@ void createCocoaApplication(void) {
 
 TUP0 startApplication_COCOA (CocoaEnv_COCOA env, CLOS clos, Int poly) {
 	printf("Initializing cocoa application: ");
-	toRunWhenAppFinished = (AppCallback)clos;
-
 	if (!app) {
+        printf("App unset\n");
 		app = cocoaApplication_COCOA(0);
+		toRunWhenAppFinished = (AppCallback)clos;
+        printf("clos code is %p\n", clos->Code);
         runAsMainContinuation(createCocoaApplication);
 	}
 	
@@ -137,22 +152,12 @@ TUP0 startApplication_COCOA (CocoaEnv_COCOA env, CLOS clos, Int poly) {
 Bool compareCocoaIDs_COCOA (CocoaID_COCOA a, CocoaID_COCOA b) {
     internal_CocoaID_COCOA ia = (internal_CocoaID_COCOA)a;
     internal_CocoaID_COCOA ib = (internal_CocoaID_COCOA)b;   
-    printf("comparing ids. #1: %p, #2:%p \n", ia->this, ib->this);  
-    /*if(ia->this == ib->this)
-        printf("gonna return true\n");
-    else
-        printf("gonna return false\n");*/
     return (ia->this == ib->this);
 }
 
 Bool compareComponents_COCOA (Bool targetValue, Component_COCOA a, Component_COCOA b) {
     internal_CocoaID_COCOA ia = (internal_CocoaID_COCOA)(a->id_COCOA);
     internal_CocoaID_COCOA ib = (internal_CocoaID_COCOA)(b->id_COCOA);   
-    /*printf("comparing ids. #1: %p, #2:%p \n", ia->this, ib->this);  
-    if(ia->this == ib->this)
-        printf("gonna return true\n");
-    else
-        printf("gonna return false\n");*/
     return (targetValue == (ia->this == ib->this));
 }
 

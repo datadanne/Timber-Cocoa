@@ -3,7 +3,6 @@ module TestDropDown where
 import CTWindow
 import CTDropDown
 
-
 root w = class
     env = new posix w
     osx = new cocoa w

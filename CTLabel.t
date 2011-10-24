@@ -8,11 +8,9 @@ struct Label < Component, HasText where
 
 mkCocoaLabel = class
     size := {width=0; height=0}
-    mouseEventResponder := Nothing          
     textColor := {r=0;g=0;b=0}
     text := "Default Label"
 
-    id = new mkCocoaID
     base = new basicComponent False Nothing "Label"
     addResponder = base.addResponder
     setResponders = base.setResponders
@@ -31,7 +29,7 @@ mkCocoaLabel = class
     setText s = request
         text := s
         case (<- base.getState) of
-            Active -> labelSetText id s
+            Active -> _= labelSetText cocoaRef s
             _ ->
 
     getText = request
@@ -42,7 +40,7 @@ mkCocoaLabel = class
     
     setTextColor c = request
         case (<- base.getState) of
-            Active -> labelSetTextColor id c
+            Active -> _= labelSetTextColor cocoaRef c
             _ ->
         textColor := c
     
@@ -51,7 +49,7 @@ mkCocoaLabel = class
     
     setPosition p = request  
         case (<- base.getState) of
-            Active -> labelSetPosition id p
+            Active -> _= labelSetPosition cocoaRef p
             _ ->
         base.setPosition p  
     
@@ -69,15 +67,14 @@ mkCocoaLabel = class
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request
             base.setState Active
-            initLabel this app
-            
+            cocoaRef := initLabel ()
             inithelper
     
     inithelper = do
-        labelSetText id text
-        labelSetPosition id (<- base.getPosition)
-        labelSetSize id size  
-        labelSetTextColor id textColor
+        _= labelSetText cocoaRef text
+        _= labelSetPosition cocoaRef (<- base.getPosition)
+        _= labelSetSize cocoaRef size  
+        _= labelSetTextColor cocoaRef textColor
 
     cocoaRef := defaultCocoaRef   
     getCocoaRef = request
@@ -89,8 +86,8 @@ mkCocoaLabel = class
 
 -- extern stuff --
 private
-extern initLabel :: Label -> App -> Request ()
-extern labelSetText :: CocoaID -> String -> Action
-extern labelSetPosition :: CocoaID -> Position -> Action    
-extern labelSetSize :: CocoaID -> Size -> Action           
-extern labelSetTextColor :: CocoaID -> Color -> Action
+extern initLabel :: () -> CocoaRef
+extern labelSetText :: CocoaRef -> String -> ()
+extern labelSetPosition :: CocoaRef -> Position -> ()    
+extern labelSetSize :: CocoaRef -> Size -> ()       
+extern labelSetTextColor :: CocoaRef -> Color -> ()

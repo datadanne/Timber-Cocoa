@@ -4,7 +4,6 @@ struct CocoaID where
 	dummy :: Int
 
 struct CocoaWindow < RespondsToWindowEvents, HasSize, HasBackgroundColor, ContainsComponents, HasResponders, RespondsToInputEvents where 
-    --windowId :: CocoaID
     getId :: Request WindowID
     initWindow :: App -> Request ()
     destroyWindow :: Request ()
@@ -81,7 +80,6 @@ type CocoaRef = Int
 defaultCocoaRef = 0 :: CocoaRef
        
 struct Component < BaseComponent where   
-    id :: CocoaID          
     getCocoaRef :: Request CocoaRef
     init :: App -> Request ()
     destroy :: Request ()
@@ -147,7 +145,6 @@ type WindowID = Int
 extern cocoa :: World -> Class CocoaEnv
 extern compareKeys :: Bool -> CocoaKey -> CocoaKey -> Bool
 extern compareState :: Bool -> ComponentState -> ComponentState -> Bool
-extern mkCocoaID :: Class CocoaID
 
 private
 {-  The Cocoa environment will create and pass an instance of this class 

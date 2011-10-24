@@ -12,12 +12,8 @@ mkCocoaTextArea env = class
     size := {width=200; height=17}
     text := ""
     position := {x=0; y=0}
-    keyEventResponder := Nothing
-    mouseEventResponder := Nothing
-
-    dts = new defaultTextScrollResponder this env
     
-    id = new mkCocoaID
+    dts = new defaultTextScrollResponder this env
     base = new basicComponent True Nothing "TEXT_AREA"
     addResponder = base.addResponder
     setResponders :: [RespondsToInputEvents] -> Request ()
@@ -44,8 +40,8 @@ mkCocoaTextArea env = class
         case (<- base.getState) of  
             Active -> 
                       (hoz,vert) = s
-                      textAreaSetHorizontalScroll id hoz
-                      textAreaSetVerticalScroll id vert
+                      _= textAreaSetHorizontalScroll cocoaRef hoz
+                      _= textAreaSetVerticalScroll cocoaRef vert
             _ -> 
 
     appendText s = request
@@ -55,7 +51,7 @@ mkCocoaTextArea env = class
         text := s
         setName s
         case (<- base.getState) of
-            Active -> textAreaSetText id s
+            Active -> _= textAreaSetText cocoaRef s
             _ ->
    
     getText = request
@@ -64,7 +60,7 @@ mkCocoaTextArea env = class
     -- setPosition
     setPosition p = request
         case (<- base.getState) of
-            Active -> textAreaSetPosition id p
+            Active -> _= textAreaSetPosition cocoaRef p
             _ -> 
         position := p       
     
@@ -74,7 +70,7 @@ mkCocoaTextArea env = class
 
     setSize s = request
         case (<- base.getState) of
-            Active -> textAreaSetSize id s
+            Active -> _= textAreaSetSize cocoaRef s
             _ -> 
         
         size := s
@@ -88,18 +84,18 @@ mkCocoaTextArea env = class
     -- undocumented feature in Timber, init must be placed above 'this' else we have some nice raise(2); :-)
     init app = request
             base.setState Active
-            initTextArea this app
+            cocoaRef := initTextArea ()
             
             inithelper
     
     inithelper = do
-        textAreaSetText id text
-        textAreaSetPosition id position
-        textAreaSetSize id size
+        _= textAreaSetText cocoaRef text
+        _= textAreaSetPosition cocoaRef position
+        _= textAreaSetSize cocoaRef size
 
         (hoz,vert) = scrollable
-        textAreaSetHorizontalScroll id hoz
-        textAreaSetVerticalScroll id vert
+        _= textAreaSetHorizontalScroll cocoaRef hoz
+        _= textAreaSetVerticalScroll cocoaRef vert
        
         addResponder dts
         
@@ -117,7 +113,7 @@ defaultTextScrollResponder textArea env = class
     scrollTo deltaX deltaY = do
         env.stdout.write ("deltaY: " ++ (show deltaY) ++ ", deltaX: " ++ (show deltaX))
         scrolledState := (deltaX, deltaY)
-        textAreaScrollTo textArea.id deltaX deltaY
+        _= textAreaScrollTo (<-textArea.getCocoaRef) deltaX deltaY
     
     respondToInputEvent (MouseEvent t) modifiers = request
         case t of
@@ -137,10 +133,10 @@ defaultTextScrollResponder textArea env = class
 ------          ** EXTERN **            ----------------------------------------------------------  
 
 --textArea      
-extern initTextArea :: TextArea -> App -> Request ()
-extern textAreaSetText :: CocoaID -> String -> Action
-extern textAreaSetPosition :: CocoaID -> Position -> Action
-extern textAreaSetSize :: CocoaID -> Size -> Action
-extern textAreaSetHorizontalScroll :: CocoaID -> Bool -> Request ()
-extern textAreaSetVerticalScroll :: CocoaID -> Bool -> Request ()
-extern textAreaScrollTo :: CocoaID -> Float -> Float -> Action
+extern initTextArea :: () -> CocoaRef
+extern textAreaSetText :: CocoaRef -> String -> ()
+extern textAreaSetPosition :: CocoaRef -> Position -> ()
+extern textAreaSetSize :: CocoaRef -> Size -> ()
+extern textAreaSetHorizontalScroll :: CocoaRef -> Bool -> ()
+extern textAreaSetVerticalScroll :: CocoaRef -> Bool -> ()
+extern textAreaScrollTo :: CocoaRef -> Float -> Float -> ()

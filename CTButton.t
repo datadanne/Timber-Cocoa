@@ -13,8 +13,6 @@ mkCocoaButton env = class
     size := {width=108; height=21}
     title := "Click me!"
     position := {x=0; y=0}
-    keyEventResponder := Nothing
-    mouseEventResponder := Nothing
 
     base = new basicComponent True Nothing "BUTTON"
     addResponder = base.addResponder
@@ -72,7 +70,6 @@ mkCocoaButton env = class
         size := buttonSetSize cocoaRef size
         _ = buttonSetPosition cocoaRef position
 
-    id = new mkCocoaID
     cocoaRef := defaultCocoaRef   
     getCocoaRef = request
         result cocoaRef 

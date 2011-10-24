@@ -12,8 +12,6 @@ mkCocoaTextField env = class
     text := ""
     position := {x=0; y=0}
 
-    
-    id = new mkCocoaID
     base = new basicComponent True Nothing "TEXT_AREA"
     addResponder = base.addResponder
     setResponders = base.setResponders
@@ -44,7 +42,7 @@ mkCocoaTextField env = class
         text := s
         setName s
         case (<- base.getState) of
-            Active -> textFieldSetText id s
+            Active -> _= textFieldSetText cocoaRef s
             _ ->
    
     getText = request
@@ -53,7 +51,7 @@ mkCocoaTextField env = class
     -- setPosition
     setPosition p = request
         case (<- base.getState) of
-            Active -> textFieldSetPosition id p
+            Active -> _= textFieldSetPosition cocoaRef p
             _ -> 
         position := p       
     
@@ -73,13 +71,12 @@ mkCocoaTextField env = class
     -- undocumented feature in Timber, init must be placed above 'this' else we have some nice raise(2); :-)
     init app = request
             base.setState Active
-            initTextField this app
-            
+            cocoaRef := initTextField ()
             inithelper
     
     inithelper = do
-        textFieldSetText id text
-        textFieldSetPosition id position
+        _= textFieldSetText cocoaRef text
+        _= textFieldSetPosition cocoaRef position
     
     cocoaRef := defaultCocoaRef   
     getCocoaRef = request
@@ -94,6 +91,6 @@ mkCocoaTextField env = class
 
 --textField      
 private
-extern initTextField :: TextField -> App -> Request ()
-extern textFieldSetText :: CocoaID -> String -> Action
-extern textFieldSetPosition :: CocoaID -> Position -> Action
+extern initTextField :: () -> CocoaRef
+extern textFieldSetText :: CocoaRef -> String -> ()
+extern textFieldSetPosition :: CocoaRef -> Position -> ()

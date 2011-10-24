@@ -51,7 +51,6 @@ mkCocoaWindow env = class
     
     windowNr := 0
     getId = request
-        env.stdout.write ("WINDOW NR: " ++ (show windowNr) ++ "\n")
         result windowNr
 
     initWindow app = request

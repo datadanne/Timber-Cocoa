@@ -10,7 +10,6 @@ mkCocoaCallbackLabel = class
     
     -- the component we are "extending"
     baseLabel = new mkCocoaLabel
-    id = baseLabel.id 
 
 {- Vi borde ju bygga in en extra-syntax för target=Cocoa som gör att man kan skriva typ baseComponent = new mkCocoa<Component_name> och så fylls allt nedan i vid kompilering, alltså typ arv..? -}                      
         
@@ -47,6 +46,7 @@ mkCocoaCallbackLabel = class
     getSize = baseLabel.getSize        
     destroy = baseLabel.destroy
     init = baseLabel.init
+    getCocoaRef = baseLabel.getCocoaRef
     
     installOnTextChangeCallback a = request
         textChangeCallback := Just a

@@ -128,7 +128,6 @@ struct GameGrid < Container where
     
 tetrisGrid width height env = class
     base = new mkCocoaContainer env
-    id = base.id
     
     emptyTile = 0
     redTile = 1
@@ -235,7 +234,7 @@ tetrisGrid width height env = class
     getAllComponents = base.getAllComponents
     getComponents = base.getComponents
                
-    result GameGrid {id_temp=self;..}
+    result GameGrid {id_temp=base.id_temp;..}
   
 isTrue 0 = False
 isTrue _ = True  

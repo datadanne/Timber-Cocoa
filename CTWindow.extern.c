@@ -13,8 +13,6 @@ pthread_mutex_t eventMutex;
 @end
 
 bool dispatchEventToTimber(NSEvent* event) { 
-	printf("C: Event received in dispatchEventToTimber\n"); 
-
 	/* figure out event
 		flag 0,1,2 0 = windowEvent, etc. */
 	if ([event type] == NSLeftMouseDown || [event type] == NSLeftMouseDragged) {

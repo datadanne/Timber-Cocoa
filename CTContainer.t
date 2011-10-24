@@ -11,7 +11,6 @@ mkCocoaContainer env = class
     color := {r=255; g=255; b=255}
     appRef := Nothing
 
-    id = new mkCocoaID
     base = new basicComponent False Nothing "Container"
     addResponder = base.addResponder
     setResponders = base.setResponders

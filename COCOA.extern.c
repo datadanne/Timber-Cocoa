@@ -1,9 +1,9 @@
 #include "COCOA.extern.h"
 #import <Cocoa/Cocoa.h>
 
-extern ADDR copy(ADDR obj);
-
-// these functions are used to convert from LIST to char*
+/*
+    Helper functions for converting LIST from char*
+*/
 int length (LIST list) {
     switch ((int)list) {
         case 0: return 0;
@@ -27,42 +27,29 @@ char *listToChars(LIST str) {
     return buf;
 }
 
-struct Callback {
-	WORD * GCINFO;
-	TUP0 (*Code) (Callback, Time, Time);
-};
-
 struct AppCallback {
     POLY GCINFO;
     Msg (*Code) (AppCallback, App_COCOA, Time, Time);
-    CocoaWindow_COCOA w1_8;
-    Ref self_4;
+    //CocoaWindow_COCOA w1_8;
+    //Ref self_4;
 };
 
-// place COCOA struct outisde the garbage collected heap by setting gcinfo to 0
+//  COCOA struct GCINFO = 0 makes it reside out of range of GC.
 struct CocoaEnv_COCOA cenv_struct = { 0, &startApplication_COCOA }; 
-CocoaEnv_COCOA cenv				 = &cenv_struct;
-                                                        
+CocoaEnv_COCOA cenv				 = &cenv_struct;                                                        
 CocoaEnv_COCOA cocoa_COCOA(World w, Int dummy) {
     // Keep w but don't use it.
 	return cenv;
 }
 
 /*
- * Private methods
+    COCOA Root scanner for GC
  */
-
-// GC Root Scanner
-
-extern pthread_mutex_t envmut;
-extern int rootsDirty;
-
-static AppCallback toRunWhenAppFinished;
 App_COCOA app;
-
-App_COCOA getApp(void) {
-	return app;
-}
+void scanAppInit(void);
+struct Scanner appScanner = {scanAppInit, NULL};
+static AppCallback toRunWhenAppFinished;
+extern ADDR copy(ADDR obj);
 
 void scanAppInit(void) {
     DISABLE(rts);
@@ -76,7 +63,9 @@ void scanAppInit(void) {
 	ENABLE(rts);
 }
 
-struct Scanner appScanner = {scanAppInit, NULL};
+App_COCOA getApp(void) {
+	return app;
+}
 
 @interface CocoaDelegate : NSObject <NSApplicationDelegate>
 -(void) applicationDidFinishLaunching:(NSNotification*)aNotification;
@@ -87,7 +76,7 @@ struct Scanner appScanner = {scanAppInit, NULL};
 
     DISABLE(rts);
     if (toRunWhenAppFinished->Code == NULL) {
-        printf("CRITICAL ERROR in applicationDidFinishLaunching: Nothing to run!\n");
+        printf("COCOA.extern.c: CRITICAL ERROR in applicationDidFinishLaunching! Nothing to run!\n");
     } else {
         ENABLE(rts);
 	    toRunWhenAppFinished->Code(toRunWhenAppFinished, app, 0,0);
@@ -112,6 +101,7 @@ void createCocoaApplication(void) {
 	}
     /* ... */
 
+    // Add Quit option to app menu
 	id menubar = [[NSMenu new] autorelease];
     id appMenuItem = [[NSMenuItem new] autorelease];
     [menubar addItem:appMenuItem];
@@ -129,9 +119,9 @@ void createCocoaApplication(void) {
 	
 	[pool drain];
 	[NSApp run];
-
 }
 
+extern int rootsDirty;
 TUP0 startApplication_COCOA (CocoaEnv_COCOA env, CLOS clos, Int poly) {
 	if (!app) {
 		app = cocoaApplication_COCOA(0);
@@ -152,18 +142,6 @@ Bool compareKeys_COCOA(Bool targetValue, CocoaKey_COCOA aKey, CocoaKey_COCOA ano
 
 Bool compareState_COCOA(Bool targetValue, ComponentState_COCOA aState, ComponentState_COCOA anotherState) {
     return (targetValue == (((int)aState == (int)anotherState)));
-}
-
-// --------- GC Handling ------------------------------------------------
-WORD __internal__GC__CocoaID_COCOA[] = {WORDS(sizeof(struct internal_CocoaID_COCOA)), 0, 0};
-
-CocoaID_COCOA mkCocoaID_COCOA(Int dummy) {
-	internal_CocoaID_COCOA cocoaObject;
-	NEW(internal_CocoaID_COCOA, cocoaObject, WORDS(sizeof(struct internal_CocoaID_COCOA)));
-	cocoaObject->GCINFO = __internal__GC__CocoaID_COCOA;  
-	cocoaObject->this 	= NULL;
-
-	return (CocoaID_COCOA) cocoaObject;
 }
 
 void _init_external_COCOA(void) {

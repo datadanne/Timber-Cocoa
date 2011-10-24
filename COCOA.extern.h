@@ -12,18 +12,6 @@ CocoaEnv_COCOA cocoa_COCOA(World w, Int dummy);
 TUP0 startApplication_COCOA (CocoaEnv_COCOA env, CLOS clos, Int poly);
 App_COCOA getApp(void);
 
-
-struct internal_CocoaID_COCOA {
-    POLY GCINFO;
-    Int dummy_COCOA;
-	NSObject *this;
-};
-
-typedef struct internal_CocoaID_COCOA *internal_CocoaID_COCOA;     
-
-struct Callback;
-typedef struct Callback * Callback;
-
 struct AppCallback;
 typedef struct AppCallback * AppCallback;
 

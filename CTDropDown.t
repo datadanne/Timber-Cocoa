@@ -20,7 +20,6 @@ mkCocoaDropDown env = class
     title := ""
     position := {x=0; y=0}
     
-    id = new mkCocoaID
     base = new basicComponent True Nothing "DropDown"
     addResponder = base.addResponder
     setResponders = base.setResponders

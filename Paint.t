@@ -5,9 +5,7 @@ import CTLabel
 import CTContainer  -- but still, removing this causes compiler panic
 
 mkPaintBackdrop env = class
-    base = new mkCocoaContainer env
-    id = base.id
-        
+    base = new mkCocoaContainer env        
     addResponder = base.addResponder
     setResponders = base.setResponders
     getResponders = base.getResponders
@@ -20,6 +18,7 @@ mkPaintBackdrop env = class
     getState = base.getState
     setState = base.setState
     respondToInputEvent = base.respondToInputEvent
+    getCocoaRef = base.getCocoaRef
 
     setPosition = base.setPosition
     getPosition = base.getPosition
@@ -30,7 +29,6 @@ mkPaintBackdrop env = class
     setBackgroundColor = base.setBackgroundColor
     getBackgroundColor = base.getBackgroundColor
     
-    
     addComponent = base.addComponent
     removeComponent = base.removeComponent
     removeAllComponents = base.removeAllComponents
@@ -40,11 +38,9 @@ mkPaintBackdrop env = class
         result []
         
     destroy = base.destroy
-        
-    -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init = base.init
        
-    result Container{..}  
+    result Container{id_temp=base.id_temp;..}  
 
 paintHandler w1 label env = class
     pixelCount := 0

@@ -145,8 +145,6 @@ type Modifiers = [CocoaKey]
 type WindowID = Int
 
 extern cocoa :: World -> Class CocoaEnv
---extern compareCocoaIDs :: CocoaID -> CocoaID -> Bool
---extern compareComponents :: Bool -> Component -> Component -> Bool
 extern compareKeys :: Bool -> CocoaKey -> CocoaKey -> Bool
 extern compareState :: Bool -> ComponentState -> ComponentState -> Bool
 extern mkCocoaID :: Class CocoaID

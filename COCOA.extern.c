@@ -69,10 +69,9 @@ void scanAppInit(void) {
 	if (app) {
 		app = (App_COCOA)copy((ADDR)app);
 	}
-		
+
 	if (toRunWhenAppFinished) {
 		toRunWhenAppFinished = (AppCallback)copy((ADDR)toRunWhenAppFinished);
-	    printf("CODE IS NOW AT %p\n", toRunWhenAppFinished->Code);
 	}
 	ENABLE(rts);
 }
@@ -85,10 +84,8 @@ struct Scanner appScanner = {scanAppInit, NULL};
 
 @implementation CocoaDelegate
 -(void) applicationDidFinishLaunching:(NSNotification*)aNotification {
-	printf("AND CODE IS NOW AT %p\n", toRunWhenAppFinished->Code);
 
     DISABLE(rts);
-
     if (toRunWhenAppFinished->Code == NULL) {
         printf("CRITICAL ERROR in applicationDidFinishLaunching: Nothing to run!\n");
     } else {
@@ -102,7 +99,6 @@ struct Scanner appScanner = {scanAppInit, NULL};
 @end
 
 void createCocoaApplication(void) {
-    printf("hello says createCocoaApplication\n");
 	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
 	/* https://gnunet.org/svn/GNUnet/src/setup/cocoa/config_cocoa.m */
@@ -137,28 +133,17 @@ void createCocoaApplication(void) {
 }
 
 TUP0 startApplication_COCOA (CocoaEnv_COCOA env, CLOS clos, Int poly) {
-	printf("Initializing cocoa application: ");
 	if (!app) {
-        printf("App unset\n");
 		app = cocoaApplication_COCOA(0);
 		toRunWhenAppFinished = (AppCallback)clos;
-        printf("clos code is %p\n", clos->Code);
+
+	    DISABLE(rts);
+    	addRootScanner(&appScanner);
+    	rootsDirty = 1;
+    	ENABLE(rts);
         runAsMainContinuation(createCocoaApplication);
 	}
-	
     return 0;
-}
-
-Bool compareCocoaIDs_COCOA (CocoaID_COCOA a, CocoaID_COCOA b) {
-    internal_CocoaID_COCOA ia = (internal_CocoaID_COCOA)a;
-    internal_CocoaID_COCOA ib = (internal_CocoaID_COCOA)b;   
-    return (ia->this == ib->this);
-}
-
-Bool compareComponents_COCOA (Bool targetValue, Component_COCOA a, Component_COCOA b) {
-    internal_CocoaID_COCOA ia = (internal_CocoaID_COCOA)(a->id_COCOA);
-    internal_CocoaID_COCOA ib = (internal_CocoaID_COCOA)(b->id_COCOA);   
-    return (targetValue == (ia->this == ib->this));
 }
 
 Bool compareKeys_COCOA(Bool targetValue, CocoaKey_COCOA aKey, CocoaKey_COCOA anotherKey) {
@@ -182,8 +167,4 @@ CocoaID_COCOA mkCocoaID_COCOA(Int dummy) {
 }
 
 void _init_external_COCOA(void) {
-    DISABLE(rts);
-	addRootScanner(&appScanner);
-	rootsDirty = 1;
-	ENABLE(rts);
 }

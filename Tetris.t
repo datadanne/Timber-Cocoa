@@ -6,35 +6,37 @@ import CTWindow
 import CTContainer  -- Compiler panic if this redundant import of CTContainer is removed
 import RandomGenerator
 
+data TileValue = EmptyTile | RedTile | GreenTile | BlueTile | OutOfBoundsTile
+deriving instance eqTileValue :: Eq TileValue
+
+gameGridWidth = 10
+gameGridHeight = 20
+
 root w = class
     env = new posix w
     osx = new cocoa w
     
     gameWindow = new mkCocoaWindow env
     gameGrid = new tetrisGrid 10 20 env
-    currentPiece = new tetrisPiece gameGrid env
+    gu = new gridUpdater gameGrid env
     
     -- Responder for keyboard events
-    testResponder (KeyEvent keyEventType) modifiers = request
-        theKey = getKey keyEventType
-        case (theKey) of
-            A -> currentPiece.movePiece (-1) 0
-            S -> currentPiece.movePiece 0 1
-            D -> currentPiece.movePiece 1 0
-            _ -> 
+    testResponder event modifiers = request
+        case event of
+            (KeyEvent (KeyPressed theKey)) ->
+                case (theKey) of
+                    A -> gu.movePiece (-1) 0
+                    S -> gu.movePiece 0 1
+                    D -> gu.movePiece 1 0
+                    _ -> 
 
-        gameGrid.update
+                gameGrid.update
+            _ ->
         result False
-
-    testResponder _ modifiers = request
-        result False
-
-    getKey (KeyPressed key) = key
-    getKey (KeyReleased key) = key
-    getKey _ = raise 9
-
+        
     gameLoop env = action
-        _ <- currentPiece.movePiece 0 1
+        _ <- gu.movePiece 0 1
+        gu.clearFilledLines
         gameGrid.update        
         after (millisec 500) send gameLoop env
                 
@@ -51,15 +53,17 @@ root w = class
 
         osx.startApplication applicationDidFinishLaunching
 
-struct TetrisPiece < HasPosition where
+struct GridUpdater < HasPosition where
     movePiece :: Int -> Int -> Request Bool
+    clearFilledLines :: Request ()
     
-tetrisPiece gameGrid env = class
+gridUpdater gameGrid env = class
     randomizer = new baseGen 31415926
     
     -- These default values are not used.
     shape := array []
-    color := 1
+    color :: TileValue
+    color := RedTile
     position := {x=0;y=0}
 
     movePiece addX addY = request
@@ -68,7 +72,7 @@ tetrisPiece gameGrid env = class
             createNextPiece
         
         -- Perform collision test. Begin by removing the piece to avoid it interfering.
-        setPieceValues 0
+        setPieceValues EmptyTile
         collides <- testCollision addX addY
         if (not collides) then
             position := {x=position.x+addX;y=position.y+addY}
@@ -78,22 +82,41 @@ tetrisPiece gameGrid env = class
             createNextPiece
         setPieceValues color
         
-        result (not collides)  
-        
-    nextShape := linePiece90
+        result (not collides)
+
+    blocksInRow := 0
+    clearFilledLines = request
+        setPieceValues EmptyTile
+        forall row <- [1..gameGridHeight] do
+                blocksInRow := 0
+                forall col <- [1..gameGridWidth] do
+                    lineVal = <- gameGrid.getValueAt col row
+                    if (lineVal /= EmptyTile && lineVal /= OutOfBoundsTile ) then
+                        blocksInRow := blocksInRow + 1 
+
+                if (blocksInRow == gameGridWidth) then
+                    forall col <- [1..gameGridWidth] do
+                        forall r <- [0 .. (row-2)] do
+                            above <- gameGrid.getValueAt col (row-r-1)
+                            gameGrid.setValueAt col (row-r) above
+        setPieceValues color
+
+    nextShape := square
     createNextPiece = do
         (startX,startY, newShape) = nextShape
         shape := newShape
         position := {x=startX;y=startY}
-        color := (<- randomizer.next) `mod` 3 +1
+        color := case ((<- randomizer.next) `mod` 3 +1) of
+                    3 -> BlueTile
+                    2 -> GreenTile
+                    _ -> RedTile
 
         nextShapeId = <- (randomizer.next) `mod` 3 + 1
-        env.stdout.write ("NEXT:" ++ (show nextShapeId) ++ "\n")
         case (nextShapeId) of
             1 -> nextShape := square
             2 -> nextShape := linePiece0
             _ -> nextShape := linePiece90
-
+            
     collision := False
     testCollision offsetX offsetY = do
         collision := False
@@ -117,33 +140,28 @@ tetrisPiece gameGrid env = class
     getPosition = request
         result position
         
-    result TetrisPiece {..}
+    result GridUpdater {..}
     
 struct GameGrid < Container where
     setColorAt :: Int -> Int -> (Int,Int,Int) -> Request Bool
-    setValueAt :: Int -> Int -> Int -> Request Bool
-    getValueAt :: Int -> Int -> Request Int
+    setValueAt :: Int -> Int -> TileValue -> Request Bool
+    getValueAt :: Int -> Int -> Request TileValue
     clear :: Request ()
     update :: Request ()
     
 tetrisGrid width height env = class
-    base = new mkCocoaContainer env
-    
-    emptyTile = 0
-    redTile = 1
-    greenTile = 2
-    blueTile = 3
-
-    -- Grid of tiles. Each tile has (X,Y,Value,Container)
-    grid :: [(Int, Int, Int, Container)]
+    -- Grid of tiles. Each tile has (X,Y,TileValue,Container)
+    grid :: [(Int, Int, TileValue, Container)]
     grid := []
     
+    blocksInRow := 0
     update = request
         forall (tx,ty,val,container) <- grid do
             case (val) of
-                3 -> container.setBackgroundColor ({r=70;g=170;b=250})
-                2 -> container.setBackgroundColor ({r=170;g=250;b=70})
-                1 -> container.setBackgroundColor ({r=250;g=100;b=100})
+                RedTile -> container.setBackgroundColor ({r=250;g=100;b=100})
+                GreenTile -> container.setBackgroundColor ({r=70;g=170;b=250})
+                BlueTile -> container.setBackgroundColor ({r=170;g=250;b=70})
+                OutOfBoundsTile-> container.setBackgroundColor ({r=255;g=255;b=255})
                 _ -> container.setBackgroundColor ({r=50;g=50;b=50})
 
     setColorAt x y newColor = request
@@ -159,6 +177,9 @@ tetrisGrid width height env = class
     -- Remove a tile and replace it with a tile with the new value.        
     newGrid := []
     setValueAt x y val = request
+        result (<- internalSetValueAt x y val)
+    
+    internalSetValueAt x y val = do
         newGrid := []
         
         forall (tileX,tileY,oldVal,container) <- grid do
@@ -171,9 +192,12 @@ tetrisGrid width height env = class
 
         result False
 
-    value := -1
+    value := OutOfBoundsTile
     getValueAt x y = request
-        value := -1
+        result (<- internalGetValueAt x y)
+        
+    internalGetValueAt x y = do
+        value := OutOfBoundsTile
         forall (tileX,tileY,val, container) <- grid do
             if (tileX == x && tileY == y) then
                 value := val
@@ -182,7 +206,7 @@ tetrisGrid width height env = class
     clear = request
         newGrid := []
         forall (x,y,val, container) <- grid do
-            newGrid := (x,y,emptyTile,container) : newGrid
+            newGrid := (x,y,EmptyTile,container) : newGrid
         grid := newGrid
                 
     init app = request
@@ -198,12 +222,13 @@ tetrisGrid width height env = class
                tile.setSize ({width=tileSize;height=tileSize})
                tile.setBackgroundColor backgroundColor
                tile.setPosition ({x=(col-1)*(tileSize+1)+1;y=(row-1)*(tileSize+1)+1})
-               grid := (col,row, emptyTile, tile) : grid
+               grid := (col,row, EmptyTile, tile) : grid
                base.addComponent tile
                
     destroy = request
 
     -- Fill out rest of interface using base container --
+    base = new mkCocoaContainer env
     addResponder = base.addResponder
     setResponders = base.setResponders
     getResponders = base.getResponders
@@ -236,7 +261,7 @@ tetrisGrid width height env = class
                
     result GameGrid {id_temp=base.id_temp;..}
   
-isTrue 0 = False
+isTrue (EmptyTile) = False
 isTrue _ = True  
     
 {- 

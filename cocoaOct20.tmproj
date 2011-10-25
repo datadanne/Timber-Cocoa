@@ -3,14 +3,14 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>Tutorial4MultipleWindows.t</string>
+	<string>COCOA.extern.c</string>
 	<key>documents</key>
 	<array>
 		<dict>
 			<key>filename</key>
 			<string>COCOA.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-24T11:24:16Z</date>
+			<date>2011-10-24T11:54:21Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -22,7 +22,7 @@
 			<key>filename</key>
 			<string>CTCommon.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-24T11:23:51Z</date>
+			<date>2011-10-24T11:43:08Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -46,25 +46,27 @@
 			<key>filename</key>
 			<string>CTTextArea.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-24T11:30:50Z</date>
+			<date>2011-10-24T11:37:58Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTTextField.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-24T11:32:57Z</date>
+			<date>2011-10-24T11:37:58Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>CTWindow.t</string>
 			<key>lastUsed</key>
-			<date>2011-10-24T09:22:19Z</date>
+			<date>2011-10-24T11:54:19Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>COCOA.extern.c</string>
 			<key>lastUsed</key>
-			<date>2011-10-24T10:59:53Z</date>
+			<date>2011-10-24T11:54:21Z</date>
+			<key>selected</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -106,13 +108,13 @@
 			<key>filename</key>
 			<string>CTWindow.extern.c</string>
 			<key>lastUsed</key>
-			<date>2011-10-24T10:23:01Z</date>
+			<date>2011-10-24T11:42:56Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>COCOA.extern.h</string>
 			<key>lastUsed</key>
-			<date>2011-10-24T10:39:20Z</date>
+			<date>2011-10-24T11:42:12Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -175,13 +177,13 @@
 					<key>filename</key>
 					<string>Paint.t</string>
 					<key>lastUsed</key>
-					<date>2011-10-24T11:24:17Z</date>
+					<date>2011-10-24T11:37:41Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>Tetris.t</string>
 					<key>lastUsed</key>
-					<date>2011-10-24T11:24:34Z</date>
+					<date>2011-10-24T11:37:54Z</date>
 				</dict>
 			</array>
 			<key>expanded</key>
@@ -244,7 +246,7 @@
 					<key>filename</key>
 					<string>ExternTest.extern.c</string>
 					<key>lastUsed</key>
-					<date>2011-10-23T22:22:04Z</date>
+					<date>2011-10-24T11:42:39Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
@@ -295,9 +297,7 @@
 					<key>filename</key>
 					<string>Tutorial4MultipleWindows.t</string>
 					<key>lastUsed</key>
-					<date>2011-10-24T11:35:00Z</date>
-					<key>selected</key>
-					<true/>
+					<date>2011-10-24T11:35:53Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
@@ -398,12 +398,12 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>52</integer>
+				<integer>145</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>86</integer>
 		</dict>
 		<key>COCOA.extern.h</key>
 		<dict>
@@ -412,7 +412,7 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>14</integer>
+				<integer>13</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -424,14 +424,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>71</integer>
 				<key>line</key>
-				<integer>82</integer>
+				<integer>146</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>58</integer>
+			<integer>166</integer>
 		</dict>
 		<key>CTButton.extern.c</key>
 		<dict>
@@ -722,14 +722,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>61</integer>
+				<integer>45</integer>
 				<key>line</key>
-				<integer>231</integer>
+				<integer>14</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>195</integer>
+			<integer>87</integer>
 		</dict>
 		<key>CTWindow.extern.h</key>
 		<dict>
@@ -766,26 +766,42 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>8</integer>
+				<integer>53</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>28</integer>
 		</dict>
 		<key>ExternTest.extern.c</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>30</integer>
+				<integer>23</integer>
 				<key>line</key>
-				<integer>20</integer>
+				<integer>3</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>14</integer>
+				<key>line</key>
+				<integer>3</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>23</integer>
+				<key>line</key>
+				<integer>3</integer>
+			</dict>
 		</dict>
 		<key>NewTest.t</key>
 		<dict>
@@ -806,9 +822,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>34</integer>
+				<integer>48</integer>
 				<key>line</key>
-				<integer>4</integer>
+				<integer>29</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -862,14 +878,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>35</integer>
+				<integer>41</integer>
 				<key>line</key>
-				<integer>129</integer>
+				<integer>236</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>112</integer>
+			<integer>206</integer>
 		</dict>
 		<key>Tutorial2Resizing.t</key>
 		<dict>
@@ -987,6 +1003,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{253, 59}, {1710, 985}}</string>
+	<string>{{210, 73}, {1710, 985}}</string>
 </dict>
 </plist>

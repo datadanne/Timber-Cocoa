@@ -29,23 +29,23 @@ char *listToChars(LIST str) {
 
 struct AppCallback {
     POLY GCINFO;
-    Msg (*Code) (AppCallback, App_COCOA, Time, Time);
-    //CocoaWindow_COCOA w1_8;
-    //Ref self_4;
+    Msg (*Code) (AppCallback, App_CocoaDef, Time, Time);
 };
 
-//  COCOA struct GCINFO = 0 makes it reside out of range of GC.
-struct CocoaEnv_COCOA cenv_struct = { 0, &startApplication_COCOA }; 
-CocoaEnv_COCOA cenv				 = &cenv_struct;                                                        
-CocoaEnv_COCOA cocoa_COCOA(World w, Int dummy) {
+// GCINFO = 0 makes it static (not GC'ed)
+struct CocoaEnv_CocoaDef cenv_struct = { 0, &startApplication_COCOA }; 
+
+CocoaEnv_CocoaDef cenv				 = &cenv_struct;                                                        
+
+CocoaEnv_CocoaDef cocoa_COCOA(World w, Int dummy) {
     // Keep w but don't use it.
 	return cenv;
 }
 
 /*
-    COCOA Root scanner for GC
+    Root scanner for GC
  */
-App_COCOA app;
+App_CocoaDef app;
 void scanAppInit(void);
 struct Scanner appScanner = {scanAppInit, NULL};
 static AppCallback toRunWhenAppFinished;
@@ -54,16 +54,15 @@ extern ADDR copy(ADDR obj);
 void scanAppInit(void) {
     DISABLE(rts);
 	if (app) {
-		app = (App_COCOA)copy((ADDR)app);
+		app = (App_CocoaDef)copy((ADDR)app);
 	}
-
 	if (toRunWhenAppFinished) {
 		toRunWhenAppFinished = (AppCallback)copy((ADDR)toRunWhenAppFinished);
 	}
 	ENABLE(rts);
 }
 
-App_COCOA getApp(void) {
+App_CocoaDef getApp(void) {
 	return app;
 }
 
@@ -76,7 +75,7 @@ App_COCOA getApp(void) {
 
     DISABLE(rts);
     if (toRunWhenAppFinished->Code == NULL) {
-        printf("COCOA.extern.c: CRITICAL ERROR in applicationDidFinishLaunching! Nothing to run!\n");
+        printf("COCOA.extern.c: CRITICAL ERROR in applicationDidFinishLaunching: nothing to run!\n");
     } else {
         ENABLE(rts);
 	    toRunWhenAppFinished->Code(toRunWhenAppFinished, app, 0,0);
@@ -87,7 +86,7 @@ App_COCOA getApp(void) {
 }
 @end
 
-void createCocoaApplication(void) {
+void createCocoaApplication(Thread current_thread) {
 	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
 	/* https://gnunet.org/svn/GNUnet/src/setup/cocoa/config_cocoa.m */
@@ -122,7 +121,7 @@ void createCocoaApplication(void) {
 }
 
 extern int rootsDirty;
-TUP0 startApplication_COCOA (CocoaEnv_COCOA env, CLOS clos, Int poly) {
+TUP0 startApplication_COCOA (CocoaEnv_CocoaDef env, CLOS clos, Int poly) {
 	if (!app) {
 		app = cocoaApplication_COCOA(0);
 		toRunWhenAppFinished = (AppCallback)clos;
@@ -131,17 +130,18 @@ TUP0 startApplication_COCOA (CocoaEnv_COCOA env, CLOS clos, Int poly) {
     	addRootScanner(&appScanner);
     	rootsDirty = 1;
     	ENABLE(rts);
+    	
         runAsMainContinuation(createCocoaApplication);
 	}
     return 0;
 }
 
-Bool compareKeys_COCOA(Bool targetValue, CocoaKey_COCOA aKey, CocoaKey_COCOA anotherKey) {
-    return (targetValue == (((int)aKey == (int)anotherKey)));
+Bool compareKeys_COCOA(CocoaKey_CocoaDef aKey, CocoaKey_CocoaDef anotherKey) {
+    return ((int)aKey == (int)anotherKey);
 }
 
-Bool compareState_COCOA(Bool targetValue, ComponentState_COCOA aState, ComponentState_COCOA anotherState) {
-    return (targetValue == (((int)aState == (int)anotherState)));
+Bool compareState_COCOA(ComponentState_CocoaDef aState, ComponentState_CocoaDef anotherState) {
+    return ((int)aState == (int)anotherState));
 }
 
 void _init_external_COCOA(void) {

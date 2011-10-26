@@ -42,12 +42,12 @@ TUP0 textAreaSetText_CTTextArea(Int cocoaRef, LIST str) {
 	[pool drain];
 } 
 
-TUP0 textAreaSetPosition_CTTextArea(Int cocoaRef, Position_COCOA pos) {
+TUP0 textAreaSetPosition_CTTextArea(Int cocoaRef, Position_CocoaDef pos) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
     NSScrollView *scrollView = (NSScrollView*) cocoaRef;
 	NSTextView *theTextView = [scrollView documentView];
 	
-	NSPoint p = NSMakePoint(pos->x_COCOA-5,pos->y_COCOA-20); // TODO: Remove hardcoded offset.
+	NSPoint p = NSMakePoint(pos->x_CocoaDef-5,pos->y_CocoaDef-20); // TODO: Remove hardcoded offset.
 	
 	[scrollView setFrameOrigin: p];
 	
@@ -55,14 +55,14 @@ TUP0 textAreaSetPosition_CTTextArea(Int cocoaRef, Position_COCOA pos) {
     [theTextView displayIfNeeded];
    	[pool drain]; 
 }
-TUP0 textAreaSetSize_CTTextArea(Int cocoaRef, Size_COCOA size) {
+TUP0 textAreaSetSize_CTTextArea(Int cocoaRef, Size_CocoaDef size) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSScrollView *scrollView = (NSScrollView*) cocoaRef;
 	NSTextView *theTextView = [scrollView documentView];
 
-	[scrollView setFrameSize: NSMakeSize(size->width_COCOA,size->height_COCOA)];
+	[scrollView setFrameSize: NSMakeSize(size->width_CocoaDef,size->height_CocoaDef)];
 	
-	[theTextView setMinSize:NSMakeSize(size->width_COCOA, size->height_COCOA)];
+	[theTextView setMinSize:NSMakeSize(size->width_CocoaDef, size->height_CocoaDef)];
     [theTextView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
     [theTextView setVerticallyResizable:YES];
     [theTextView setHorizontallyResizable:NO];

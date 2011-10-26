@@ -3,6 +3,6 @@
 
 Int initTextField_CTTextField(TUP0);
 TUP0 textFieldSetText_CTTextField(Int, LIST);
-TUP0 textFieldSetPosition_CTTextField(Int, Position_COCOA);
+TUP0 textFieldSetPosition_CTTextField(Int, Position_CocoaDef);
 
 #endif

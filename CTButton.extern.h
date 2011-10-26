@@ -3,7 +3,7 @@
 
 Int initButton_CTButton(LIST);
 TUP0 buttonSetTitle_CTButton(Int,LIST);
-TUP0 buttonSetPosition_CTButton(Int,Position_COCOA);
-Size_COCOA buttonSetSize_CTButton(Int,Size_COCOA);
+TUP0 buttonSetPosition_CTButton(Int,Position_CocoaDef);
+Size_CocoaDef buttonSetSize_CTButton(Int,Size_CocoaDef);
 
 #endif

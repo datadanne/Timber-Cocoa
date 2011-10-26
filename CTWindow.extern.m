@@ -6,19 +6,19 @@
 	//printf("CLOSIN TIME for window nr %d \n", [sender windowNumber]);
 	
 	/* Ask Timber whether or not the window should close */
-	App_COCOA app = getApp();
-	return app->l_App_COCOA_AppImpl_COCOA_COCOA->sendWindowCloseRequest_COCOA(app->l_App_COCOA_AppImpl_COCOA_COCOA, [sender windowNumber], 0);
+	App_CocoaDef app = getApp();
+	return app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef->sendWindowCloseRequest_CocoaDef(app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef, [sender windowNumber], 0);
 }
 - (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)toSize {    
-    Size_COCOA toSize_22;
-    NEW (Size_COCOA, toSize_22, WORDS(sizeof(struct Size_COCOA)));
-    toSize_22->GCINFO = __GC__Size_COCOA;
-    toSize_22->width_COCOA = toSize.width;
-    toSize_22->height_COCOA = toSize.height;
+    Size_CocoaDef toSize_22;
+    NEW (Size_CocoaDef, toSize_22, WORDS(sizeof(struct Size_CocoaDef)));
+    toSize_22->GCINFO = __GC__Size_CocoaDef;
+    toSize_22->width_CocoaDef = toSize.width;
+    toSize_22->height_CocoaDef = toSize.height;
 
     /* Inform Timber a resize is taking place */
-	App_COCOA app = getApp();
-    app->l_App_COCOA_AppImpl_COCOA_COCOA->sendWindowResize_COCOA(app->l_App_COCOA_AppImpl_COCOA_COCOA, toSize_22, [sender windowNumber], 0);
+	App_CocoaDef app = getApp();
+    app->l_App_CocoaDef_AppImpl_COCOA_COCOA->sendWindowResize_CocoaDef(app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef, toSize_22, [sender windowNumber], 0);
 
     return toSize;
 }

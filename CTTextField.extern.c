@@ -18,10 +18,10 @@ TUP0 textFieldSetText_CTTextField(Int cocoaRef, LIST str) {
 	[pool drain];
 }
 
-TUP0 textFieldSetPosition_CTTextField(Int cocoaRef, Position_COCOA pos) {
+TUP0 textFieldSetPosition_CTTextField(Int cocoaRef, Position_CocoaDef pos) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSTextField *thisTextField = (NSTextField*) cocoaRef;
-	NSPoint p = NSMakePoint(pos->x_COCOA-5,pos->y_COCOA-20); // TODO: Remove hardcoded offset.
+	NSPoint p = NSMakePoint(pos->x_CocoaDef-5,pos->y_CocoaDef-20); // TODO: Remove hardcoded offset.
 	
 	[thisTextField setFrameOrigin: p];
 	[thisTextField performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];

@@ -1,131 +1,153 @@
 module CTContainer where
 
-import CTCommon
-
-struct Container < Component, ContainsComponents, HasBackgroundColor
+import CocoaDef
 
 --------------------------------------------------------------------------------------------------
 ------          ** CONTAINER **         ----------------------------------------------------------
-mkCocoaContainer env = class
-    myComponents := []        
-    color := {r=255; g=255; b=255}
-    appRef := Nothing
 
-    base = new basicComponent False Nothing "Container"
-    addResponder = base.addResponder
-    setResponders = base.setResponders
-    getResponders = base.getResponders
-    setParent = base.setParent
-    getParent = base.getParent
-    setIsFocusable = base.setIsFocusable
-    getIsFocusable = base.getIsFocusable
-    setName s = base.setName s
-    getName = base.getName
-    getState = base.getState
-    setState = base.setState
-    respondToInputEvent = base.respondToInputEvent
+mkCocoaContainer :: Class Container
+mkCocoaContainer = class
+    myComponents := []    
+    color        := {r=255; g=255; b=255}
+    appRef       := Nothing
+    state        := Inactive
+
+    BaseComponent {setPosition = setPositionImpl; setSize = setSizeImpl; ..} = 
+        new basicComponent False Nothing "Container"
 
     setPosition p = request
-        case (<- base.getState) of
-            Active -> _ = containerSetPosition cocoaRef p
-            _ ->
-        base.setPosition p
-
-    getPosition = base.getPosition
+        if isActive state then
+            Active ref = state
+            _ = containerSetPosition ref p
+        setPositionImpl p
 
     setSize s = request
-        case (<- base.getState) of
-            Active -> _ = containerSetSize cocoaRef s
-            _ ->
-        base.setSize s
-
-    getSize = base.getSize
+        if isActive state then
+            Active ref = state
+            _ = containerSetSize ref s
+        setSizeImpl s
 
     setBackgroundColor c = request
-        case (<- base.getState) of
-            Active -> _ = containerSetBackgroundColor cocoaRef c
-            _ ->
+        if isActive state then
+            Active ref = state
+            _ = containerSetBackgroundColor ref c
         color := c
 
     getBackgroundColor = request
         result color
     
-    
     addComponent c = request        
         myComponents := c : myComponents
-        c.setParent (Just this)
-
-        state <- base.getState
-        if (state == Active && isJust appRef) then
-            c.init (fromJust appRef)
---            containerAddComponent id c.id    
-            _ = containerAddComponent cocoaRef (<-c.getCocoaRef)
+        c.setParent this
+        if isActive state then
+            Active ref = state
+            c_ref <- c.initComp (fromJust appRef)
+            _ = containerAddComponent ref c_ref
             
     removeComponent c = request
         myComponents := [x | x <- myComponents, not (x == c)]
-        _ = containerRemoveComponent cocoaRef (<-c.getCocoaRef)
-        c.destroy
-    
-    internalRemoveAllComponents = do
-        forall c <- myComponents do
-            _ = containerRemoveComponent cocoaRef (<-c.getCocoaRef)
-            c.destroy
-        myComponents := []
+        if isActive state then
+            Active ref = state
+            s <- c.getState
+            if isActive s then
+                Active c_ref = s
+                _ = containerRemoveComponent ref c_ref
+            c.destroyComp
             
     removeAllComponents = request
-        internalRemoveAllComponents
+        removeAllComponentsImpl
+
+    removeAllComponentsImpl = do
+        if isActive state then
+            Active ref = state
+            forall c <- myComponents do
+                s <- c.getState
+                if isActive s then
+                    Active c_ref = s
+                    _ = containerRemoveComponent ref c_ref
+                c.destroyComp
+        myComponents := []
 
     getComponents = request
         result myComponents
 
-    children := []
-    getAllComponents = request
-        children := []
-        forall c <- myComponents do
-            children := (children ++ (<- c.getAllComponents) ++ [c])
-        result children
-        
-    destroy = request
-        if ((<- base.getState) == Active) then
-            internalRemoveAllComponents
-            _ = destroyContainer cocoaRef
-            base.setState Destroyed
-        
-    -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
-    init app = request
-            appRef := Just app
-            base.setState Active
-            cocoaRef := initContainer ()
-            inithelper
-
-            forall cmp <- myComponents do
-                cmp.init app
---                containerAddComponent id cmp.id
-                _ = containerAddComponent cocoaRef (<-cmp.getCocoaRef)
-    inithelper = do
-       _ = containerSetSize cocoaRef (<- base.getSize)
-       _ = containerSetBackgroundColor cocoaRef color
-       _ = containerSetPosition cocoaRef (<- base.getPosition)
+    -- TODO: test that it actually works!
+    getAllChildren = request
+        cs <- forall c <- myComponents do
+            list <- c.getAllChildren
+            result list ++ [c] -- order is important here (for reactions to mouse events)
+        result cs
     
-    cocoaRef := defaultCocoaRef   
-    getCocoaRef = request
-        result cocoaRef 
+    destroyComp = request
+        if (isActive state) then
+            removeAllComponentsImpl
+            Active ref = state
+            _ = destroyContainer ref
+            state := Destroyed
+        
+    initComp app = request
+        appRef := Just app
+        ref = initContainer ()
+        state := Active ref
+        _ = containerSetSize ref (<-getSize)
+        _ = containerSetBackgroundColor ref color
+        _ = containerSetPosition ref (<-getPosition)
+        forall c <- myComponents do
+            c_ref <- c.initComp app
+            _ = containerAddComponent ref c_ref
+        result ref
+    
+    getState = request
+        result state
        
-    this := Container{id_temp = self; ..}  
+    this = Container {id = self; ..}  
 
     result this
-        
+
+basicHasResponders :: Class DefaultEventResponder
+basicHasResponders = class
+    responders := []
+    addResponder a = request
+        responders := a : responders
+    setResponders aa = request
+        responders := aa
+    getResponders = request
+        result responders
+    -- return true (block cocoa) if any of the installed responders say so
+    returnVal := False    
+    respondToInputEvent inputEvent modifiers = request
+        returnVal := False
+        forall h <- responders do
+            if returnVal == False then
+                returnVal := <- h.respondToInputEvent inputEvent modifiers
+        result returnVal
+    result DefaultEventResponder {..}
+
+basicComponent :: Bool -> (Maybe Component) -> String -> Class BaseComponent
+basicComponent f p n = class
+    DefaultEventResponder {..}     = new basicHasResponders
+    (getName,setName)               = new wrapper n
+    (getParent,setParentImpl)       = new wrapper p
+    setParent p = request setParentImpl (Just p)
+    (getIsFocusable,setIsFocusable) = new wrapper f
+    (getPosition,setPosition)       = new wrapper ({x=0; y=0})
+    (getSize,setSize)               = new wrapper ({width=100; height=100})    
+    getAllChildren                  = request result []
+    result BaseComponent {..}
+
+private
     
-
---------------------------------------------------------------------------------------------------
-------          ** EXTERN **            ----------------------------------------------------------  
-
---container
+wrapper :: a -> Class (Request a, a -> Request ())    
+wrapper s = class
+    a := s
+    set b = request a := b
+    get = request result a
+    result (get,set)
 
 extern initContainer :: () -> CocoaRef
 extern destroyContainer :: CocoaRef -> ()
 extern containerSetBackgroundColor :: CocoaRef -> Color -> ()
 extern containerSetSize :: CocoaRef -> Size -> ()
 extern containerSetPosition :: CocoaRef -> Position -> ()
-extern containerAddComponent :: CocoaRef -> CocoaRef -> ()                    -- external method for doing the actual cocoa add-call!
+extern containerAddComponent :: CocoaRef -> CocoaRef -> ()
 extern containerRemoveComponent :: CocoaRef -> CocoaRef -> ()

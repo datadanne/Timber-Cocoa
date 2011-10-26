@@ -17,9 +17,9 @@
 
 Int initContainer_CTContainer(TUP0);
 TUP0 destroyContainer_CTContainer(Int);
-TUP0 containerSetBackgroundColor_CTContainer(Int, Color_COCOA);
-TUP0 containerSetSize_CTContainer(Int, Size_COCOA);
-TUP0 containerSetPosition_CTContainer(Int, Position_COCOA);
+TUP0 containerSetBackgroundColor_CTContainer(Int, Color_CocoaDef);
+TUP0 containerSetSize_CTContainer(Int, Size_CocoaDef);
+TUP0 containerSetPosition_CTContainer(Int, Position_CocoaDef);
 TUP0 containerAddComponent_CTContainer(Int, Int);
 TUP0 containerRemoveComponent_CTContainer(Int, Int);
 

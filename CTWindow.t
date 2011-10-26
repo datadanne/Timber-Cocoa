@@ -1,146 +1,140 @@
 module CTWindow where
 
-import POSIX -- temporary, only needed for Env
-import COCOA
 import CTContainer
     
 --------------------------------------------------------------------------------------------------
 ------          ** WINDOW **            ---------------------------------------------------------- 
-mkCocoaWindow :: Env -> Class CocoaWindow
-mkCocoaWindow env = class    
-    state := Inactive
-    rootContainer = new mkCocoaContainer env
-    addComponent = rootContainer.addComponent
-    getComponents = rootContainer.getComponents
-    removeComponent = rootContainer.removeComponent
-    removeAllComponents = rootContainer.removeAllComponents
-    setBackgroundColor = rootContainer.setBackgroundColor
-    getBackgroundColor = rootContainer.getBackgroundColor
 
-    handlers = new basicHasResponders 
-    addResponder = handlers.addResponder
-    setResponders = handlers.setResponders
-    getResponders = handlers.getResponders
-    respondToInputEvent = handlers.respondToInputEvent
-
-    dwh := new defaultWindowResponder this env
+mkCocoaWindow :: Class CocoaWindow
+mkCocoaWindow = class    
     
-    onWindowResize size = request
-        result (<- dwh.onWindowResize size)
+    state := Inactive        
+    
+    rootContainer = new mkCocoaContainer
+    defaultResponder = new defaultInputResponder this rootContainer
+    
+    DefaultEventResponder {respondToInputEvent=respondToInputEventImpl;..} = new basicHasResponders 
+    
+    -- return true (block cocoa) if any of the installed responders say so
+    respondToInputEvent inputEvent modifiers = request
+        if not (<-defaultResponder.respondToInputEvent inputEvent modifiers) then
+            result (<-respondToInputEventImpl inputEvent modifiers)
+        else
+            result True
+    
+    Container {setPosition=dummy1;getPosition=dummy2;setSize=setSizeImpl;..} = rootContainer
+    setSize size = request
+        if isActive state then 
+            Active ref = state
+            _ = windowSetSize ref size
+        setSizeImpl size
 
-    onWindowCloseRequest = request
-        result (<- dwh.onWindowCloseRequest)
-
-    setWindowResponder resp = request 
-        dwh := resp  
-        
+    -- the position of the window may change, but the position of root container is (0,0)
     position := {x=0;y=0}
     getPosition = request
         result position
-
     setPosition pos = request
-        if (state == Active) then 
-            _ = windowSetPosition cocoaRef pos
+        if isActive state then 
+            Active ref = state
+            _ = windowSetPosition ref pos
         position := pos
-
-    getSize = rootContainer.getSize
-    setSize size = request
-        if (state == Active) then 
-            _ = windowSetSize cocoaRef size
-        rootContainer.setSize size
-    
-    windowNr := 0
-    getId = request
-        result windowNr
-
-    initWindow app = request
-        if (state == Inactive) then
-            (ref,nr) = initCocoaWindow ()
-            cocoaRef := ref
-            windowNr := nr
-
-            rootContainer.init app
-            rootContainer.setName "rootContainer"
-            state := Active
-            inithelper 
-
-    inithelper = do
-        _ <- internalSetVisible isVisible
-        _ = windowSetContentView cocoaRef (<-rootContainer.getCocoaRef)
-        _ = windowSetSize cocoaRef (<- rootContainer.getSize)        
-        _ = windowSetPosition cocoaRef position
         
-        wh = new defaultInputResponder this rootContainer env
-        handlers.addResponder wh
+    windowResponder := new defaultWindowResponder this
+    onWindowResize size = request
+        windowResponder.onWindowResize size
+    onWindowCloseRequest = request
+        result (<- windowResponder.onWindowCloseRequest)
+    setWindowResponder resp = request 
+        windowResponder := resp
 
+    windowId := 0
+    getId = request
+        result windowId
+
+    isVisible := True
+    initWindow app = request
+        if state == Inactive then
+            (ref,id) = initCocoaWindow ()
+            state    := Active ref
+            windowId := id
+            container_ref <- rootContainer.initComp app
+            rootContainer.setName "RootContainer"
+            _ = windowSetHidden ref
+            _ = windowSetContentView ref container_ref
+            _ = windowSetSize ref (<-getSize)        
+            _ = windowSetPosition ref position
+            if isVisible then
+                _ = windowSetVisible ref
 
     destroyWindow = request
-        if (state == Active) then 
+        if isActive state then 
+            Active ref = state
+            _ = destroyCocoaWindow ref -- Is this the right order for Cocoa?
+            rootContainer.destroyComp
             state := Destroyed
-            rootContainer.destroy
-            _ = destroyCocoaWindow cocoaRef
 
     currentFocus := rootContainer
     setFocus cmp = request
          currentFocus := cmp
-         if (state == Active) then
-             _ = windowSetFocus cocoaRef (<-cmp.getCocoaRef)
-         
+         if isActive state then
+            Active ref = state
+            cmp_state <- cmp.getState
+            if isActive cmp_state then
+                Active cmp_ref = cmp_state
+                _ = windowSetFocus ref cmp_ref
     getFocus = request
         result currentFocus
 
-    isVisible := True
     setVisible b = request
-        if (isVisible /= b)  then
+        if isVisible /= b then
             isVisible := b
-            result (<- internalSetVisible isVisible)
+            result (<- setVisibleImpl)
         else
             result False
             
-    internalSetVisible vis = do
-        isActive = (state == Active)
-        if (isActive) then
-            if (vis) then
-                _ = windowSetVisible cocoaRef
+    setVisibleImpl = do
+        if isActive state then
+            Active ref = state
+            if isVisible then
+                _ = windowSetVisible ref
             else
-                _ = windowSetHidden cocoaRef
-        result isActive
+                _ = windowSetHidden ref
+            result True
+        else
+            result False
 
-    cocoaRef := defaultCocoaRef
     this = CocoaWindow {..}
     
     result this
 
-defaultWindowResponder window env = class
+defaultWindowResponder :: CocoaWindow -> Class RespondsToWindowEvents
+defaultWindowResponder window = class
     onWindowResize toSize = request
-        env.stdout.write ("Resizing window to width: " ++ (show toSize.width) ++ ", height: " ++ (show toSize.height) ++ "\n")
-
-    onWindowCloseRequest = request
+    onWindowCloseRequest = request 
         result True
-
-    setWindowResponder responder = request
-    
     result RespondsToWindowEvents {..}
-    
-defaultInputResponder window rootContainer env = class
-    getKey (KeyPressed theKey) = theKey
-    getKey (KeyReleased theKey) = theKey
-    getKey _ = raise 9
 
-    mkNewEvent (MousePressed _) p = MousePressed p
-    mkNewEvent (MouseReleased _) p = MouseReleased p
-    mkNewEvent (MouseClicked _) p = MouseClicked p
-    mkNewEvent (MouseMoved _) p = MouseMoved p
-    mkNewEvent (MouseWheelScroll _ dx dy) p = MouseWheelScroll p dx dy
+getKey (KeyPressed k)  = k
+getKey (KeyReleased k) = k
+getKey _               = raise 99
 
-    posget (MousePressed p) = p 
-    posget (MouseReleased p) = p 
-    posget (MouseClicked p) = p
-    posget (MouseWheelScroll p _ _) = p   
+mkNewEventAt (MousePressed _) p           = MousePressed p
+mkNewEventAt (MouseReleased _) p          = MouseReleased p
+mkNewEventAt (MouseClicked _) p           = MouseClicked p
+mkNewEventAt (MouseMoved _) p             = MouseMoved p
+mkNewEventAt (MouseWheelScroll _ dx dy) p = MouseWheelScroll p dx dy
+
+getMousePosition (MousePressed p)         = p 
+getMousePosition (MouseReleased p)        = p 
+getMousePosition (MouseClicked p)         = p
+getMousePosition (MouseWheelScroll p _ _) = p   
+
+defaultInputResponder :: CocoaWindow -> Container -> Class RespondsToInputEvents
+defaultInputResponder window rootContainer = class
     
     currentFocus := rootContainer
-
     focusables := []
+    
     respondToInputEvent (KeyEvent keyEventType) modifiers = request
         currentFocus := <- window.getFocus
         
@@ -148,12 +142,11 @@ defaultInputResponder window rootContainer env = class
             window.setFocus rootContainer
 
         consumed <- currentFocus.respondToInputEvent (KeyEvent keyEventType) modifiers
-    
         if (not consumed) then
             theKey = getKey keyEventType
             isPressed = case keyEventType of (KeyPressed _) -> True; _ -> False
             if (theKey == Tab && isPressed) then
-                cmps <- rootContainer.getAllComponents
+                cmps <- rootContainer.getAllChildren
                 foundFocus := False
                 focusables := []
             
@@ -173,7 +166,7 @@ defaultInputResponder window rootContainer env = class
         result False
 
     respondToInputEvent (MouseEvent me) modifiers = request
-        cmps <- rootContainer.getAllComponents
+        cmps <- rootContainer.getAllChildren
         scanList cmps (findMouseFocus me modifiers)
         result (<- rootContainer.respondToInputEvent (MouseEvent me) modifiers)
     
@@ -200,14 +193,14 @@ defaultInputResponder window rootContainer env = class
             result False
 
     findMouseFocus event modifiers cmp = do
-        originBottomLeft = posget event
+        originBottomLeft = getMousePosition event
         windowSize = <- window.getSize
         eventPosition = ({x=originBottomLeft.x;y=windowSize.height-originBottomLeft.y})
         parentPosition <- (getParentPosition cmp)
         relativePosition = getRelativePosition parentPosition eventPosition
 
         -- Construct new event based on local coordinates.
-        eventInLocalCoords = mkNewEvent event relativePosition
+        eventInLocalCoords = mkNewEventAt event relativePosition
         
         cmpPos <- cmp.getPosition
         cmpSize <- cmp.getSize
@@ -227,21 +220,32 @@ getParentPosition cmp = do
     else
         result ({x=0;y=0})
 
-getRelativePosition from to = {x=to.x-from.x;y=to.y-from.y}
+getRelativePosition from to = {x=to.x-from.x; y=to.y-from.y}
 
-clickInsideBox mousePos boxPos boxSize = inInterval mousePos.x boxPos.x boxSize.width && inInterval mousePos.y boxPos.y boxSize.height
-inInterval x startPos width = (x >= startPos && x <= (startPos+width))
+clickInsideBox mousePos boxPos boxSize = 
+    (inInterval mousePos.x boxPos.x boxSize.width) && (inInterval mousePos.y boxPos.y boxSize.height)
+    
+inInterval x startPos width = 
+    (x >= startPos && x <= (startPos+width))
 
---------------------------------------------------------------------------------------------------
-------          ** EXTERN **            ----------------------------------------------------------  
+instance eqCocoaKey :: Eq CocoaKey where
+  (==) = compareKeys
+  (/=) a b = not (compareKeys a b)
 
---window
+instance eqComponentState :: Eq ComponentState where
+    (==) = compareState
+    (/=) a b = not (compareState a b)
+
 private
-extern initCocoaWindow :: () -> (CocoaRef, Int)
-extern destroyCocoaWindow :: CocoaRef -> ()
-extern windowSetContentView :: CocoaRef -> CocoaRef -> ()  -- external method for changing contentView for a window!
-extern windowSetHidden :: CocoaRef -> ()
-extern windowSetVisible :: CocoaRef -> ()
-extern windowSetSize :: CocoaRef -> Size -> ()
-extern windowSetPosition :: CocoaRef -> Position -> ()
-extern windowSetFocus :: CocoaRef -> CocoaRef -> ()
+
+extern compareKeys  :: CocoaKey -> CocoaKey -> Bool
+extern compareState :: ComponentState -> ComponentState -> Bool
+
+extern initCocoaWindow      :: () -> (CocoaRef, WindowID)
+extern destroyCocoaWindow   :: CocoaRef -> ()
+extern windowSetContentView :: CocoaRef -> CocoaRef -> ()
+extern windowSetHidden      :: CocoaRef -> ()
+extern windowSetVisible     :: CocoaRef -> ()
+extern windowSetSize        :: CocoaRef -> Size -> ()
+extern windowSetPosition    :: CocoaRef -> Position -> ()
+extern windowSetFocus       :: CocoaRef -> CocoaRef -> ()

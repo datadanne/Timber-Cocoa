@@ -9,32 +9,20 @@ struct Button < Component where
 
 --------------------------------------------------------------------------------------------------
 ------          ** BUTTON **            ----------------------------------------------------------
+
 mkCocoaButton env = class
     size := {width=108; height=21}
     title := "Click me!"
     position := {x=0; y=0}
 
-    base = new basicComponent True Nothing "BUTTON"
-    addResponder = base.addResponder
-    setResponders = base.setResponders
-    getResponders = base.getResponders
-    setParent = base.setParent
-    getParent = base.getParent
-    setIsFocusable = base.setIsFocusable
-    getIsFocusable = base.getIsFocusable
-    setName = base.setName
-    getName = base.getName
-    getState = base.getState
-    setState = base.setState
-    getAllComponents = base.getAllComponents
-    respondToInputEvent = base.respondToInputEvent
+    BaseComponent {..} = new basicComponent True Nothing "BUTTON"
     
     -- setTitle
     setTitle s = request
         title := s
         setName s
-        case (<- base.getState) of
-            Active -> _ = buttonSetTitle cocoaRef s
+        case (<- getState) of
+            Active ref -> _ = buttonSetTitle ref s
             _ ->
    
     -- getTitle
@@ -43,8 +31,8 @@ mkCocoaButton env = class
     
     -- setPosition
     setPosition p = request
-        case (<- base.getState) of
-            Active -> _= buttonSetPosition cocoaRef p
+        case (<- getState) of
+            Active ref -> _= buttonSetPosition ref p
             _ -> 
         position := p       
     
@@ -53,26 +41,27 @@ mkCocoaButton env = class
         result position
 
     setSize s = request
-        case (<- base.getState) of
-            Active -> size := buttonSetSize cocoaRef s
+        case (<- getState) of
+            Active ref -> size := buttonSetSize ref s
             _ -> size := s
 
     getSize = request
         result size
         
     destroy = request
-        base.setState Destroyed
+        setState Destroyed
 
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     init app = request
-        base.setState Active
-        cocoaRef := initButton title
-        size := buttonSetSize cocoaRef size
-        _ = buttonSetPosition cocoaRef position
+        ref = initButton title
+        setState (Active ref)
+        size := buttonSetSize ref size
+        _ = buttonSetPosition ref position
 
-    cocoaRef := defaultCocoaRef   
     getCocoaRef = request
-        result cocoaRef 
+        case (<-getState) of
+            Active ref -> result Just ref
+            _ -> result Nothing
         
     this = Button{id_temp=self;..}
 

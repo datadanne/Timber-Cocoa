@@ -3,18 +3,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-/* 
-    Extended version of NSView, adds method for changing background color.
-*/
-@interface CocoaView : NSView {
-@private
-    int r;
-    int g;
-    int b;
-}
--(void) setBackgroundColor:(int) ra:(int) ga:(int) ba;
-@end
-
 Int initContainer_CTContainer(TUP0);
 TUP0 destroyContainer_CTContainer(Int);
 TUP0 containerSetBackgroundColor_CTContainer(Int, Color_CocoaDef);

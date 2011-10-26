@@ -13,14 +13,10 @@ mkCocoaWindow = class
     rootContainer = new mkCocoaContainer
     defaultResponder = new defaultInputResponder this rootContainer
     
-    DefaultEventResponder {respondToInputEvent=respondToInputEventImpl;..} = new basicHasResponders 
+    DefaultEventResponder {setResponders=setRespondersImpl;..} = new basicHasResponders 
     
-    -- return true (block cocoa) if any of the installed responders say so
-    respondToInputEvent inputEvent modifiers = request
-        if not (<-defaultResponder.respondToInputEvent inputEvent modifiers) then
-            result (<-respondToInputEventImpl inputEvent modifiers)
-        else
-            result True
+    setResponders rs = request
+        setRespondersImpl (defaultResponder:rs)
     
     Container {setPosition=dummy1;getPosition=dummy2;setSize=setSizeImpl;..} = rootContainer
     setSize size = request
@@ -53,12 +49,14 @@ mkCocoaWindow = class
 
     isVisible := True
     initWindow app = request
-        if state == Inactive then
-            (ref,id) = initCocoaWindow ()
+        if isInactive state then
+            p = initCocoaWindow ()
+            (ref,id) = p
             state    := Active ref
             windowId := id
             container_ref <- rootContainer.initComp app
             rootContainer.setName "RootContainer"
+            addResponder defaultResponder
             _ = windowSetHidden ref
             _ = windowSetContentView ref container_ref
             _ = windowSetSize ref (<-getSize)        
@@ -136,9 +134,9 @@ defaultInputResponder window rootContainer = class
     focusables := []
     
     respondToInputEvent (KeyEvent keyEventType) modifiers = request
-        currentFocus := <- window.getFocus
+        currentFocus := (<- window.getFocus)
         
-        if ((<- currentFocus.getState) == Destroyed) then
+        if isDestroyed (<- currentFocus.getState) then
             window.setFocus rootContainer
 
         consumed <- currentFocus.respondToInputEvent (KeyEvent keyEventType) modifiers
@@ -159,10 +157,11 @@ defaultInputResponder window rootContainer = class
         
                 scanList focusables findKeyFocus
 
-                if (focusables /= [] && currentFocus == rootContainer) then
+                if (length focusables > 0 && currentFocus == rootContainer) then
                     window.setFocus (head focusables)
 
-        -- TODO: Resolve menu key event capture. No listener if consumed.    
+        -- TODO: Allow menu to consume key events
+        
         result False
 
     respondToInputEvent (MouseEvent me) modifiers = request
@@ -170,15 +169,6 @@ defaultInputResponder window rootContainer = class
         scanList cmps (findMouseFocus me modifiers)
         result (<- rootContainer.respondToInputEvent (MouseEvent me) modifiers)
     
-    scanList [] _ = do 
-        result False 
-    
-    scanList x func = do
-        if (<- func (head x)) then
-            result True
-        else
-            result (<- (scanList (tail x) func))
-        
     foundFocus := False
     findKeyFocus cmp = do
         if (foundFocus) then
@@ -194,9 +184,9 @@ defaultInputResponder window rootContainer = class
 
     findMouseFocus event modifiers cmp = do
         originBottomLeft = getMousePosition event
-        windowSize = <- window.getSize
-        eventPosition = ({x=originBottomLeft.x;y=windowSize.height-originBottomLeft.y})
-        parentPosition <- (getParentPosition cmp)
+        windowSize <- window.getSize
+        eventPosition = ({x=originBottomLeft.x; y=windowSize.height-originBottomLeft.y})
+        parentPosition <- getParentPosition cmp
         relativePosition = getRelativePosition parentPosition eventPosition
 
         -- Construct new event based on local coordinates.
@@ -204,14 +194,23 @@ defaultInputResponder window rootContainer = class
         
         cmpPos <- cmp.getPosition
         cmpSize <- cmp.getSize
-        if (clickInsideBox relativePosition cmpPos cmpSize) then
-            if ( <- cmp.getIsFocusable ) then
+        if clickInsideBox relativePosition cmpPos cmpSize then
+            if (<- cmp.getIsFocusable) then
                 window.setFocus cmp
             result (<- cmp.respondToInputEvent (MouseEvent eventInLocalCoords) modifiers)
         else
             result False
         
     result RespondsToInputEvents {..}
+
+scanList [] _ = do 
+    result False 
+    
+scanList x cmd = do
+    if (<- cmd (head x)) then
+        result True
+    else
+        result (<- (scanList (tail x) cmd))
     
 getParentPosition cmp = do
     parent <- cmp.getParent
@@ -232,15 +231,9 @@ instance eqCocoaKey :: Eq CocoaKey where
   (==) = compareKeys
   (/=) a b = not (compareKeys a b)
 
-instance eqComponentState :: Eq ComponentState where
-    (==) = compareState
-    (/=) a b = not (compareState a b)
-
 private
 
-extern compareKeys  :: CocoaKey -> CocoaKey -> Bool
-extern compareState :: ComponentState -> ComponentState -> Bool
-
+extern compareKeys          :: CocoaKey -> CocoaKey -> Bool
 extern initCocoaWindow      :: () -> (CocoaRef, WindowID)
 extern destroyCocoaWindow   :: CocoaRef -> ()
 extern windowSetContentView :: CocoaRef -> CocoaRef -> ()

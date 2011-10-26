@@ -108,7 +108,7 @@ basicHasResponders :: Class DefaultEventResponder
 basicHasResponders = class
     responders := []
     addResponder a = request
-        responders := a : responders
+        responders := responders ++ [a]
     setResponders aa = request
         responders := aa
     getResponders = request

@@ -34,8 +34,12 @@ struct BaseComponent < IsFocusable, HasSize, HasResponders, RespondsToInputEvent
 
 data ComponentState = Active CocoaRef | Inactive | Destroyed
 
-isActive (Active _) = True
-isActive _          = False
+isActive (Active _)   = True
+isActive _            = False
+isInactive Inactive   = True
+isInactive _          = False
+isDestroyed Destroyed = True
+isDestroyed _         = False
 
 instance eqComponent :: Eq Component where
     (==) a b = a.id == b.id

@@ -1,11 +1,9 @@
 #include "CTWindow.extern.h"
 #import "CTWindow.extern.m"
 
-extern pthread_mutex_t rts;
-extern int rootsDirty;
-
-InputEvent_CocoaDef receivedEvent;
-pthread_mutex_t eventMutex;
+Bool compareKeys_CTWindow(CocoaKey_CocoaDef aKey, CocoaKey_CocoaDef anotherKey) {
+    return ((int)aKey == (int)anotherKey);
+}
 
 @interface NSEvent (DeviceDelta)
   - (float)deviceDeltaX;
@@ -13,126 +11,123 @@ pthread_mutex_t eventMutex;
 @end
 
 bool dispatchEventToTimber(NSEvent* event) { 
+    InputEvent_CocoaDef receivedEvent; //should be global if has to be a root for GC
     
-    
-	/* figure out event
-		flag 0,1,2 0 = windowEvent, etc. */
-	if ([event type] == NSLeftMouseDown || [event type] == NSLeftMouseDragged) {
-        Position_CocoaDef x_5110 = NULL;
-	    NEW (Position_CocoaDef, x_5110, WORDS(sizeof(struct Position_CocoaDef)));
-
-	    x_5110->GCINFO = __GC__Position_CocoaDef;
+	if ([event type] == NSLeftMouseDown) {
+        Position_CocoaDef pos;
+	    NEW (Position_CocoaDef, pos, WORDS(sizeof(struct Position_CocoaDef)));
+	    pos->GCINFO = __GC__Position_CocoaDef;
 		NSPoint p = [event locationInWindow];
-	    x_5110->x_CocoaDef = p.x;
-		x_5110->y_CocoaDef = p.y;
+	    pos->x_CocoaDef = p.x;
+		pos->y_CocoaDef = p.y;
 		
 		DEBUG("C detects mouse at %f , %f", p.x, p.y);
 		
-	    _MouseClicked_CocoaDef x_5111;
-	    NEW (_MouseClicked_CocoaDef, x_5111, WORDS(sizeof(struct _MouseClicked_CocoaDef)));
-	    x_5111->GCINFO = __GC___MouseClicked_CocoaDef;
-	    x_5111->Tag = 3;
-	    x_5111->a = x_5110;
+	    _MouseClicked_CocoaDef clicked;
+	    NEW (_MouseClicked_CocoaDef, clicked, WORDS(sizeof(struct _MouseClicked_CocoaDef)));
+	    clicked->GCINFO = __GC___MouseClicked_CocoaDef;
+	    clicked->Tag = 3;
+	    clicked->a = pos;
 	   
 	    NEW (InputEvent_CocoaDef, receivedEvent, WORDS(sizeof(struct _MouseEvent_CocoaDef)));
 	    ((_MouseEvent_CocoaDef)receivedEvent)->GCINFO = __GC___MouseEvent_CocoaDef;
 	    ((_MouseEvent_CocoaDef)receivedEvent)->Tag = 1;
-	    ((_MouseEvent_CocoaDef)receivedEvent)->a = (MouseEventType_CocoaDef)x_5111;
+	    ((_MouseEvent_CocoaDef)receivedEvent)->a = (MouseEventType_CocoaDef)clicked;
 		
 		DEBUG("Event is to be sent for window nr %d", [event windowNumber]);
+		
 	} else if ([event type] == NSKeyUp || [event type] == NSFlagsChanged) {
-	    _KeyReleased_CocoaDef x_1652;
-        NEW (_KeyReleased_CocoaDef, x_1652, WORDS(sizeof(struct _KeyReleased_CocoaDef)));
-        x_1652->GCINFO = __GC___KeyReleased_CocoaDef;
-        x_1652->Tag = 0;
+	    _KeyReleased_CocoaDef released;
+        NEW (_KeyReleased_CocoaDef, released, WORDS(sizeof(struct _KeyReleased_CocoaDef)));
+        released->GCINFO = __GC___KeyReleased_CocoaDef;
+        released->Tag = 0;
+        released->a = (CocoaKey_CocoaDef)(POLY)(126 - [event keyCode]);
 
         DEBUG("KEY CODE %d\n", [event keyCode]);
 
-        x_1652->a = (CocoaKey_CocoaDef)(POLY)(126 - [event keyCode]);
-                
         NEW (InputEvent_CocoaDef, receivedEvent, WORDS(sizeof(struct _KeyEvent_CocoaDef)));
         ((_KeyEvent_CocoaDef)receivedEvent)->GCINFO = __GC___KeyEvent_CocoaDef;
         ((_KeyEvent_CocoaDef)receivedEvent)->Tag = 0;
-        ((_KeyEvent_CocoaDef)receivedEvent)->a = (KeyEventType_COCOA)x_1652;
+        ((_KeyEvent_CocoaDef)receivedEvent)->a = (KeyEventType_CocoaDef)released;
 
 	} else if ([event type] == NSKeyDown || [event type] == NSFlagsChanged) {
-		    _KeyPressed_CocoaDef x_1652;
-	        NEW (_KeyPressed_CocoaDef, x_1652, WORDS(sizeof(struct _KeyPressed_CocoaDef)));
-	        x_1652->GCINFO = __GC___KeyPressed_CocoaDef;
-	        x_1652->Tag = 1;
+		_KeyPressed_CocoaDef pressed;
+	    NEW (_KeyPressed_CocoaDef, pressed, WORDS(sizeof(struct _KeyPressed_CocoaDef)));
+	    pressed->GCINFO = __GC___KeyPressed_CocoaDef;
+	    pressed->Tag = 1;
+        pressed->a = (CocoaKey_CocoaDef)(POLY)(126 - [event keyCode]);
+        
+	    DEBUG("KEY CODE %d\n", [event keyCode]);
 
-	        DEBUG("KEY CODE %d\n", [event keyCode]);
-
-	        x_1652->a = (CocoaKey_CocoaDef)(POLY)(126 - [event keyCode]);
-
-	        NEW (InputEvent_CocoaDef, receivedEvent, WORDS(sizeof(struct _KeyEvent_CocoaDef)));
-	        ((_KeyEvent_CocoaDef)receivedEvent)->GCINFO = __GC___KeyEvent_CocoaDef;
-	        ((_KeyEvent_CocoaDef)receivedEvent)->Tag = 0;
-	        ((_KeyEvent_CocoaDef)receivedEvent)->a = (KeyEventType_COCOA)x_1652;
+	    NEW (InputEvent_CocoaDef, receivedEvent, WORDS(sizeof(struct _KeyEvent_CocoaDef)));
+	    ((_KeyEvent_CocoaDef)receivedEvent)->GCINFO = __GC___KeyEvent_CocoaDef;
+	    ((_KeyEvent_CocoaDef)receivedEvent)->Tag = 0;
+        ((_KeyEvent_CocoaDef)receivedEvent)->a = (KeyEventType_CocoaDef)pressed;
 
 	} else if ([event type] == NSScrollWheel) {
-  	    NSLog(@"Scroll Event: %@", event);
 
         DEBUG("Scrolling event! \n");            
-        //    printf("deltaX: %f \n", [event deltaX]);
-        //    printf("deltaY: %f \n", [event deltaX]);
-        // 
-        //    printf("hasPreciseScrollingDeltas: %d \n", [event hasPreciseScrollingDeltas]);
-        //    printf("scrollingDeltaX: %f \n", [event scrollingDeltaX]);
-        //    printf("scrollingDeltaY: %f \n", [event scrollingDeltaY]);                                   
-        //    printf("isDirectionIntevertedFromDevice: %d", [event isDirectionInvertedFromDevice]);  
 
    		NSPoint p = [event locationInWindow];
 
-        Position_CocoaDef x_1073;
-        NEW(Position_CocoaDef, x_1073, WORDS(sizeof(struct Position_CocoaDef)));
-        x_1073->GCINFO = __GC__Position_CocoaDef;
-        x_1073->x_CocoaDef = p.x;
-        x_1073->y_CocoaDef = p.y;
+        Position_CocoaDef position;
+        NEW(Position_CocoaDef, position, WORDS(sizeof(struct Position_CocoaDef)));
+        position->GCINFO = __GC__Position_CocoaDef;
+        position->x_CocoaDef = p.x;
+        position->y_CocoaDef = p.y;
         
-        _MouseWheelScroll_CocoaDef x_1074;
-        NEW (_MouseWheelScroll_CocoaDef, x_1074, WORDS(sizeof(struct _MouseWheelScroll_CocoaDef)));
-        x_1074->GCINFO = __GC___MouseWheelScroll_CocoaDef;
-        x_1074->Tag = 4;
-        x_1074->a = x_1073;
+        _MouseWheelScroll_CocoaDef scroll;
+        NEW (_MouseWheelScroll_CocoaDef, scroll, WORDS(sizeof(struct _MouseWheelScroll_CocoaDef)));
+        scroll->GCINFO = __GC___MouseWheelScroll_CocoaDef;
+        scroll->Tag = 4;
+        scroll->a = position;
 
         float deltaX = -1 * [event deviceDeltaX];
         float deltaY = -1 * [event deviceDeltaY];
 
 #if _ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED_ >= 1070
-            if ([event hasPreciseScrollingDeltas]) {
-                deltaX = [event scrollingDeltaX];
-                deltaY = [event scrollingDeltaY];
-            }
 
-            if ([event isDirectionInvertedFromDevice]) {
-                deltaX *= -1;
-                deltaY *= -1;
-            }
+        if ([event hasPreciseScrollingDeltas]) {
+            deltaX = [event scrollingDeltaX];
+            deltaY = [event scrollingDeltaY];
+        }
+        if ([event isDirectionInvertedFromDevice]) {
+            deltaX *= -1;
+            deltaY *= -1;
+        }
+
 #endif
-        x_1074->b = deltaX;
-        x_1074->c = deltaY;
 
-        //InputEvent_CocoaDef test_12;
+        scroll->b = deltaX;
+        scroll->c = deltaY;
+
         NEW (InputEvent_CocoaDef, receivedEvent, WORDS(sizeof(struct _MouseEvent_CocoaDef)));
         ((_MouseEvent_CocoaDef)receivedEvent)->GCINFO = __GC___MouseEvent_CocoaDef;
         ((_MouseEvent_CocoaDef)receivedEvent)->Tag = 1;
-        ((_MouseEvent_CocoaDef)receivedEvent)->a = (MouseEventType_CocoaDef)x_1074;     
+        ((_MouseEvent_CocoaDef)receivedEvent)->a = (MouseEventType_CocoaDef)scroll;     
 
     	App_CocoaDef app = getApp();
-        app->l_App_CocoaDef_AppImpl_COCOA_COCOA->sendInputEvent_CocoaDef(app->l_App_CocoaDef_AppImpl_COCOA_COCOA, 
-			(InputEvent_CocoaDef)receivedEvent, [event windowNumber], 0);      
+        app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef->sendInputEvent_CocoaDef(
+            app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef, 
+			(InputEvent_CocoaDef)receivedEvent, [event windowNumber], 0);
+			      
         return true;
+        
 	} else {
-        printf("Event of type %d was discarded\n", [event type]);
+	    
+        // printf("Event of type %d was discarded\n", [event type]);
         return false;
+        
     }
 
 	App_CocoaDef app = getApp();    
-    return app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef->sendInputEvent_CocoaDef(app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef, (InputEvent_CocoaDef)receivedEvent, [event windowNumber], 0);
+    return app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef->sendInputEvent_CocoaDef(
+        app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef, (InputEvent_CocoaDef)receivedEvent, 
+        [event windowNumber], 0);
 }
 
 // --------- Window ----------------------------------------------
+/*
 void scanEventReceived() {
 	DISABLE(rts);
 	if(receivedEvent)
@@ -141,6 +136,8 @@ void scanEventReceived() {
 }
 
 struct Scanner eventScanner = {scanEventReceived, NULL};
+*/
+
 static WindowDelegate *delegate;
 
 TUP2 initCocoaWindow_CTWindow(TUP0 dummy) {   
@@ -152,7 +149,8 @@ TUP2 initCocoaWindow_CTWindow(TUP0 dummy) {
     	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
         NSRect frameRect = NSMakeRect(0, [[[NSScreen screens] objectAtIndex: 0] frame].size.height, 1, 1);
         NSUInteger styleMask = (NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask);
-        window = [[CocoaWindow alloc] initWithContentRect:frameRect styleMask:styleMask  backing:NSBackingStoreBuffered defer:NO]; 
+        window = [[CocoaWindow alloc] initWithContentRect:frameRect styleMask:styleMask  
+            backing:NSBackingStoreBuffered defer:NO]; 
         [window setTitle:@"CocoaWindow"];
         [window setEventDispatcher:dispatchEventToTimber];
 
@@ -168,68 +166,78 @@ TUP2 initCocoaWindow_CTWindow(TUP0 dummy) {
     NEW (TUP2, initResult, WORDS(sizeof(struct TUP2)));
     initResult->GCINFO = __GC__TUP2+((5 * (((BITS32)1 | (BITS32)2))));
     initResult->a = (POLY)window;
-    initResult->b = (POLY)([window windowNumber]-1); // -1 needed from conversion? No?
+    initResult->b = (POLY)([window windowNumber]);
     return initResult;
 }
 
 TUP0 destroyCocoaWindow_CTWindow(Int cocoaRef) {
-    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
     dispatch_async(dispatch_get_main_queue(), ^{
-    
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
 	    [thisWindow close];
 	    [pool drain];
-        });
+    });
 }
 
 TUP0 windowSetContentView_CTWindow(Int windowRef, Int cmpRef) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    CocoaWindow *wnd = (CocoaWindow*) windowRef;
-    CocoaView *view = (CocoaView*) cmpRef;                                                  
-	[wnd setContentView: view];
-	[pool release];
+    dispatch_async(dispatch_get_main_queue(), ^{   
+	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];  
+        CocoaWindow *wnd = (CocoaWindow*) windowRef;
+        NSView *view = (NSView*) cmpRef;                                             
+	    [wnd setContentView: view];
+	    [pool release];
+    });
 }
 
 TUP0 windowSetVisible_CTWindow(Int cocoaRef) {  
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
-	[thisWindow orderFront: NULL];
-	[pool drain];
+    dispatch_async(dispatch_get_main_queue(), ^{ 
+	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
+	    [thisWindow orderFront: NULL];
+	    [pool drain];
+    });
 }
 
 TUP0 windowSetHidden_CTWindow(Int cocoaRef) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
-	[thisWindow orderOut: NULL];
-	[pool drain];
+    dispatch_async(dispatch_get_main_queue(), ^{ 
+	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
+	    [thisWindow orderOut: NULL];
+	    [pool drain];
+    });
 }
 
 TUP0 windowSetFocus_CTWindow(Int cocoaRef, Int cmpRef) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
-    NSView *responder = (NSView*) cmpRef;
-	[thisWindow makeFirstResponder: responder];
-	[pool drain];
+    dispatch_async(dispatch_get_main_queue(), ^{ 
+	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
+        NSView *responder = (NSView*) cmpRef;
+	    [thisWindow makeFirstResponder: responder];
+	    [pool drain];
+    });
 }
 
 TUP0 windowSetSize_CTWindow (Int cocoaRef, Size_CocoaDef size) {
-    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;    int width = size->width_CocoaDef;
+    // TODO: can this be moved inside the async block?
+    int width = size->width_CocoaDef;
     int height = size->height_CocoaDef;
 
 	dispatch_async(dispatch_get_main_queue(), ^{
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
 	    [thisWindow setContentSize: NSMakeSize(width, height)];
 		[pool drain];
     });
 }
 
 TUP0 windowSetPosition_CTWindow (Int cocoaRef, Position_CocoaDef pos) {
-    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
+    // TODO: can this be moved inside the async block?    
     int y = pos->y_CocoaDef;
     int x = pos->x_CocoaDef;
     
 	dispatch_async(dispatch_get_main_queue(), ^{
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
 		int screenHeight = [[[NSScreen screens] objectAtIndex: 0] frame].size.height;
 		int windowHeight = [thisWindow frame].size.height;
 		int newY = screenHeight - y - windowHeight;
@@ -240,9 +248,10 @@ TUP0 windowSetPosition_CTWindow (Int cocoaRef, Position_CocoaDef pos) {
 }
 
 void _init_external_CTWindow(void) {
-	pthread_mutex_init(&eventMutex, &glob_mutexattr);
+/*
     DISABLE(rts);
 	addRootScanner(&eventScanner);
 	rootsDirty = 1;
 	ENABLE(rts);
+*/
 }

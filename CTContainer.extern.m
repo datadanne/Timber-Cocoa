@@ -1,7 +1,13 @@
+// ------------- CocoaView ----------------------------               
+@interface CocoaView : NSView {
+@private
+    int r;
+    int g;
+    int b;
+}
+-(void) setBackgroundColor:(int) ra:(int) ga:(int) ba;
+@end
 
-/* 
-    ------------- CocoaView ----------------------------       
-*/        
 @implementation CocoaView
 - (BOOL)isFlipped {
     return YES;

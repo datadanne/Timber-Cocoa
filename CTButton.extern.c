@@ -9,6 +9,7 @@ TUP0 buttonSetTitle_CTButton(Int cocoaRef, LIST s) {
 	[thisButton sizeToFit]; //setNeedsDisplay???
 	[pool drain];
 } 
+
 TUP0 buttonSetPosition_CTButton(Int cocoaRef, Position_CocoaDef pos) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	NSButton *thisButton = (NSButton*) cocoaRef;

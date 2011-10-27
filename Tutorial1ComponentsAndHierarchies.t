@@ -8,7 +8,7 @@ root w = class
     env = new posix w
     osx = new cocoa w
     
-    w1 = new mkCocoaWindow env
+    w1 = new mkCocoaWindow
     
     applicationDidFinishLaunching app = action                         
         w1.setSize ({width=400; height=400})    
@@ -17,19 +17,18 @@ root w = class
         createComponentHierarchy
         
         app.addWindow w1
-        
         addButtonResponder
            
     label = new mkCocoaLabel
     button = new mkCocoaButton env
     
     createComponentHierarchy = do
-        leftContainer = new mkCocoaContainer env 
+        leftContainer = new mkCocoaContainer
         leftContainer.setSize ({width=200; height=200})
         leftContainer.setBackgroundColor ({r=100; b=0; g=0})
         leftContainer.setPosition ({x=0;y=0})
 
-        rightContainer = new mkCocoaContainer env
+        rightContainer = new mkCocoaContainer
         rightContainer.setSize ({width=200; height=200})
         rightContainer.setBackgroundColor ({r=0; b=100; g=0})
         rightContainer.setPosition ({x=200; y=0})    
@@ -50,13 +49,13 @@ root w = class
         w1.addComponent rightContainer
 
     addButtonResponder = do
-        handler = new buttonHandler label
+        handler = new buttonHandler label env
         button.addResponder handler
 
     result action
         osx.startApplication applicationDidFinishLaunching  
         
-buttonHandler label = class
+buttonHandler label env = class
     clickCount := 0
 
     respondToInputEvent (MouseEvent event) modifiers = request
@@ -66,9 +65,23 @@ buttonHandler label = class
                 clickCount := clickCount + 1
                 label.setText ("Click #" ++ show clickCount)
                 result True
+            MousePressed pos ->
+                env.stdout.write "Mouse PressEvent Received\n"
+                result True
+            MouseReleased pos -> 
+                env.stdout.write "REALESED\n"
+                result True
+
+            MouseMoved pos ->
+                env.stdout.write "mousemoved\n"
+                result True
+            MouseWheelScroll pos x y -> 
+                env.stdout.write "hello\n"
+                result True
             _ ->
+                env.stdout.write "Mouse Event Received\n"
                 result False     
-        
+
     respondToInputEvent _ modifiers = request
         result False
 

@@ -1,4 +1,4 @@
-module ScrollTest where
+module TestScrolling where
 
 import POSIX
 import COCOA
@@ -8,12 +8,11 @@ root w = class
     env = new posix w
     osx = new cocoa w
 
-    w1 = new mkCocoaWindow env
-    textA = new mkCocoaTextArea env
+    w1 = new mkCocoaWindow
+    textA = new mkCocoaTextArea
     
     applicationDidFinishLaunching app = action                         
         app.addWindow w1
-        app.setEnv env
         env.stdout.write "Step 3\n"
         
     

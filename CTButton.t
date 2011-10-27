@@ -1,6 +1,6 @@
 module CTButton where
 
-import CTCommon   
+import COCOA   
 import POSIX
 
 struct Button < Component where
@@ -11,12 +11,11 @@ struct Button < Component where
 ------          ** BUTTON **            ----------------------------------------------------------
 
 mkCocoaButton env = class
-    size := {width=108; height=21}
     title := "Click me!"
-    position := {x=0; y=0}
-
-    BaseComponent {..} = new basicComponent True Nothing "BUTTON"
+    defaultSize= {width=108; height=21}
     
+    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl..} = new basicComponent True Nothing "BUTTON"
+
     -- setTitle
     setTitle s = request
         title := s
@@ -34,43 +33,29 @@ mkCocoaButton env = class
         case (<- getState) of
             Active ref -> _= buttonSetPosition ref p
             _ -> 
-        position := p       
-    
-    -- getPosition  
-    getPosition = request
-        result position
+        setPositionImpl p
 
     setSize s = request
-        case (<- getState) of
-            Active ref -> size := buttonSetSize ref s
-            _ -> size := s
+        setSizeImpl = case (<- getState) of
+            Active ref -> (buttonSetSize ref s)
+            _ -> s
 
-    getSize = request
-        result size
-        
-    destroy = request
+    destroyComp = request
         setState Destroyed
 
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
-    init app = request
+    initComp app = request
         ref = initButton title
         setState (Active ref)
-        size := buttonSetSize ref size
-        _ = buttonSetPosition ref position
+        setSizeImpl (buttonSetSize ref (<- getSize))
+        _ = buttonSetPosition ref (<- getPosition)
+        result ref
 
-    getCocoaRef = request
-        case (<-getState) of
-            Active ref -> result Just ref
-            _ -> result Nothing
-        
-    this = Button{id_temp=self;..}
+
+    this = Button{id = self;..}
 
     result this
 
---------------------------------------------------------------------------------------------------
-------          ** EXTERN **            ----------------------------------------------------------  
-
---button     
 private 
 extern initButton :: String -> CocoaRef
 extern buttonSetTitle :: CocoaRef -> String -> ()

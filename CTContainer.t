@@ -1,18 +1,16 @@
 module CTContainer where
 
 import CocoaDef
-
+import POSIX
 --------------------------------------------------------------------------------------------------
 ------          ** CONTAINER **         ----------------------------------------------------------
-
-mkCocoaContainer :: Class Container
 mkCocoaContainer = class
     myComponents := []    
     color        := {r=255; g=255; b=255}
     appRef       := Nothing
     state        := Inactive
 
-    BaseComponent {setPosition = setPositionImpl; setSize = setSizeImpl; ..} = 
+    BaseComponent {getAllChildren=getAllChildrenImpl;setPosition = setPositionImpl; setSize = setSizeImpl; ..} = 
         new basicComponent False Nothing "Container"
 
     setPosition p = request
@@ -72,10 +70,13 @@ mkCocoaContainer = class
         result myComponents
 
     -- TODO: test that it actually works!
+    -- Note: The shorter version created [[Component]] rather than [Component]
+    cs := []
     getAllChildren = request
-        cs <- forall c <- myComponents do
+        cs := []
+        forall c <- myComponents do
             list <- c.getAllChildren
-            result list ++ [c] -- order is important here (for reactions to mouse events)
+            cs := cs ++ list ++ [c] -- order is important here (for reactions to mouse events)
         result cs
     
     destroyComp = request
@@ -130,8 +131,9 @@ basicComponent f p n = class
     (getParent,setParentImpl)       = new wrapper p
     setParent p = request setParentImpl (Just p)
     (getIsFocusable,setIsFocusable) = new wrapper f
+    (getState, setState)            = new wrapper Inactive
     (getPosition,setPosition)       = new wrapper ({x=0; y=0})
-    (getSize,setSize)               = new wrapper ({width=100; height=100})    
+    (getSize,setSize)               = new wrapper ({width=100; height=100})
     getAllChildren                  = request result []
     result BaseComponent {..}
 

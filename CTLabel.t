@@ -1,35 +1,21 @@
 module CTLabel where
             
-import CTCommon
+import COCOA
 
 struct Label < Component, HasText where
     setTextColor :: Color -> Request ()
     getTextColor :: Request Color
 
 mkCocoaLabel = class
-    size := {width=0; height=0}
     textColor := {r=0;g=0;b=0}
     text := "Default Label"
 
-    base = new basicComponent False Nothing "Label"
-    addResponder = base.addResponder
-    setResponders = base.setResponders
-    getResponders = base.getResponders
-    setParent = base.setParent
-    getParent = base.getParent
-    setIsFocusable = base.setIsFocusable
-    getIsFocusable = base.getIsFocusable
-    setName = base.setName
-    getName = base.getName
-    getState = base.getState
-    setState = base.setState
-    getAllComponents = base.getAllComponents
-    respondToInputEvent = base.respondToInputEvent
+    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl..} = new basicComponent True Nothing "Label"
 
     setText s = request
         text := s
-        case (<- base.getState) of
-            Active -> _= labelSetText cocoaRef s
+        case (<- getState) of
+            Active ref -> _= labelSetText ref s
             _ ->
 
     getText = request
@@ -39,8 +25,8 @@ mkCocoaLabel = class
         text := text ++ s
     
     setTextColor c = request
-        case (<- base.getState) of
-            Active -> _= labelSetTextColor cocoaRef c
+        case (<- getState) of
+            Active ref -> _= labelSetTextColor ref c
             _ ->
         textColor := c
     
@@ -48,39 +34,32 @@ mkCocoaLabel = class
         result textColor
     
     setPosition p = request  
-        case (<- base.getState) of
-            Active -> _= labelSetPosition cocoaRef p
+        case (<- getState) of
+            Active ref-> _= labelSetPosition ref p
             _ ->
-        base.setPosition p  
-    
-    getPosition = base.getPosition
+        setPositionImpl p  
 
     setSize s = request
-        size := s
-
-    getSize = request
-        result size
+        case (<- getState) of
+            Active ref -> _= labelSetSize ref s
+            _ ->
+        setSizeImpl s
         
-    destroy = request
-        base.setState Destroyed
+    destroyComp = request
+        setState Destroyed
                             
     -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
-    init app = request
-            base.setState Active
-            cocoaRef := initLabel ()
-            inithelper
-    
-    inithelper = do
-        _= labelSetText cocoaRef text
-        _= labelSetPosition cocoaRef (<- base.getPosition)
-        _= labelSetSize cocoaRef size  
-        _= labelSetTextColor cocoaRef textColor
+    initComp app = request
+            ref = initLabel ()
+            setState (Active ref)
+            _= labelSetText ref text
+            _= labelSetPosition ref (<- getPosition)
+            _= labelSetSize ref (<- getSize)
+            _= labelSetTextColor ref textColor
+            result ref
 
-    cocoaRef := defaultCocoaRef   
-    getCocoaRef = request
-        result cocoaRef 
         
-    this = Label{id_temp=self;..}
+    this = Label{id=self;..}
 
     result this  
 

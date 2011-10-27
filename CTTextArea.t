@@ -1,35 +1,22 @@
 module CTTextArea where
 
-import CTCommon   
-import POSIX
+import COCOA
 
 struct TextArea < Component, HasText, IsScrollable
     
 
 --------------------------------------------------------------------------------------------------
 ------          ** TextArea **            ----------------------------------------------------------
-mkCocoaTextArea env = class
-    size := {width=200; height=17}
+mkCocoaTextArea = class
     text := ""
-    position := {x=0; y=0}
     
-    dts = new defaultTextScrollResponder this env
-    base = new basicComponent True Nothing "TEXT_AREA"
-    addResponder = base.addResponder
+    dts = new defaultTextScrollResponder this
+    --base = new basicComponent True Nothing "TEXT_AREA"
+    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl;setResponders=setRespondersImpl..} = new basicComponent True Nothing "TextArea"
+
     setResponders :: [RespondsToInputEvents] -> Request ()
     setResponders rs = request
-        base.setResponders (dts:rs)
-    getResponders = base.getResponders
-    setParent = base.setParent
-    getParent = base.getParent
-    setIsFocusable = base.setIsFocusable
-    getIsFocusable = base.getIsFocusable
-    setName = base.setName
-    getName = base.getName
-    getState = base.getState
-    setState = base.setState
-    getAllComponents = base.getAllComponents
-    respondToInputEvent = base.respondToInputEvent
+        setRespondersImpl (dts:rs)
 
     scrollable := (False, True)
     getScrollable = request
@@ -37,11 +24,11 @@ mkCocoaTextArea env = class
     
     setScrollable s = request
         scrollable := s
-        case (<- base.getState) of  
-            Active -> 
+        case (<- getState) of  
+            (Active ref) -> 
                       (hoz,vert) = s
-                      _= textAreaSetHorizontalScroll cocoaRef hoz
-                      _= textAreaSetVerticalScroll cocoaRef vert
+                      _= textAreaSetHorizontalScroll ref hoz
+                      _= textAreaSetVerticalScroll ref vert
             _ -> 
 
     appendText s = request
@@ -49,9 +36,8 @@ mkCocoaTextArea env = class
         
     setText s = request
         text := s
-        setName s
-        case (<- base.getState) of
-            Active -> _= textAreaSetText cocoaRef s
+        case (<- getState) of
+            (Active ref) -> _= textAreaSetText ref s
             _ ->
    
     getText = request
@@ -59,67 +45,53 @@ mkCocoaTextArea env = class
     
     -- setPosition
     setPosition p = request
-        case (<- base.getState) of
-            Active -> _= textAreaSetPosition cocoaRef p
+        case (<- getState) of
+            (Active ref) -> _= textAreaSetPosition ref p
             _ -> 
-        position := p       
-    
-    -- getPosition  
-    getPosition = request
-        result position
+        setPositionImpl p
 
     setSize s = request
-        case (<- base.getState) of
-            Active -> _= textAreaSetSize cocoaRef s
+        case (<- getState) of
+            (Active ref) -> _= textAreaSetSize ref s
             _ -> 
-        
-        size := s
+        setSizeImpl s
 
-    getSize = request
-        result size
-        
-    destroy = request
-        base.setState Destroyed
+    destroyComp = request
+        setState Destroyed
 
     -- undocumented feature in Timber, init must be placed above 'this' else we have some nice raise(2); :-)
-    init app = request
-            base.setState Active
-            cocoaRef := initTextArea ()
-            
-            inithelper
-    
-    inithelper = do
-        _= textAreaSetText cocoaRef text
-        _= textAreaSetPosition cocoaRef position
-        _= textAreaSetSize cocoaRef size
+    initComp app = request
+        ref = initTextArea ()
+        setState (Active ref)
+        
+        _= textAreaSetText ref text
+        _= textAreaSetPosition ref (<- getPosition)
+        _= textAreaSetSize ref (<- getSize)
 
         (hoz,vert) = scrollable
-        _= textAreaSetHorizontalScroll cocoaRef hoz
-        _= textAreaSetVerticalScroll cocoaRef vert
+        _= textAreaSetHorizontalScroll ref hoz
+        _= textAreaSetVerticalScroll ref vert
        
         addResponder dts
+        result ref
         
-    cocoaRef := defaultCocoaRef   
-    getCocoaRef = request
-        result cocoaRef 
-        
-    this = TextArea{id_temp=self;..}
+    this = TextArea{id=self;..}
 
     result this
 
-defaultTextScrollResponder textArea env = class
+defaultTextScrollResponder textArea = class
     scrolledState := (1.0, 1.0)
     
     scrollTo deltaX deltaY = do
-        env.stdout.write ("deltaY: " ++ (show deltaY) ++ ", deltaX: " ++ (show deltaX))
         scrolledState := (deltaX, deltaY)
-        _= textAreaScrollTo (<-textArea.getCocoaRef) deltaX deltaY
+        case (<-textArea.getState) of
+            (Active ref) -> _= textAreaScrollTo ref deltaX deltaY
+            _ ->
     
     respondToInputEvent (MouseEvent t) modifiers = request
         case t of
             MouseMoved pos ->
             MouseWheelScroll pos deltaX deltaY -> 
-                env.stdout.write ("pos: " ++ (show deltaX) ++ "," ++ (show deltaY) ++ "\n")
                 scrollTo deltaX deltaY
             _ ->                    
             

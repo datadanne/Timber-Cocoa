@@ -8,8 +8,8 @@ root w = class
     env = new dummyPosix w
     osx = new cocoa w
 
-    w1 = new mkCocoaWindow env
-    c2 = new mkCocoaContainer env
+    w1 = new mkCocoaWindow
+    c2 = new mkCocoaContainer
     label = new mkCocoaLabel
     
     posget (MousePressed p) = p

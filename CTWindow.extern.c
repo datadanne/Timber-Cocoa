@@ -26,7 +26,7 @@ bool dispatchEventToTimber(NSEvent* event) {
 	    _MouseClicked_CocoaDef clicked;
 	    NEW (_MouseClicked_CocoaDef, clicked, WORDS(sizeof(struct _MouseClicked_CocoaDef)));
 	    clicked->GCINFO = __GC___MouseClicked_CocoaDef;
-	    clicked->Tag = 3;
+	    clicked->Tag = 2;
 	    clicked->a = pos;
 	   
 	    NEW (InputEvent_CocoaDef, receivedEvent, WORDS(sizeof(struct _MouseEvent_CocoaDef)));

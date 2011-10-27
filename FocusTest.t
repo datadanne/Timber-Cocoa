@@ -7,10 +7,10 @@ root w = class
     env = new posix w
     osx = new cocoa w
 
-    w1 = new mkCocoaWindow env
-    c2 = new mkCocoaContainer env
+    w1 = new mkCocoaWindow
+    c2 = new mkCocoaContainer
     button = new mkCocoaButton env
-    buttonOverlay = new mkCocoaContainer env
+    buttonOverlay = new mkCocoaContainer
     button2 = new mkCocoaButton env
     inputField = new mkCocoaTextField env
     dropDown = new mkCocoaDropDown env
@@ -53,7 +53,7 @@ root w = class
         after (sec 13) send action
             button3 = new mkCocoaButton env
             button3.setTitle "Three?"
-            c3 = new mkCocoaContainer env
+            c3 = new mkCocoaContainer
             c3.addComponent button3
             c3.setSize ({width=180;height=50})
             c3.setName "Container:C3"

@@ -11,7 +11,7 @@ struct AppImpl where
     sendWindowResize        :: Size -> WindowID -> Request ()
     sendWindowCloseRequest  :: WindowID -> Request Bool       
 
-struct CocoaWindow < RespondsToWindowEvents, RespondsToInputEvents, HasSize, HasBackgroundColor, ContainsComponents, HasResponders where 
+struct CocoaWindow < HasWindowResponder, RespondsToWindowEvents, RespondsToInputEvents, HasSize, HasBackgroundColor, ContainsComponents, HasResponders where 
     getId         :: Request WindowID
     initWindow    :: App -> Request ()
     destroyWindow :: Request ()
@@ -22,7 +22,6 @@ struct CocoaWindow < RespondsToWindowEvents, RespondsToInputEvents, HasSize, Has
 struct Component < BaseComponent where 
     initComp    :: App -> Request CocoaRef
     destroyComp :: Request ()
-    getState    :: Request ComponentState
     id          :: OID
 
 struct BaseComponent < IsFocusable, HasSize, HasResponders, RespondsToInputEvents where
@@ -31,6 +30,8 @@ struct BaseComponent < IsFocusable, HasSize, HasResponders, RespondsToInputEvent
     setParent :: Component -> Request ()
     getParent :: Request (Maybe Component)
     getAllChildren :: Request [Component]
+    setState    :: ComponentState -> Request ()
+    getState    :: Request ComponentState
 
 data ComponentState = Active CocoaRef | Inactive | Destroyed
 

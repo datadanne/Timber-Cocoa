@@ -9,8 +9,8 @@ root w = class
     env = new posix w
     osx = new cocoa w
     
-    w1 = new mkCocoaWindow env
-    colorWindow = new mkCocoaWindow env
+    w1 = new mkCocoaWindow
+    colorWindow = new mkCocoaWindow
     
     applicationDidFinishLaunching app = action
         w1.setSize ({width=400;height=400}) 
@@ -28,8 +28,8 @@ root w = class
     label = new mkCocoaLabel
     tabCountLabel = new mkCocoaLabel
     button = new mkCocoaButton env
-    leftContainer = new mkCocoaContainer env 
-    rightContainer = new mkCocoaContainer env
+    leftContainer = new mkCocoaContainer 
+    rightContainer = new mkCocoaContainer
     
     createComponentHierarchy = do
         leftContainer.setSize ({width=200; height=200})
@@ -64,7 +64,7 @@ root w = class
         handler = new buttonHandler label
         button.addResponder handler
 
-    ta = new mkCocoaTextArea env
+    ta = new mkCocoaTextArea
 
     addWindowResponder = do
         ta.setSize ({width=300; height=80})
@@ -160,9 +160,8 @@ myTabResponder label = class
     getKey (KeyReleased key) = key
     getKey _ = raise 9
 
-    respondToInputEvent (KeyEvent keyEventType) modifiers = request	
-        theKey = getKey keyEventType
-        if (theKey == Tab) then
+    respondToInputEvent (KeyEvent (KeyPressed key)) modifiers = request	
+        if (key == Tab) then
             tabCount := tabCount + 1
             label.setText ("Tabs blocked #" ++ (show tabCount))
         result True

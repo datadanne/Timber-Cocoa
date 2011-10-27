@@ -5,42 +5,13 @@ import CTLabel
 import CTContainer  -- but still, removing this causes compiler panic
 
 mkPaintBackdrop env = class
-    base = new mkCocoaContainer env        
-    addResponder = base.addResponder
-    setResponders = base.setResponders
-    getResponders = base.getResponders
-    setParent = base.setParent
-    getParent = base.getParent
-    setIsFocusable = base.setIsFocusable
-    getIsFocusable = base.getIsFocusable
-    setName s = base.setName s
-    getName = base.getName
-    getState = base.getState
-    setState = base.setState
-    respondToInputEvent = base.respondToInputEvent
-    getCocoaRef = base.getCocoaRef
 
-    setPosition = base.setPosition
-    getPosition = base.getPosition
-
-    setSize = base.setSize
-    getSize = base.getSize
-
-    setBackgroundColor = base.setBackgroundColor
-    getBackgroundColor = base.getBackgroundColor
+    Container {getAllChildren=getAllChildrenImpl..} = new mkCocoaContainer
     
-    addComponent = base.addComponent
-    removeComponent = base.removeComponent
-    removeAllComponents = base.removeAllComponents
-
-    getComponents = base.getComponents
-    getAllComponents = request
+    getAllChildren = request
         result []
-        
-    destroy = base.destroy
-    init = base.init
        
-    result Container{id_temp=base.id_temp;..}  
+    result Container{..}  
 
 paintHandler w1 label env = class
     pixelCount := 0
@@ -53,11 +24,10 @@ paintHandler w1 label env = class
     respondToInputEvent (MouseEvent event) modifiers = request
         pos = (posget event)
     
-        env.stdout.write "Painting box\n"
         label.setText ("Pixel Count: " ++ show pixelCount)
         --label.setText ("Position: " ++ (show pos.x) ++ "," ++ (show pos.y))
     
-        blackBox = new mkCocoaContainer env
+        blackBox = new mkCocoaContainer
         blackBox.setSize ({width=7;height=7})
         blackBox.setBackgroundColor({r=pos.x `mod` 255;g=pos.y `mod` 255;b=2*(pos.y-pos.x) `mod` 255})
         blackBox.setName ("Container" ++ (show pixelCount))
@@ -76,7 +46,7 @@ root w = class
     env = new posix w
     osx = new cocoa w
 
-    w1 = new mkCocoaWindow env
+    w1 = new mkCocoaWindow
     bg = new mkPaintBackdrop env
     label = new mkCocoaLabel
 

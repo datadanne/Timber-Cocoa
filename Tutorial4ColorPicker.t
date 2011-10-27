@@ -9,7 +9,7 @@ colorPickerTile colorPickerX colorPickerY env = class
         size = 12
         responder = new tileResponder color callback env
     
-        container = new mkCocoaContainer env
+        container = new mkCocoaContainer
         container.setSize ({width=size;height=size})
         container.setPosition ({x=size*colorPickerX;y=size*colorPickerY})
         container.setBackgroundColor color

@@ -7,8 +7,8 @@ root w = class
     env = new posix w
     osx = new cocoa w
 
-    w1 = new mkCocoaWindow env
-    c2 = new mkCocoaContainer env
+    w1 = new mkCocoaWindow
+    c2 = new mkCocoaContainer
     button = new mkCocoaButton env
     button2 = new mkCocoaButton env
     

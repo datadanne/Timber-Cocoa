@@ -51,8 +51,7 @@ mkCocoaWindow = class
     isVisible := True
     initWindow app = request
         if isInactive state then
-            p = initCocoaWindow ()
-            (ref,id) = p
+            (ref,id) = initCocoaWindow ()
             state    := Active ref
             windowId := id
             container_ref <- rootContainer.initComp app

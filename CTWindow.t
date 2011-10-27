@@ -4,9 +4,12 @@ import CTContainer
     
 --------------------------------------------------------------------------------------------------
 ------          ** WINDOW **            ---------------------------------------------------------- 
+
+mkCocoaWindow :: Class CocoaWindow
 mkCocoaWindow = class    
     
     state := Inactive        
+    
     rootContainer = new mkCocoaContainer
     defaultResponder = new defaultInputResponder this rootContainer
     
@@ -21,12 +24,6 @@ mkCocoaWindow = class
             Active ref = state
             _ = windowSetSize ref size
         setSizeImpl size
-        
-    setState s = request
-        state := s
-        
-    getState = request
-        result state
 
     -- the position of the window may change, but the position of root container is (0,0)
     position := {x=0;y=0}
@@ -37,14 +34,15 @@ mkCocoaWindow = class
             Active ref = state
             _ = windowSetPosition ref pos
         position := pos
+
+    windowResponder := new defaultWindowResponder this        
+    setWindowResponder resp = request 
+        windowResponder := resp
         
-    windowResponder := new defaultWindowResponder this
     onWindowResize size = request
         windowResponder.onWindowResize size
     onWindowCloseRequest = request
         result (<- windowResponder.onWindowCloseRequest)
-    setWindowResponder resp = request 
-        windowResponder := resp
 
     windowId := 0
     getId = request
@@ -74,10 +72,7 @@ mkCocoaWindow = class
             rootContainer.destroyComp
             state := Destroyed
 
-    -- This variable is only used for getFocus!
-    currentFocus :: Component 
     currentFocus := rootContainer
-
     setFocus cmp = request
          currentFocus := cmp
          if isActive state then
@@ -128,16 +123,14 @@ mkNewEventAt (MouseClicked _) p           = MouseClicked p
 mkNewEventAt (MouseMoved _) p             = MouseMoved p
 mkNewEventAt (MouseWheelScroll _ dx dy) p = MouseWheelScroll p dx dy
 
-getMousePosition (MouseReleased p)        = p
-getMousePosition (MousePressed p)         = p  
+getMousePosition (MousePressed p)         = p 
+getMousePosition (MouseReleased p)        = p 
 getMousePosition (MouseClicked p)         = p
-getMousePosition (MouseMoved p)           = p
 getMousePosition (MouseWheelScroll p _ _) = p   
 
 defaultInputResponder :: CocoaWindow -> Container -> Class RespondsToInputEvents
 defaultInputResponder window rootContainer = class
-
-    currentFocus :: Component
+    
     currentFocus := rootContainer
     focusables := []
     
@@ -175,7 +168,6 @@ defaultInputResponder window rootContainer = class
     respondToInputEvent (MouseEvent me) modifiers = request
         cmps <- rootContainer.getAllChildren
         scanList cmps (findMouseFocus me modifiers)
-
         result (<- rootContainer.respondToInputEvent (MouseEvent me) modifiers)
     
     foundFocus := False
@@ -199,13 +191,13 @@ defaultInputResponder window rootContainer = class
         relativePosition = getRelativePosition parentPosition eventPosition
 
         -- Construct new event based on local coordinates.
-        eventInLocalCoords = mkNewEventAt event relativePosition        
+        eventInLocalCoords = mkNewEventAt event relativePosition
+        
         cmpPos <- cmp.getPosition
         cmpSize <- cmp.getSize
         if clickInsideBox relativePosition cmpPos cmpSize then
             if (<- cmp.getIsFocusable) then
                 window.setFocus cmp
-                
             result (<- cmp.respondToInputEvent (MouseEvent eventInLocalCoords) modifiers)
         else
             result False
@@ -214,14 +206,13 @@ defaultInputResponder window rootContainer = class
 
 scanList [] _ = do 
     result False 
-
+    
 scanList x cmd = do
     if (<- cmd (head x)) then
         result True
     else
         result (<- (scanList (tail x) cmd))
-
-getParentPosition :: Component -> Cmd _ Position
+    
 getParentPosition cmp = do
     parent <- cmp.getParent
     if (isJust parent) then
@@ -231,7 +222,7 @@ getParentPosition cmp = do
 
 getRelativePosition from to = {x=to.x-from.x; y=to.y-from.y}
 
-clickInsideBox mousePos boxPos boxSize =
+clickInsideBox mousePos boxPos boxSize = 
     (inInterval mousePos.x boxPos.x boxSize.width) && (inInterval mousePos.y boxPos.y boxSize.height)
     
 inInterval x startPos width = 
@@ -240,7 +231,6 @@ inInterval x startPos width =
 instance eqCocoaKey :: Eq CocoaKey where
   (==) = compareKeys
   (/=) a b = not (compareKeys a b)
-
 
 private
 

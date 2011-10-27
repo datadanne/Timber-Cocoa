@@ -11,7 +11,7 @@ struct AppImpl where
     sendWindowResize        :: Size -> WindowID -> Request ()
     sendWindowCloseRequest  :: WindowID -> Request Bool       
 
-struct CocoaWindow < HasWindowResponder, RespondsToWindowEvents, RespondsToInputEvents, HasSize, HasBackgroundColor, ContainsComponents, HasResponders where 
+struct CocoaWindow < RespondsToWindowEvents, RespondsToInputEvents, HasSize, HasBackgroundColor, ContainsComponents, HasResponders, HasWindowResponder where 
     getId         :: Request WindowID
     initWindow    :: App -> Request ()
     destroyWindow :: Request ()
@@ -22,6 +22,7 @@ struct CocoaWindow < HasWindowResponder, RespondsToWindowEvents, RespondsToInput
 struct Component < BaseComponent where 
     initComp    :: App -> Request CocoaRef
     destroyComp :: Request ()
+    getState    :: Request ComponentState
     id          :: OID
 
 struct BaseComponent < IsFocusable, HasSize, HasResponders, RespondsToInputEvents where
@@ -30,8 +31,6 @@ struct BaseComponent < IsFocusable, HasSize, HasResponders, RespondsToInputEvent
     setParent :: Component -> Request ()
     getParent :: Request (Maybe Component)
     getAllChildren :: Request [Component]
-    setState    :: ComponentState -> Request ()
-    getState    :: Request ComponentState
 
 data ComponentState = Active CocoaRef | Inactive | Destroyed
 
@@ -118,8 +117,8 @@ struct IsFocusable where
 
 data InputEvent     = MouseEvent MouseEventType | KeyEvent KeyEventType
 data KeyEventType   = KeyPressed CocoaKey | KeyReleased CocoaKey
-data MouseEventType = MouseWheelScroll Position Float Float | MouseMoved Position |
-                      MouseClicked Position | MousePressed Position | MouseReleased Position 
+data MouseEventType = MouseWheelScroll Position Float Float | MouseClicked Position | 
+                      MousePressed Position | MouseReleased Position | MouseMoved Position
 
 data CocoaKey = A | S | D | F | H | G | Z | X | C | V | Dummy1 | 
                 B | Q | W | E | R | Y | T | Num1 | Num2 | Num3 | Num4 | 

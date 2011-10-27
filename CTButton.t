@@ -1,7 +1,6 @@
 module CTButton where
 
 import COCOA   
-import POSIX
 
 struct Button < Component where
     setTitle :: String -> Request ()
@@ -10,54 +9,57 @@ struct Button < Component where
 --------------------------------------------------------------------------------------------------
 ------          ** BUTTON **            ----------------------------------------------------------
 
-mkCocoaButton env = class
+mkCocoaButton = class
+
+    state := Inactive
     title := "Click me!"
     defaultSize= {width=108; height=21}
     
     BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl..} = new basicComponent True Nothing "BUTTON"
 
-    -- setTitle
-    setTitle s = request
-        title := s
-        setName s
-        case (<- getState) of
-            Active ref -> _ = buttonSetTitle ref s
-            _ ->
-   
-    -- getTitle
-    getTitle = request
-        result title   
-    
-    -- setPosition
     setPosition p = request
-        case (<- getState) of
-            Active ref -> _= buttonSetPosition ref p
-            _ -> 
+        if isActive state then
+            Active ref = state
+            _ = buttonSetPosition ref p
         setPositionImpl p
 
     setSize s = request
-        setSizeImpl = case (<- getState) of
-            Active ref -> (buttonSetSize ref s)
-            _ -> s
+        if isActive state then
+            Active ref = state
+            setSizeImpl (buttonSetSize ref s)
+        else
+            setSizeImpl s
+
+    setTitle s = request
+        if isActive state then
+            Active ref = state
+            _ = buttonSetTitle ref s
+        title := s
+        setName s
+   
+    getTitle = request
+        result title
 
     destroyComp = request
-        setState Destroyed
+        state := Destroyed
 
-    -- undocumented feature in Timber, init must be placed above this else we have some nice raise(2); :-)
     initComp app = request
         ref = initButton title
-        setState (Active ref)
+        state := Active ref
         setSizeImpl (buttonSetSize ref (<- getSize))
         _ = buttonSetPosition ref (<- getPosition)
         result ref
+    
+    getState = request
+        result state
 
-
-    this = Button{id = self;..}
+    this = Button {id = self;..}
 
     result this
 
 private 
-extern initButton :: String -> CocoaRef
-extern buttonSetTitle :: CocoaRef -> String -> ()
+ 
+extern initButton        :: String -> CocoaRef
+extern buttonSetTitle    :: CocoaRef -> String -> ()
 extern buttonSetPosition :: CocoaRef -> Position -> ()
-extern buttonSetSize :: CocoaRef -> Size -> Size
+extern buttonSetSize     :: CocoaRef -> Size -> Size

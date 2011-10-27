@@ -2,52 +2,58 @@
                     
 // --------- Button ----------------------------------------------
 TUP0 buttonSetTitle_CTButton(Int cocoaRef, LIST s) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSButton *thisButton = (NSButton*) cocoaRef;
-	char* buf = listToChars(s);
-	[thisButton setTitle:[NSString stringWithFormat:@"%s", buf]];
-	[thisButton sizeToFit]; //setNeedsDisplay???
-	[pool drain];
+    char* buf = listToChars(s);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        NSButton *thisButton = (NSButton*) cocoaRef;
+        [thisButton setTitle:[NSString stringWithFormat:@"%s", buf]];
+        [thisButton sizeToFit]; //setNeedsDisplay???
+        [pool drain];
+    });
 } 
 
 TUP0 buttonSetPosition_CTButton(Int cocoaRef, Position_CocoaDef pos) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSButton *thisButton = (NSButton*) cocoaRef;
-//	NSPoint p = NSMakePoint(pos->x_CocoaDef-6,pos->y_CocoaDef-21); // TODO: Remove hardcoded offset.	
-	NSPoint p = NSMakePoint(pos->x_CocoaDef,pos->y_CocoaDef); // TODO: Remove hardcoded offset.	
-	[thisButton setFrameOrigin: p];
-	[thisButton performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
-   	[pool drain]; 
+    NSPoint p = NSMakePoint(pos->x_CocoaDef,pos->y_CocoaDef);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        NSButton *thisButton = (NSButton*) cocoaRef;
+        [thisButton setFrameOrigin: p];
+        [thisButton performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
+        [pool drain]; 
+    });
 }
 
 Size_CocoaDef buttonSetSize_CTButton(Int cocoaRef, Size_CocoaDef size) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSButton *thisButton = (NSButton*) cocoaRef;
-    NSRect rr = [thisButton frame];
-    //NSLog(@"%f, %f, %f, %f--bounds\n", rr.origin.x, rr.origin.y, rr.size.width, rr.size.height);
-    NSSize newS = NSMakeSize(size->width_CocoaDef, rr.size.height); //TODO
-    [thisButton setFrameSize: newS];
-    rr = [thisButton frame];
-
-    Size_CocoaDef toSize_22;
-    NEW (Size_CocoaDef, toSize_22, WORDS(sizeof(struct Size_CocoaDef)));
-    toSize_22->GCINFO = __GC__Size_CocoaDef;
-    toSize_22->width_CocoaDef = rr.size.width;
-    toSize_22->height_CocoaDef = rr.size.height;
-
-   	[pool drain]; 
-	return toSize_22;
+    int width = size->width_CocoaDef;
+    __block Size_CocoaDef newSize;
+    dispatch_sync(dispatch_get_main_queue(), ^{    
+        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        NSButton *thisButton = (NSButton*) cocoaRef;
+        NSRect rr = [thisButton frame];
+        NSSize newS = NSMakeSize(width, rr.size.height);
+        [thisButton setFrameSize: newS];
+        rr = [thisButton frame];
+        NEW (Size_CocoaDef, newSize, WORDS(sizeof(struct Size_CocoaDef)));
+        newSize->GCINFO = __GC__Size_CocoaDef;
+        newSize->width_CocoaDef = rr.size.width;
+        newSize->height_CocoaDef = rr.size.height;
+        [pool drain]; 
+    });
+    return newSize;
 }
 
 Int initButton_CTButton(LIST s) {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
-	NSButton *thisButton = [[NSButton alloc] initWithFrame: NSMakeRect(0.0, 0.0, 120.0, 60.0)];
 	char* buf = listToChars(s);
-	[thisButton setBezelStyle:NSRoundedBezelStyle];
-	[thisButton setTitle:[NSString stringWithFormat:@"%s", buf]];
-	[thisButton sizeToFit];
-	[pool drain];
-	return (Int)thisButton;
+    __block NSButton *thisButton;
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
+        thisButton = [[NSButton alloc] initWithFrame: NSMakeRect(0.0, 0.0, 120.0, 60.0)];
+        [thisButton setBezelStyle:NSRoundedBezelStyle];
+        [thisButton setTitle:[NSString stringWithFormat:@"%s", buf]];
+        [thisButton sizeToFit];
+        [pool drain];
+    });
+    return (Int)thisButton;
 }
 
 void _init_external_CTButton(void) {

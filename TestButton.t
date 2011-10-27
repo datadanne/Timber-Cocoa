@@ -1,6 +1,7 @@
 module TestButton where
 
-import CTWindow
+import POSIX
+import COCOA
 import CTButton
 
 root w = class
@@ -9,33 +10,53 @@ root w = class
 
     w1 = new mkCocoaWindow
     c2 = new mkCocoaContainer
-    button = new mkCocoaButton env
-    button2 = new mkCocoaButton env
+    button1 = new mkCocoaButton
+    button2 = new mkCocoaButton
     
-    applicationDidFinishLaunching app = action                         
+    start app = action                         
         app.addWindow w1
         
     result action
         w1.setSize ({width=500;height=500})
-        button.setName "button1"
-        button.setTitle "I am button 1"
-        button.setPosition ({x=100;y=100})
-        button.addResponder (new buttonClickHandler button2)
-        --button.setSize ({width=200; height=80})
-        w1.addComponent button
+
+        button1.setName "button1"
+        button1.setTitle "I am button 1"
+        button1.setPosition ({x=100;y=100})
+        button1.addResponder (new buttonClickHandler button2)
+        w1.addComponent button1
         
         button2.setName "button2"
         button2.setTitle "I am button 2"
         button2.setPosition ({x=100;y=130})
+        button2.addResponder (new buttonClickHandler2 button2 env.stdout.write)
         w1.addComponent button2
         
-        osx.startApplication applicationDidFinishLaunching
+        osx.startApplication start
+
+buttonClickHandler2 btn writer = class
+    c := 0
+    respondToInputEvent (MouseEvent ev) modifiers = request
+        case ev of
+            MouseClicked pos ->
+                c := c+1
+                writer (show c ++ "\n")
+                result True
+            _ ->
+                result False
+            
+    respondToInputEvent _ _ = request 
+        result False
+    
+    result RespondsToInputEvents {..}
         
 buttonClickHandler btn = class
     respondToInputEvent (MouseEvent ev) modifiers = request
         case ev of
             MouseClicked pos ->
-                btn.setSize ({width=200;height=150})
+                -- this leads to deadlock until we've fixed so that responders are actions!!!
+                -- btn.setSize ({width=200;height=150})
+                -- this is a temporary solution !!!
+                send action btn.setSize ({width=200;height=150})
                 result True
             _ ->
                 result False

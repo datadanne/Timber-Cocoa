@@ -10,7 +10,7 @@ mkCocoaLabel = class
     textColor := {r=0;g=0;b=0}
     text := "Default Label"
 
-    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl..} = new basicComponent True Nothing "Label"
+    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl..} = new basicComponent False Nothing "Label"
 
     setText s = request
         text := s

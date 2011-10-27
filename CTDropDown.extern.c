@@ -65,7 +65,7 @@
     ((_MouseEvent_CocoaDef)receivedEvent)->Tag = 1;
     ((_MouseEvent_CocoaDef)receivedEvent)->a = (MouseEventType_CocoaDef)x_5111;    
  
-    app->l_App_CocoaDef_AppImpl_COCOA_COCOA->sendInputEvent_CocoaDef(app->l_App_CocoaDef_AppImpl_COCOA_COCOA, (InputEvent_CocoaDef)receivedEvent, windowId, 0);
+    app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef->sendInputEvent_CocoaDef(app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef, (InputEvent_CocoaDef)receivedEvent, windowId, 0);
 }  
 
 - (void) setCoordsX: (float) xarg andY: (float) yarg {
@@ -150,7 +150,7 @@ TUP0 dropDownSetSize_CTDropDown(Int cocoaRef, Size_CocoaDef size) {
 - (void) setWidth: (float) w andHeight: (float) h;
 - (void) setLastEventX: (float) xarg andY: (float) yarg;
 */
-/*Msg dropDownSetLastClickPosition_CTDropDown(CocoaID_COCOA id, Position_CocoaDef pos, Time start, Time stop) {
+/*Msg dropDownSetLastClickPosition_CTDropDown(CocoaID_CocoaDef id, Position_CocoaDef pos, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	DEBUG("setting POS externally..");
 	
@@ -161,7 +161,7 @@ TUP0 dropDownSetSize_CTDropDown(Int cocoaRef, Size_CocoaDef size) {
    	[pool drain]; 
 } */
 
-/*Msg updateExpandedPos_CTDropDown(CocoaID_COCOA id, Position_CocoaDef pos, Time start, Time stop) {
+/*Msg updateExpandedPos_CTDropDown(CocoaID_CocoaDef id, Position_CocoaDef pos, Time start, Time stop) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
 	NSPopUpButton *thisDropDown = (NSPopUpButton*) cocoaRef;

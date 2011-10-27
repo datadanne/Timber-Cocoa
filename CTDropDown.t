@@ -1,10 +1,9 @@
 module CTDropDown where
 
 import COCOA -- remove and it breaks even with CTCommon imported below?
-import CTCommon
 import POSIX
 
-struct DropDown < Component, RespondsToSelectionEvents where
+struct DropDown < Component, RespondsToSelectionEvents, HasSelectionResponder where
     addOption :: String -> Request ()
     setOptions :: [String] -> Action
     getOptions :: Request [String]
@@ -12,18 +11,14 @@ struct DropDown < Component, RespondsToSelectionEvents where
 
 --------------------------------------------------------------------------------------------------
 ------          ** CTDropDown **            ----------------------------------------------------------
+mkCocoaDropDown :: Env -> Class DropDown
 mkCocoaDropDown env = class
     size := {width=108; height=17}
     extendedSize := {width=108; height=17}
     sizeState := Small
-    
-    title := ""
-    position := {x=0; y=0}
-    
-    base = new basicComponent True Nothing "DropDown"
-    addResponder = base.addResponder
-    setResponders = base.setResponders
-    getResponders = base.getResponders
+    title := ""    
+
+    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl;getSize=getSizeImpl..} = new basicComponent True Nothing "DropDown"
 
     dsh := new defaultSelectionResponder env
     selectionChanged str = action
@@ -31,17 +26,6 @@ mkCocoaDropDown env = class
         
     setSelectionResponder resp = request
         dsh := resp
-        
-    setParent = base.setParent
-    getParent = base.getParent
-    setIsFocusable = base.setIsFocusable
-    getIsFocusable = base.getIsFocusable
-    setName = base.setName
-    getName = base.getName
-    getState = base.getState
-    setState = base.setState
-    getAllChildren = base.getAllChildren
-    respondToInputEvent = base.respondToInputEvent
     
     options := ["hello", "world"]
     
@@ -54,65 +38,61 @@ mkCocoaDropDown env = class
             
     insertOption o = do
         options := o : options
-        case (<- base.getState) of
-            Active ->
-                    _ = dropDownAddOption cocoaRef o  
-                    currentOption := dropDownGetSelectedOption cocoaRef
+        case (<- getState) of
+            Active ref ->
+                    _ = dropDownAddOption ref o  
+                    currentOption := dropDownGetSelectedOption ref
             _ ->
 
     getOptions = request
         result options
     
     currentOption := ""
-    refreshMyOptionAndPerformCallback = action 
-        currentOption := dropDownGetSelectedOption cocoaRef
-        send selectionChanged currentOption
+    refreshMyOptionAndPerformCallback = action
+        case (<- getState) of
+            Active ref ->
+                currentOption := dropDownGetSelectedOption ref
+                send selectionChanged currentOption
+            _ ->
         
     getCurrentOption = request
-        --opt <- cocoaGetCurrentOption cocoaRef     TODO: do we ever need this? no should be the answer ...
+        --opt <- cocoaGetCurrentOption ref     TODO: do we ever need this? no should be the answer ...
         result currentOption
 
     setPosition p = request
-        case (<- base.getState) of
-            Active -> _= dropDownSetPosition cocoaRef p
+        case (<- getState) of
+            Active ref -> _= dropDownSetPosition ref p
             _ -> 
-        position := p       
-
-    getPosition = request
-        result position
+        setPositionImpl p       
 
     setSize s = request
-        case (<- base.getState) of
-            Active -> _= dropDownSetSize cocoaRef s
+        case (<- getState) of
+            Active ref -> _= dropDownSetSize ref s
             _ ->
         size := s
 
     getSize = request
         result size
         
-    destroy = request
-        base.setState Destroyed
+    destroyComp = request
+        setState Destroyed
         
-    init app = request
-            base.setState Active
-            cocoaRef := initDropDown ()
-            inithelper
-    
-    inithelper = do
-        forall o <- options do
-            _ = dropDownAddOption cocoaRef o
+    initComp app = request
+            ref = initDropDown ()
+            setState (Active ref)
+            forall o <- options do
+                _ = dropDownAddOption ref o
             
-        _= dropDownSetPosition cocoaRef position
-        currentOption := dropDownGetSelectedOption cocoaRef
+            _= dropDownSetPosition ref (<- getPosition)
+            _= dropDownSetSize ref size
+            currentOption := dropDownGetSelectedOption ref
 
-        sh = new defaultHandler refreshMyOptionAndPerformCallback
-        base.addResponder sh
+            sh = new defaultHandler refreshMyOptionAndPerformCallback
+            addResponder sh
+            
+            result ref
 
-    cocoaRef := defaultCocoaRef
-    getCocoaRef = request
-        result cocoaRef 
-        
-    this = DropDown{id_temp=self;..}
+    this = DropDown{id=self;..}
 
     result this
 
@@ -123,7 +103,7 @@ defaultSelectionResponder env = class
 
 
 data SizeState = Small | Expanded
-deriving instance eqSizeState :: Eq SizeState
+-- deriving instance eqSizeState :: Eq SizeState  ... broken for some reason(?)
  
 defaultHandler dropdownUpdateMethod = class 
     sizeState := Small
@@ -134,11 +114,12 @@ defaultHandler dropdownUpdateMethod = class
     respondToInputEvent (MouseEvent t) modifiers = request
         case t of
             MouseClicked pos ->
-                if (sizeState == Small) then
-                    sizeState := Expanded
-                else
-                    sizeState := Small
-                    dropdownUpdateMethod
+                case sizeState of
+                    Small ->
+                        sizeState := Expanded
+                    _ ->
+                        sizeState := Small
+                        dropdownUpdateMethod
             _ ->    
         result True 
 

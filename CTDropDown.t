@@ -44,11 +44,12 @@ mkCocoaDropDown = class
     setSelectionResponder resp = request
         dsh := resp
     
-    options := [] -- this shouldn't be a problem?
+    options := []
     addOption o = request
         _ <- insertOption o
     setOptions opts = action
-        forall o <- opts do
+        options := []
+        forall o <- (reverse opts) do
             _ <- insertOption o
     insertOption o = do
         options := o : options

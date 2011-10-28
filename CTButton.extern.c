@@ -7,7 +7,7 @@ TUP0 buttonSetTitle_CTButton(Int cocoaRef, LIST s) {
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         NSButton *thisButton = (NSButton*) cocoaRef;
         [thisButton setTitle:[NSString stringWithFormat:@"%s", buf]];
-        [thisButton sizeToFit]; //setNeedsDisplay???
+        [thisButton sizeToFit]; 
         [pool drain];
     });
 } 
@@ -20,7 +20,7 @@ TUP0 buttonSetPosition_CTButton(Int cocoaRef, Position_CocoaDef pos) {
         NSButton *thisButton = (NSButton*) cocoaRef;
         NSPoint p = NSMakePoint(x,y);
         [thisButton setFrameOrigin: p];
-        [thisButton performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
+        [thisButton setNeedsDisplay];
         [pool drain]; 
     });
 }

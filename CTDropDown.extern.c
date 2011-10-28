@@ -53,7 +53,7 @@ TUP0 dropDownSetPosition_CTDropDown(Int cocoaRef,Position_CocoaDef pos) {
         [[thisDropDown target] setCoordsX: x andY: y];
         NSPoint p = NSMakePoint(x-5,y-20); // TODO: Remove hardcoded offset.
 	    [thisDropDown setFrameOrigin: p];
-	    [thisDropDown performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
+	    [thisDropDown setNeedsDisplay];
    	    [pool drain]; 
     });
 }
@@ -65,9 +65,9 @@ TUP0 dropDownSetSize_CTDropDown(Int cocoaRef, Size_CocoaDef size) {
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
 	    NSPopUpButton *thisDropDown = (NSPopUpButton*) cocoaRef;
         [[thisDropDown target] setWidth: width andHeight: height];	
-        NSSize s = NSMakeSize(size->width, size->height);
+        NSSize s = NSMakeSize(width,height);
 	    [thisDropDown setFrameSize: s];
-	    [thisDropDown performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
+	    [thisDropDown setNeedsDisplay];
    	    [pool drain]; 
     });
 }

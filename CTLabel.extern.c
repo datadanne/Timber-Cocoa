@@ -61,7 +61,7 @@ TUP0 labelSetPosition_CTLabel(Int cocoaRef, Position_CocoaDef pos) {
         NSTextField *thisLabel = (NSTextField*) cocoaRef;
         NSPoint p = NSMakePoint(x,y);
         [thisLabel setFrameOrigin: p];
-        [thisLabel performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
+        [thisLabel setNeedsDisplay];
         [pool drain]; 
     });
 }                                            

@@ -3,6 +3,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "CocoaDef.h"
+
 @interface DropDownClickHandler : NSObject {
     float x;
     float y;

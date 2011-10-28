@@ -59,8 +59,8 @@ TUP0 containerAddComponent_CTContainer(Int containerRef, Int cmpRef) {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         CocoaView *thisView = (CocoaView*) containerRef;
-        NSObject *object = (NSObject*) cmpRef;
-        [thisView performSelectorOnMainThread:@selector(addSubview:) withObject:object waitUntilDone:YES];
+        NSView *object = (NSView*) cmpRef;
+        [thisView addSubview:object];
         [thisView setNeedsDisplay:YES];
         [pool drain];
     });
@@ -71,7 +71,7 @@ TUP0 containerRemoveComponent_CTContainer(Int containerRef, Int cmpRef) {
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         CocoaView *thisView = (CocoaView*) containerRef;
         NSView *object = (NSView*) cmpRef;
-        [object performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:YES];
+        [object removeFromSuperview];
         [pool drain];
     });
 }

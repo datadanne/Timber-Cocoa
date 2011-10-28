@@ -24,6 +24,7 @@ TUP0 textFieldSetPosition_CTTextField(Int cocoaRef, Position_CocoaDef pos) {
 	NSPoint p = NSMakePoint(pos->x_CocoaDef-5,pos->y_CocoaDef-20); // TODO: Remove hardcoded offset.
 	
 	[thisTextField setFrameOrigin: p];
+    //remove performSelectorOnMainThread when executing on the main thread
 	[thisTextField performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
    	[pool drain]; 
 }                                            

@@ -48,6 +48,9 @@ mkCocoaLabel = class
         
     destroyComp = request
         state := Destroyed
+    
+    getState = request
+        result state
                             
     initComp app = request
             ref = initLabel ()

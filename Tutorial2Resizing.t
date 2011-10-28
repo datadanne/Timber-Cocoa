@@ -1,6 +1,7 @@
 module Tutorial2Resizing where
 
-import CTWindow
+import POSIX
+import COCOA
 import CTButton
 import CTLabel
 import CTTextArea

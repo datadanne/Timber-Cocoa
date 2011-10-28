@@ -1,6 +1,10 @@
 #ifndef CTLABEL_EXTERN_H_
 #define CTLABEL_EXTERN_H_
 
+#import <Cocoa/Cocoa.h>
+
+#include "CocoaDef.h"
+
 Int initLabel_CTLabel(TUP0);
 TUP0 labelSetText_CTLabel(Int, LIST);
 TUP0 labelSetPosition_CTLabel(Int, Position_CocoaDef);

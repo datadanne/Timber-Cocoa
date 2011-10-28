@@ -1,26 +1,24 @@
 module Tutorial1ComponentsAndHierarchies where
 
-import CTWindow
+import POSIX
+import COCOA
 import CTButton
 import CTLabel
 
+root :: RootType
 root w = class
     env = new posix w
     osx = new cocoa w
-    
     w1 = new mkCocoaWindow
+    label = new mkCocoaLabel
+    button = new mkCocoaButton
     
-    applicationDidFinishLaunching app = action                         
+    start app = action                         
         w1.setSize ({width=400; height=400})    
         w1.setBackgroundColor ({r=200;g=200;b=200})
-    
         createComponentHierarchy
-        
         app.addWindow w1
         addButtonResponder
-           
-    label = new mkCocoaLabel
-    button = new mkCocoaButton env
     
     createComponentHierarchy = do
         leftContainer = new mkCocoaContainer
@@ -53,7 +51,7 @@ root w = class
         button.addResponder handler
 
     result action
-        osx.startApplication applicationDidFinishLaunching  
+        osx.startApplication start  
         
 buttonHandler label env = class
     clickCount := 0
@@ -85,5 +83,4 @@ buttonHandler label env = class
     respondToInputEvent _ modifiers = request
         result False
 
-    
     result RespondsToInputEvents {..}        

@@ -1,6 +1,7 @@
 module TestDropDown where
 
 import POSIX
+import COCOA
 import CTDropDown
 
 root :: RootType

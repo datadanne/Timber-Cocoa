@@ -4,10 +4,9 @@ import POSIX
 import COCOA
 import CTButton
 
+root :: RootType
 root w = class
-    env = new posix w
     osx = new cocoa w
-
     w1 = new mkCocoaWindow
     c2 = new mkCocoaContainer
     button1 = new mkCocoaButton

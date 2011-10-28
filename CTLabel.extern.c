@@ -16,11 +16,14 @@ Int initLabel_CTLabel(TUP0 dummy) {
 }
 
 TUP0 labelSetTextColor_CTLabel(Int cocoaRef, Color_CocoaDef color) {
-    NSColor color = NSColor colorWithCalibratedRed:color->r_CocoaDef/255.0 
-        green:color->g_CocoaDef/255.0 blue:color->b_CocoaDef/255.0 alpha:1.0
+    int r = r_CocoaDef;
+    int g = g_CocoaDef;
+    int b = b_CocoaDef;
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
         NSTextField *thisLabel = (NSTextField*) cocoaRef;
+        NSColor color = NSColor colorWithCalibratedRed:color->r/255.0 
+            green:color->g/255.0 blue:color->b/255.0 alpha:1.0
         [thisLabel setTextColor:[color]];
         [thisLabel setNeedsDisplay];
         [pool drain]; 
@@ -39,20 +42,24 @@ TUP0 labelSetText_CTLabel(Int cocoaRef, LIST str) {
 }
 
 TUP0 labelSetSize_CTLabel(Int cocoaRef, Size_CocoaDef size) {
-    NSSize size0 = NSMakeSize(size->width_CocoaDef, size->height_CocoaDef);
+    int width = width_CocoaDef;
+    int height = height_CocoaDef;
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         NSTextField *thisLabel = (NSTextField*) cocoaRef;
+        NSSize size0 = NSMakeSize(size->width,size->height);
         [thisLabel setFrameSize: size0];
         [pool drain];
     });
 }
 
 TUP0 labelSetPosition_CTLabel(Int cocoaRef, Position_CocoaDef pos) {
-    NSPoint p = NSMakePoint(pos->x_CocoaDef,pos->y_CocoaDef);
+    int x = pos->x_CocoaDef;
+    int y = pos->y_CocoaDef;
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         NSTextField *thisLabel = (NSTextField*) cocoaRef;
+        NSPoint p = NSMakePoint(x,y);
         [thisLabel setFrameOrigin: p];
         [thisLabel performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
         [pool drain]; 

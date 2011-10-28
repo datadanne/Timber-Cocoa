@@ -13,10 +13,12 @@ TUP0 buttonSetTitle_CTButton(Int cocoaRef, LIST s) {
 } 
 
 TUP0 buttonSetPosition_CTButton(Int cocoaRef, Position_CocoaDef pos) {
-    NSPoint p = NSMakePoint(pos->x_CocoaDef,pos->y_CocoaDef);
+    int x = pos->x_CocoaDef;
+    int y = pos->y_CocoaDef;
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         NSButton *thisButton = (NSButton*) cocoaRef;
+        NSPoint p = NSMakePoint(x,y);
         [thisButton setFrameOrigin: p];
         [thisButton performSelectorOnMainThread:@selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
         [pool drain]; 

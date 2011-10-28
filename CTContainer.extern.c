@@ -32,20 +32,24 @@ TUP0 containerSetBackgroundColor_CTContainer(Int containerRef, Color_CocoaDef co
 } 
 
 TUP0 containerSetSize_CTContainer(Int containerRef, Size_CocoaDef size) {
-    NSSize size0 = NSMakeSize(size->width_CocoaDef, size->height_CocoaDef);
+    int width = size->width_CocoaDef;
+    int height = size->height_CocoaDef;
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        CocoaView *thisView = (CocoaView*) containerRef;
+        CocoaView *thisView = (CocoaView*) containerRef;        
+        NSSize size0 = NSMakeSize(width,height);
         [thisView setFrameSize: size0];
         [pool drain];
     });
 }
 
 TUP0 containerSetPosition_CTContainer(Int containerRef, Position_CocoaDef pos) {
-    NSPoint p = NSMakePoint(pos->x_CocoaDef,pos->y_CocoaDef);
+    int x = pos->x_CocoaDef;
+    int y = pos->y_CocoaDef;
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         CocoaView *thisContainer = (CocoaView*) containerRef;
+        NSPoint p = NSMakePoint(x,y);
         [thisContainer setFrameOrigin: p];
         [pool drain]; 
     });

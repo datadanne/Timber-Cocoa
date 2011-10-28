@@ -1,7 +1,6 @@
 module CTDropDown where
 
-import COCOA -- remove and it breaks even with CTCommon imported below?
-import POSIX
+import COCOA
 
 struct DropDown < Component, RespondsToSelectionEvents, HasSelectionResponder where
     addOption :: String -> Request ()
@@ -10,107 +9,98 @@ struct DropDown < Component, RespondsToSelectionEvents, HasSelectionResponder wh
     getCurrentOption :: Request String
 
 --------------------------------------------------------------------------------------------------
-------          ** CTDropDown **            ----------------------------------------------------------
-mkCocoaDropDown :: Env -> Class DropDown
-mkCocoaDropDown env = class
-    size := {width=108; height=17}
-    extendedSize := {width=108; height=17}
-    sizeState := Small
-    title := ""    
+------          ** CTDropDown **        ----------------------------------------------------------
 
-    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl;getSize=getSizeImpl..} = new basicComponent True Nothing "DropDown"
+mkCocoaDropDown :: Class DropDown
+mkCocoaDropDown = class
 
-    dsh := new defaultSelectionResponder env
+    state        := Inactive
+    size         := {width=108; height=17}
+--  extendedSize := {width=108; height=17}
+--  sizeState    := Small
+    title        := "DropDown"    
+
+    BaseComponent {setPosition=setPositionImpl;setSize=dummy1;getSize=dummy2;..} = 
+        new basicComponent True Nothing "DropDown"
+    
+    setPosition p = request
+        if isActive state then
+            Active ref = state
+            _ = dropDownSetPosition ref p
+        setPositionImpl p
+    
+    setSize s = request
+        if isActive state then
+            Active ref = state
+            _ = dropDownSetSize ref s
+        size := s
+    
+    getSize = request
+        result size
+
+    dsh := new defaultSelectionResponder
     selectionChanged str = action
         dsh.selectionChanged str
-        
     setSelectionResponder resp = request
         dsh := resp
     
-    options := ["hello", "world"]
-    
+    options := [] -- this shouldn't be a problem?
     addOption o = request
         _ <- insertOption o
-        
     setOptions opts = action
         forall o <- opts do
             _ <- insertOption o
-            
     insertOption o = do
         options := o : options
-        case (<- getState) of
-            Active ref ->
-                    _ = dropDownAddOption ref o  
-                    currentOption := dropDownGetSelectedOption ref
-            _ ->
-
+        if isActive state then
+            Active ref = state
+            _ = dropDownAddOption ref o  
+            currentOption := dropDownGetSelectedOption ref
     getOptions = request
         result options
     
     currentOption := ""
     refreshMyOptionAndPerformCallback = action
-        case (<- getState) of
-            Active ref ->
-                currentOption := dropDownGetSelectedOption ref
-                send selectionChanged currentOption
-            _ ->
-        
+        if isActive state then
+            Active ref = state
+            currentOption := dropDownGetSelectedOption ref
+            send selectionChanged currentOption
     getCurrentOption = request
-        --opt <- cocoaGetCurrentOption ref     TODO: do we ever need this? no should be the answer ...
-        result currentOption
-
-    setPosition p = request
-        case (<- getState) of
-            Active ref -> _= dropDownSetPosition ref p
-            _ -> 
-        setPositionImpl p       
-
-    setSize s = request
-        case (<- getState) of
-            Active ref -> _= dropDownSetSize ref s
-            _ ->
-        size := s
-
-    getSize = request
-        result size
+        result currentOption     
         
     destroyComp = request
-        setState Destroyed
+        state := Destroyed
+    
+    getState = request
+        result state
         
     initComp app = request
             ref = initDropDown ()
-            setState (Active ref)
+            state := Active ref
             forall o <- options do
                 _ = dropDownAddOption ref o
-            
             _= dropDownSetPosition ref (<- getPosition)
             _= dropDownSetSize ref size
             currentOption := dropDownGetSelectedOption ref
-
             sh = new defaultHandler refreshMyOptionAndPerformCallback
             addResponder sh
-            
             result ref
 
     this = DropDown{id=self;..}
 
     result this
 
-defaultSelectionResponder env = class
+defaultSelectionResponder = class
     selectionChanged str = action
     setSelectionResponder _ = request
     result RespondsToSelectionEvents {..}
 
-
 data SizeState = Small | Expanded
--- deriving instance eqSizeState :: Eq SizeState  ... broken for some reason(?)
  
 defaultHandler dropdownUpdateMethod = class 
-    sizeState := Small
-    
+    sizeState := Small    
     respondToInputEvent (KeyEvent t) modifiers = request
         result False 
-
     respondToInputEvent (MouseEvent t) modifiers = request
         case t of
             MouseClicked pos ->
@@ -122,21 +112,17 @@ defaultHandler dropdownUpdateMethod = class
                         dropdownUpdateMethod
             _ ->    
         result True 
-
     respondToInputEvent _ modifiers = request
         result False 
-        
     result RespondsToInputEvents {..}
     
 --------------------------------------------------------------------------------------------------
 ------          ** EXTERN **            ----------------------------------------------------------  
 
---dropDown  
 private
---extern optionWasSelected :: DropDown -> String -> ()      
-extern initDropDown :: () -> Int
-extern dropDownAddOption :: CocoaRef -> String -> ()
-extern dropDownSetPosition :: CocoaRef -> Position -> ()
-extern dropDownSetSize :: CocoaRef -> Size -> ()
---extern dropDownSetLastClickPosition :: CocoaRef -> Position -> Action
+
+extern initDropDown              :: () -> Int
+extern dropDownAddOption         :: CocoaRef -> String -> ()
+extern dropDownSetPosition       :: CocoaRef -> Position -> ()
+extern dropDownSetSize           :: CocoaRef -> Size -> ()
 extern dropDownGetSelectedOption :: CocoaRef -> String

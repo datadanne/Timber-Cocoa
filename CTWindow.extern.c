@@ -218,10 +218,8 @@ TUP0 windowSetFocus_CTWindow(Int cocoaRef, Int cmpRef) {
 }
 
 TUP0 windowSetSize_CTWindow (Int cocoaRef, Size_CocoaDef size) {
-    // TODO: can this be moved inside the async block?
     int width = size->width_CocoaDef;
     int height = size->height_CocoaDef;
-
 	dispatch_async(dispatch_get_main_queue(), ^{
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
@@ -231,10 +229,8 @@ TUP0 windowSetSize_CTWindow (Int cocoaRef, Size_CocoaDef size) {
 }
 
 TUP0 windowSetPosition_CTWindow (Int cocoaRef, Position_CocoaDef pos) {
-    // TODO: can this be moved inside the async block?    
     int y = pos->y_CocoaDef;
     int x = pos->x_CocoaDef;
-    
 	dispatch_async(dispatch_get_main_queue(), ^{
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;

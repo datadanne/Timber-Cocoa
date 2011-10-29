@@ -3,15 +3,15 @@ module CTTextArea where
 import COCOA
 
 struct TextArea < Component, HasText, IsScrollable
-    
 
---------------------------------------------------------------------------------------------------
-------          ** TextArea **            ----------------------------------------------------------
 mkCocoaTextArea = class
     text := ""
     
+    state := Inactive
+    getState = request
+        result state
+        
     dts = new defaultTextScrollResponder this
-    --base = new basicComponent True Nothing "TEXT_AREA"
     BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl;setResponders=setRespondersImpl..} = new basicComponent True Nothing "TextArea"
 
     setResponders :: [RespondsToInputEvents] -> Request ()
@@ -24,45 +24,44 @@ mkCocoaTextArea = class
     
     setScrollable s = request
         scrollable := s
-        case (<- getState) of  
-            (Active ref) -> 
-                      (hoz,vert) = s
-                      _= textAreaSetHorizontalScroll ref hoz
-                      _= textAreaSetVerticalScroll ref vert
-            _ -> 
+        if isActive state then
+            Active ref = state
+            (hoz,vert) = s
+            _ = textAreaSetHorizontalScroll ref hoz
+            _ = textAreaSetVerticalScroll ref vert
 
     appendText s = request
         text := text ++ s
         
     setText s = request
         text := s
-        case (<- getState) of
-            (Active ref) -> _= textAreaSetText ref s
-            _ ->
+        if isActive state then
+            Active ref = state
+            _= textAreaSetText ref s
    
     getText = request
         result text
     
     -- setPosition
     setPosition p = request
-        case (<- getState) of
-            (Active ref) -> _= textAreaSetPosition ref p
-            _ -> 
+        if isActive state then
+            Active ref = state
+            _ = textAreaSetPosition ref p 
         setPositionImpl p
 
     setSize s = request
-        case (<- getState) of
-            (Active ref) -> _= textAreaSetSize ref s
-            _ -> 
+        if isActive state then
+            Active ref = state
+            _ = textAreaSetSize ref s
         setSizeImpl s
 
     destroyComp = request
-        setState Destroyed
+        state := Destroyed
 
     -- undocumented feature in Timber, init must be placed above 'this' else we have some nice raise(2); :-)
     initComp app = request
         ref = initTextArea ()
-        setState (Active ref)
+        state := Active ref
         
         _= textAreaSetText ref text
         _= textAreaSetPosition ref (<- getPosition)

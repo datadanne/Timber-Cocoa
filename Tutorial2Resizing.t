@@ -1,7 +1,8 @@
 module Tutorial2Resizing where
 
 import POSIX
-import COCOA
+
+import CTWindow
 import CTButton
 import CTLabel
 import CTTextArea
@@ -25,7 +26,7 @@ root w = class
         addWindowResponder
            
     label = new mkCocoaLabel
-    button = new mkCocoaButton env
+    button = new mkCocoaButton
     
     createComponentHierarchy = do
         leftContainer = new mkCocoaContainer 

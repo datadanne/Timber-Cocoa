@@ -1,31 +1,17 @@
 module CTTextField where
 
-import CTCommon   
-import POSIX
+import COCOA   
 
 struct TextField < Component, HasText, IsScrollable    
 
---------------------------------------------------------------------------------------------------
-------          ** TextField **            ----------------------------------------------------------
-mkCocoaTextField env = class
-    size := {width=200; height=17}
+mkCocoaTextField = class
     text := ""
-    position := {x=0; y=0}
 
-    base = new basicComponent True Nothing "TEXT_AREA"
-    addResponder = base.addResponder
-    setResponders = base.setResponders
-    getResponders = base.getResponders
-    setParent = base.setParent
-    getParent = base.getParent
-    setIsFocusable = base.setIsFocusable
-    getIsFocusable = base.getIsFocusable
-    setName = base.setName
-    getName = base.getName
-    getState = base.getState
-    setState = base.setState
-    getAllChildren = base.getAllChildren
-    respondToInputEvent = base.respondToInputEvent
+    state := Inactive
+    getState = request
+        result state
+
+    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl..} = new basicComponent True Nothing "TextField"
 
     scrollable := (True, False)
     getScrollable = request
@@ -41,48 +27,33 @@ mkCocoaTextField env = class
     setText s = request
         text := s
         setName s
-        case (<- base.getState) of
-            Active -> _= textFieldSetText cocoaRef s
-            _ ->
+        if isActive state then
+            Active ref = state
+            _ = textFieldSetText ref s
    
     getText = request
         result text
-    
-    -- setPosition
+
     setPosition p = request
-        case (<- base.getState) of
-            Active -> _= textFieldSetPosition cocoaRef p
-            _ -> 
-        position := p       
-    
-    -- getPosition  
-    getPosition = request
-        result position
+        if isActive state then
+            Active ref = state
+            _ = textFieldSetPosition ref p
+        setPositionImpl p
 
     setSize s = request
-        size := s
-
-    getSize = request
-        result size
+        setSizeImpl s
         
-    destroy = request
-        base.setState Destroyed
+    destroyComp = request
+        state := Destroyed
 
-    -- undocumented feature in Timber, init must be placed above 'this' else we have some nice raise(2); :-)
-    init app = request
-            base.setState Active
-            cocoaRef := initTextField ()
-            inithelper
-    
-    inithelper = do
-        _= textFieldSetText cocoaRef text
-        _= textFieldSetPosition cocoaRef position
-    
-    cocoaRef := defaultCocoaRef   
-    getCocoaRef = request
-        result cocoaRef
+    initComp app = request
+            ref = initTextField ()
+            state := Active ref
+            _ = textFieldSetText ref text
+            _ = textFieldSetPosition ref (<- getPosition)
+            result ref
                 
-    this = TextField{id_temp=self;..}
+    this = TextField{id=self;..}
 
     result this
 

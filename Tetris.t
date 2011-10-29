@@ -3,13 +3,9 @@ module Tetris where
 import POSIX
 import COCOA
 import CTButton
-import CTWindow
-import CTContainer  -- Compiler panic if this redundant import of CTContainer is removed
 import RandomGenerator
 
 data TileValue = EmptyTile | RedTile | OrangeTile | BlueTile | OutOfBoundsTile
--- deriving instance eqTileValue :: Eq TileValue 
--- Stopped working after update. Haven't figured out why yet...
 
 gameGridWidth = 10
 gameGridHeight = 20
@@ -22,7 +18,7 @@ root w = class
     gameGrid = new tetrisGrid gameGridWidth gameGridHeight env
     gu = new gridUpdater gameGrid env
     
-    startButton = new mkCocoaButton env
+    startButton = new mkCocoaButton
     
     -- Responder for keyboard events
     keyboardResponder event modifiers = request

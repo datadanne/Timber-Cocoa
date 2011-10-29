@@ -1,5 +1,7 @@
 module Tutorial4MultipleWindows where
 
+import POSIX
+
 import Tutorial4ColorPicker
 import CTButton
 import CTLabel
@@ -27,7 +29,7 @@ root w = class
 
     label = new mkCocoaLabel
     tabCountLabel = new mkCocoaLabel
-    button = new mkCocoaButton env
+    button = new mkCocoaButton
     leftContainer = new mkCocoaContainer 
     rightContainer = new mkCocoaContainer
     
@@ -94,7 +96,7 @@ root w = class
         rgbLabel.setPosition ({x=40; y=40})
         rightContainer.addComponent rgbLabel
         
-        colorButton = new mkCocoaButton env   
+        colorButton = new mkCocoaButton
         colorButton.setTitle "Open ColorPicker"
         colorButton.setSize ({width=150;height=21})
         colorButton.setPosition ({x=40; y=75})

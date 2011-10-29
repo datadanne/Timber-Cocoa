@@ -1,5 +1,7 @@
 module Tutorial3TabResponder where
 
+import POSIX
+
 import CTWindow
 import CTButton
 import CTLabel
@@ -24,7 +26,7 @@ root w = class
            
     label = new mkCocoaLabel
     tabCountLabel = new mkCocoaLabel
-    button = new mkCocoaButton env
+    button = new mkCocoaButton
     
     createComponentHierarchy = do
         leftContainer = new mkCocoaContainer 

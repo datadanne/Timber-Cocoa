@@ -35,6 +35,15 @@ mkCocoaWindow = class
             _ = windowSetPosition ref pos
         position := pos
 
+    resizeable := True
+    getResizeable = request
+        result resizeable
+    setResizeable bool = request
+        if isActive state then 
+            Active ref = state
+            _ = windowSetResizeable ref bool
+        resizeable := bool
+
     windowResponder := new defaultWindowResponder this        
     setWindowResponder resp = request 
         windowResponder := resp
@@ -241,4 +250,5 @@ extern windowSetHidden      :: CocoaRef -> ()
 extern windowSetVisible     :: CocoaRef -> ()
 extern windowSetSize        :: CocoaRef -> Size -> ()
 extern windowSetPosition    :: CocoaRef -> Position -> ()
-extern windowSetFocus       :: CocoaRef -> CocoaRef -> ()
+extern windowSetFocus       :: CocoaRef -> CocoaRef -> () 
+extern windowSetResizeable  :: CocoaRef -> Bool -> ()

@@ -4,6 +4,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include "CocoaDef.h"
+#include "rts.h"
 
 @interface DropDownClickHandler : NSObject {
     float x;

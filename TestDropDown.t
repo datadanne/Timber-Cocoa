@@ -12,7 +12,7 @@ root w = class
 
     start app = action                         
         app.addWindow w1
-        
+    
     result action
         w1.setSize ({width=700;height=500})
         w1.setPosition ({x=0;y=0})                                         
@@ -26,5 +26,4 @@ root w = class
 
 defaultSelectionResponder = class
     selectionChanged str = action
-    setSelectionResponder _ = request
     result RespondsToSelectionEvents {..}

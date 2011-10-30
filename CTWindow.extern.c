@@ -239,21 +239,29 @@ TUP0 windowSetPosition_CTWindow (Int cocoaRef, Position_CocoaDef pos) {
 
 TUP0 windowSetResizable_CTWindow (Int cocoaRef, Bool resizable) {
     NSUInteger styleMask;
-
     if (resizable) {
         styleMask = (NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask);
     } else {
         styleMask = (NSTitledWindowMask | NSClosableWindowMask);
     }                                                            
-    
     dispatch_async(dispatch_get_main_queue(), ^{
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
-
 	    [thisWindow setStyleMask: styleMask];
 	   	[pool drain];         
     });
-} 
+}
+
+TUP0 windowSetTitle_CTWindow (Int cocoaRef, LIST title) {
+    char *buf = listToChars(title); 
+    dispatch_async(dispatch_get_main_queue(), ^{
+		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
+	    [thisWindow setTitle: [NSString stringWithFormat:@"%s", buf]];
+	   	[pool drain];         
+        free(buf);
+    });
+}  
 void _init_external_CTWindow(void) {
 /*
     DISABLE(rts);

@@ -53,7 +53,16 @@ mkCocoaWindow = class
             Active ref = state
             _ = windowSetResizable ref bool
         resizable := bool
-
+    
+    title := "CocoaWindow"
+    getTitle = request
+        result title            
+    setTitle s = request
+        if isActive state then
+            Active ref = state
+            _ = windowSetTitle ref s
+        title := s
+        
     overrideWindowCloseRequest := False
     setWindowResponder resp override = request 
         overrideWindowCloseRequest := override
@@ -94,6 +103,7 @@ mkCocoaWindow = class
             _ = windowSetSize ref (<-getSize)        
             _ = windowSetPosition ref position 
             _ = windowSetResizable ref resizable
+            _ = windowSetTitle ref title
             if isVisible then
                 _ = windowSetVisible ref
 
@@ -132,7 +142,7 @@ mkCocoaWindow = class
                 _ = windowSetHidden ref
             result True
         else
-            result False
+            result False 
 
     this = CocoaWindow {..}
     
@@ -268,4 +278,5 @@ extern windowSetVisible     :: CocoaRef -> ()
 extern windowSetSize        :: CocoaRef -> Size -> ()
 extern windowSetPosition    :: CocoaRef -> Position -> ()
 extern windowSetFocus       :: CocoaRef -> CocoaRef -> () 
-extern windowSetResizable   :: CocoaRef -> Bool -> ()
+extern windowSetResizable   :: CocoaRef -> Bool -> ()  
+extern windowSetTitle       :: CocoaRef -> String -> ()

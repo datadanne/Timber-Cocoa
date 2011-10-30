@@ -12,7 +12,7 @@ struct AppImpl where
     sendWindowCloseRequest :: WindowID -> Request Bool       
 
 struct CocoaWindow < RespondsToWindowEvents, RespondsToInputEvents, HasSize, HasBackgroundColor, 
-    ContainsComponents, HasResponders, HasWindowResponder, IsResizable where 
+    ContainsComponents, HasTitle, HasResponders, HasWindowResponder, IsResizable where 
     getId         :: Request WindowID
     initWindow    :: App -> Request ()
     destroyWindow :: Request ()
@@ -110,6 +110,10 @@ struct IsResizable where
 struct HasBackgroundColor where
     setBackgroundColor :: Color -> Request ()
     getBackgroundColor :: Request Color
+
+struct HasTitle where
+    setTitle :: String -> Request ()
+    getTitle :: Request String
 
 struct HasText where
     setText :: String -> Request ()

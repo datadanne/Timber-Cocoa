@@ -106,6 +106,7 @@ root w = class
         colorWindow.setSize ({width=215;height=215})
         colorWindow.setPosition ({x=445;y=300})
         colorWindow.setVisible False
+        colorWindow.setResizable False
         
         initColorGrid = new colorPickerGrid colorWindow setColor env
         initColorGrid

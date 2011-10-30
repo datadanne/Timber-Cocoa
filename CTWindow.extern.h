@@ -26,5 +26,6 @@ TUP0 windowSetVisible_CTWindow(Int);
 TUP0 windowSetSize_CTWindow(Int, Size_CocoaDef);
 TUP0 windowSetPosition_CTWindow(Int, Position_CocoaDef);
 TUP0 windowSetFocus_CTWindow(Int,Int);
+TUP0 windowSetResizable_CTWindow (Int, Bool);
 
 #endif

@@ -11,7 +11,7 @@ struct AppImpl where
     sendWindowResize       :: Size -> WindowID -> Request ()
     sendWindowCloseRequest :: WindowID -> Request Bool       
 
-struct CocoaWindow < RespondsToWindowEvents, RespondsToInputEvents, HasSize, HasBackgroundColor, ContainsComponents, HasResponders, HasWindowResponder, IsResizeable where 
+struct CocoaWindow < RespondsToWindowEvents, RespondsToInputEvents, HasSize, HasBackgroundColor, ContainsComponents, HasResponders, HasWindowResponder, IsResizable where 
     getId         :: Request WindowID
     initWindow    :: App -> Request ()
     destroyWindow :: Request ()
@@ -98,9 +98,9 @@ struct HasSize < HasPosition where
     setSize :: Size -> Request ()
     getSize :: Request Size
 
-struct IsResizeable where
-    setResizeable :: Bool -> Request ()
-    getResizeable :: Request Bool
+struct IsResizable where
+    setResizable :: Bool -> Request ()
+    getResizable :: Request Bool
 
 struct HasBackgroundColor where
     setBackgroundColor :: Color -> Request ()

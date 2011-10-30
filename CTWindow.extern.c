@@ -243,10 +243,10 @@ TUP0 windowSetPosition_CTWindow (Int cocoaRef, Position_CocoaDef pos) {
 	});
 } 
 
-TUP0 windowSetResizeable_CTWindow (Int cocoaRef, Bool resizeable) {
+TUP0 windowSetResizable_CTWindow (Int cocoaRef, Bool resizable) {
     NSUInteger styleMask;
 
-    if (resizeable) {
+    if (resizable) {
         styleMask = (NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask);
     } else {
         styleMask = (NSTitledWindowMask | NSClosableWindowMask);

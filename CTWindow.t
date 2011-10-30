@@ -69,7 +69,8 @@ mkCocoaWindow = class
             _ = windowSetHidden ref
             _ = windowSetContentView ref container_ref
             _ = windowSetSize ref (<-getSize)        
-            _ = windowSetPosition ref position
+            _ = windowSetPosition ref position 
+            _ = windowSetResizeable ref resizeable
             if isVisible then
                 _ = windowSetVisible ref
 

@@ -106,13 +106,6 @@ bool dispatchEventToTimber(NSEvent* event) {
         ((_MouseEvent_CocoaDef)receivedEvent)->GCINFO = __GC___MouseEvent_CocoaDef;
         ((_MouseEvent_CocoaDef)receivedEvent)->Tag = 1;
         ((_MouseEvent_CocoaDef)receivedEvent)->a = (MouseEventType_CocoaDef)scroll;     
-
-    	App_CocoaDef app = getApp();
-        app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef->sendInputEvent_CocoaDef(
-            app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef, 
-			(InputEvent_CocoaDef)receivedEvent, [event windowNumber], 0);
-			      
-        return true;
         
 	} else {
 	    

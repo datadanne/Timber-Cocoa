@@ -35,10 +35,7 @@ buttonClickHandler btn = class
     respondToInputEvent (MouseEvent ev) modifiers = request
         case ev of
             MouseClicked pos ->
-                -- this leads to deadlock until we've fixed so that responders are actions!!!
-                -- btn.setSize ({width=200;height=150})
-                -- this is a temporary solution !!!
-                send action btn.setSize ({width=200;height=150})
+                btn.setSize ({width=200;height=150})
                 result True
             _ ->
                 result False

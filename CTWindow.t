@@ -13,7 +13,17 @@ mkCocoaWindow = class
     rootContainer = new mkCocoaContainer
     defaultResponder = new defaultInputResponder this rootContainer
     
-    DefaultEventResponder {setResponders=setRespondersImpl;..} = new basicHasResponders 
+    DefaultEventResponder {setResponders=setRespondersImpl;respondToInputEvent=respondToInputEventImpl;..} = 
+        new basicHasResponders 
+    
+    respondToInputEvent e m = request
+        respond e m
+        result False -- do not block Cocoa from processing events
+    
+    respond = new class
+        act e m = action
+            respondToInputEventImpl e m
+        result act
     
     setResponders rs = request
         setRespondersImpl (defaultResponder:rs)
@@ -44,14 +54,27 @@ mkCocoaWindow = class
             _ = windowSetResizable ref bool
         resizable := bool
 
-    windowResponder := new defaultWindowResponder this        
-    setWindowResponder resp = request 
-        windowResponder := resp
-        
+    overrideWindowCloseRequest := False
+    setWindowResponder resp override = request 
+        overrideWindowCloseRequest := override
+        set resp
     onWindowResize size = request
-        windowResponder.onWindowResize size
+        resize size
     onWindowCloseRequest = request
-        result (<- windowResponder.onWindowCloseRequest)
+        close
+        result overrideWindowCloseRequest
+
+    (resize,close,set) = new class
+        windowResponder := Nothing
+        resize size = action
+            if isJust windowResponder then
+                (fromJust windowResponder).onWindowResize size
+        close = action
+            if isJust windowResponder then
+                (fromJust windowResponder).onWindowCloseRequest
+        set resp = request 
+            windowResponder := Just resp
+        result (resize,close,set)
 
     windowId := 0
     getId = request
@@ -114,13 +137,6 @@ mkCocoaWindow = class
     this = CocoaWindow {..}
     
     result this
-
-defaultWindowResponder :: CocoaWindow -> Class RespondsToWindowEvents
-defaultWindowResponder window = class
-    onWindowResize toSize = request
-    onWindowCloseRequest = request 
-        result True
-    result RespondsToWindowEvents {..}
 
 getKey (KeyPressed k)  = k
 getKey (KeyReleased k) = k

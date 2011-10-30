@@ -73,7 +73,7 @@ root w = class
         w1.addComponent ta
 
         windowResponderObj = new windowResponder ta env
-        w1.setWindowResponder windowResponderObj
+        w1.setWindowResponder windowResponderObj False
         replaceTabResponder
         
     replaceTabResponder = do

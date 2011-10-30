@@ -67,7 +67,7 @@ struct RespondsToInputEvents where
     respondToInputEvent :: InputEvent -> Modifiers -> Request Bool
 
 struct HasWindowResponder where
-    setWindowResponder   :: RespondsToWindowEvents -> Request ()
+    setWindowResponder   :: RespondsToWindowEvents -> Bool -> Request ()
 
 struct RespondsToWindowEvents where
     onWindowResize       :: Size -> Request ()

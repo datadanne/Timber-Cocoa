@@ -75,7 +75,7 @@ root w = class
         w1.addComponent ta
 
         windowResponderObj = new windowResponder ta env
-        w1.setWindowResponder windowResponderObj
+        w1.setWindowResponder windowResponderObj False
         replaceTabResponder
 
    -- Tutorial 3 : Consume tab event in text area.
@@ -107,6 +107,11 @@ root w = class
         colorWindow.setPosition ({x=445;y=300})
         colorWindow.setVisible False
         colorWindow.setResizable False
+        colorWindow.setWindowResponder (new class
+            onWindowResize s = request
+            onWindowCloseRequest = request
+                result False
+            result RespondsToWindowEvents{..}) True
         
         initColorGrid = new colorPickerGrid colorWindow setColor env
         initColorGrid

@@ -8,7 +8,7 @@
 
 	/* Ask Timber whether or not the window should close */
 	App_CocoaDef app = getApp();
-	return app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef->sendWindowCloseRequest_CocoaDef(app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef, [sender windowNumber], 0);
+	return ! (app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef->sendWindowCloseRequest_CocoaDef(app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef, [sender windowNumber], 0));
 }
 - (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)toSize { 
     Thread current_thread = CURRENT();

@@ -27,7 +27,7 @@ struct AppCallback {
 
 AppCallback toRunWhenAppFinished;
 
-int length (LIST list);
-char *listToChars(LIST str);
+int length (LIST);
+char *listToChars(LIST);
 
 #endif

@@ -2,25 +2,21 @@
 #import "COCOA.extern.m"
 
 int length (LIST list) {
-    switch ((int)list) {
-        case 0: return 0;
-        default: return (1 + length(((CONS)list)->tl));
-    }
+    int l;
+    for(l=0; ((int)list)!=0; l++)
+        list = ((CONS)list)->tl;
+    return l;
 }
 
 char *listToChars(LIST str) {
-	int len;
-    char* buf; 
-	int size = length(str);
-
-    NEW(char*, buf, WORDS(sizeof(char) * size+1));   
-    len = 0;
-    while (str && len < size) {
+	int len = 0;
+    int size = length(str);
+    char* buf = malloc(sizeof(char)*size+1);
+    while (len < size) {
       buf[len++] = (Char)(Int)((CONS)str)->hd;
       str = ((CONS)str)->tl;
     }
 	buf[len] = 0;
-	
     return buf;
 }
 

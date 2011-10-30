@@ -82,11 +82,9 @@ bool dispatchEventToTimber(NSEvent* event) {
         scroll->Tag = 4;
         scroll->a = position;
 
-        float deltaX = -1 * [event deviceDeltaX];
-        float deltaY = -1 * [event deviceDeltaY];
-
-#if _ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED_ >= 1070
-
+        float deltaX;
+        float deltaY;
+#if __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 1070
         if ([event hasPreciseScrollingDeltas]) {
             deltaX = [event scrollingDeltaX];
             deltaY = [event scrollingDeltaY];
@@ -95,7 +93,10 @@ bool dispatchEventToTimber(NSEvent* event) {
             deltaX *= -1;
             deltaY *= -1;
         }
-
+#else
+        deltaX = -1 * [event deviceDeltaX];
+        deltaY = -1 * [event deviceDeltaY];
+        
 #endif
 
         scroll->b = deltaX;

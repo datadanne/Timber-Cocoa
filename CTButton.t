@@ -41,7 +41,7 @@ mkCocoaButton = class
         result title
 
     destroyComp = request
-        state := Destroyed
+        state := destroyState state
 
     initComp app = request
         ref = initButton title

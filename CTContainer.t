@@ -55,11 +55,10 @@ mkCocoaContainer = class
         myComponents := [x | x <- myComponents, not (x == c)]
         if isActive state then
             Active ref = state
-            s <- c.getState
-            if isActive s then
-                Active c_ref = s
-                _ = containerRemoveComponent ref c_ref
             c.destroyComp
+            (Destroyed c_ref) <- c.getState
+            if isJust c_ref then
+                _ = containerRemoveComponent ref (fromJust c_ref)
             
     removeAllComponents = request
         removeAllComponentsImpl
@@ -83,7 +82,7 @@ mkCocoaContainer = class
             removeAllComponentsImpl
             Active ref = state
             _ = destroyContainer ref
-            state := Destroyed
+        state := destroyState state
         
     initComp app = request
         appRef := Just app

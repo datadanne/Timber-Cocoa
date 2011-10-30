@@ -12,13 +12,25 @@ mkCocoaTextArea = class
         result state
         
     dts = new defaultTextScrollResponder this
-    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl;setResponders=setRespondersImpl..} = new basicComponent True Nothing "TextArea"
+    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl;setResponders=setRespondersImpl..} = 
+        new basicComponent True Nothing "TextArea"
 
-    setResponders :: [RespondsToInputEvents] -> Request ()
+    setPosition p = request
+        if isActive state then
+            Active ref = state
+            _ = textAreaSetPosition ref p 
+        setPositionImpl p
+
+    setSize s = request
+        if isActive state then
+            Active ref = state
+            _ = textAreaSetSize ref s
+        setSizeImpl s
+
     setResponders rs = request
         setRespondersImpl (dts:rs)
 
-    scrollable := (False, True)
+    scrollable := (True, True)
     getScrollable = request
         result scrollable
     
@@ -42,23 +54,9 @@ mkCocoaTextArea = class
     getText = request
         result text
     
-    -- setPosition
-    setPosition p = request
-        if isActive state then
-            Active ref = state
-            _ = textAreaSetPosition ref p 
-        setPositionImpl p
-
-    setSize s = request
-        if isActive state then
-            Active ref = state
-            _ = textAreaSetSize ref s
-        setSizeImpl s
-
     destroyComp = request
-        state := Destroyed
+        state := destroyState state
 
-    -- undocumented feature in Timber, init must be placed above 'this' else we have some nice raise(2); :-)
     initComp app = request
         ref = initTextArea ()
         state := Active ref
@@ -87,27 +85,26 @@ defaultTextScrollResponder textArea = class
             (Active ref) -> _= textAreaScrollTo ref deltaX deltaY
             _ ->
     
-    respondToInputEvent (MouseEvent t) modifiers = request
+    respondToInputEvent (MouseEvent t) _ = request
         case t of
             MouseMoved pos ->
             MouseWheelScroll pos deltaX deltaY -> 
                 scrollTo deltaX deltaY
             _ ->                    
-            
         result True
     
-    respondToInputEvent _ modifiers = request
+    respondToInputEvent _ _ = request
         result False
     
     result RespondsToInputEvents {..}
+    
 --------------------------------------------------------------------------------------------------
 ------          ** EXTERN **            ----------------------------------------------------------  
 
---textArea      
-extern initTextArea :: () -> CocoaRef
-extern textAreaSetText :: CocoaRef -> String -> ()
-extern textAreaSetPosition :: CocoaRef -> Position -> ()
-extern textAreaSetSize :: CocoaRef -> Size -> ()
+extern initTextArea                :: () -> CocoaRef
+extern textAreaSetText             :: CocoaRef -> String -> ()
+extern textAreaSetPosition         :: CocoaRef -> Position -> ()
+extern textAreaSetSize             :: CocoaRef -> Size -> ()
 extern textAreaSetHorizontalScroll :: CocoaRef -> Bool -> ()
-extern textAreaSetVerticalScroll :: CocoaRef -> Bool -> ()
-extern textAreaScrollTo :: CocoaRef -> Float -> Float -> ()
+extern textAreaSetVerticalScroll   :: CocoaRef -> Bool -> ()
+extern textAreaScrollTo            :: CocoaRef -> Float -> Float -> ()

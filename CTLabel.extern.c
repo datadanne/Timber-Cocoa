@@ -37,6 +37,7 @@ TUP0 labelSetText_CTLabel(Int cocoaRef, LIST str) {
         [thisLabel setStringValue:[NSString stringWithFormat:@"%s", buf]];
         [thisLabel setNeedsDisplay];
         [pool drain];
+        free(buf);
     });
 }
 

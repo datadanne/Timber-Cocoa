@@ -11,7 +11,8 @@ struct AppImpl where
     sendWindowResize       :: Size -> WindowID -> Request ()
     sendWindowCloseRequest :: WindowID -> Request Bool       
 
-struct CocoaWindow < RespondsToWindowEvents, RespondsToInputEvents, HasSize, HasBackgroundColor, ContainsComponents, HasResponders, HasWindowResponder, IsResizable where 
+struct CocoaWindow < RespondsToWindowEvents, RespondsToInputEvents, HasSize, HasBackgroundColor, 
+    ContainsComponents, HasResponders, HasWindowResponder, IsResizable where 
     getId         :: Request WindowID
     initWindow    :: App -> Request ()
     destroyWindow :: Request ()
@@ -32,14 +33,18 @@ struct BaseComponent < IsFocusable, HasSize, HasResponders, RespondsToInputEvent
     getParent      :: Request (Maybe Component)
     getAllChildren :: Request [Component]
 
-data ComponentState = Active CocoaRef | Inactive | Destroyed
+data ComponentState =  Inactive | Active CocoaRef | Destroyed (Maybe CocoaRef)
 
-isActive (Active _)   = True
-isActive _            = False
-isInactive Inactive   = True
-isInactive _          = False
-isDestroyed Destroyed = True
-isDestroyed _         = False
+isActive (Active _)       = True
+isActive _                = False
+isInactive Inactive       = True
+isInactive _              = False
+isDestroyed (Destroyed _) = True
+isDestroyed _             = False
+
+destroyState Inactive     = Destroyed Nothing
+destroyState (Active ref) = Destroyed (Just ref)
+destroyState s            = s
 
 instance eqComponent :: Eq Component where
     (==) a b = a.id == b.id

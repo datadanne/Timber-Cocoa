@@ -27,26 +27,9 @@ root w = class
         button2.setName "button2"
         button2.setTitle "I am button 2"
         button2.setPosition ({x=100;y=130})
-        button2.addResponder (new buttonClickHandler2 button2 env.stdout.write)
         w1.addComponent button2
         
         osx.startApplication start
-
-buttonClickHandler2 btn writer = class
-    c := 0
-    respondToInputEvent (MouseEvent ev) modifiers = request
-        case ev of
-            MouseClicked pos ->
-                c := c+1
-                writer (show c ++ "\n")
-                result True
-            _ ->
-                result False
-            
-    respondToInputEvent _ _ = request 
-        result False
-    
-    result RespondsToInputEvents {..}
         
 buttonClickHandler btn = class
     respondToInputEvent (MouseEvent ev) modifiers = request

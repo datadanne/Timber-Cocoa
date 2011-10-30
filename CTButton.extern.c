@@ -9,6 +9,7 @@ TUP0 buttonSetTitle_CTButton(Int cocoaRef, LIST s) {
         [thisButton setTitle:[NSString stringWithFormat:@"%s", buf]];
         [thisButton sizeToFit]; 
         [pool drain];
+        free(buf);
     });
 } 
 
@@ -54,6 +55,7 @@ Int initButton_CTButton(LIST s) {
         [thisButton setTitle:[NSString stringWithFormat:@"%s", buf]];
         [thisButton sizeToFit];
         [pool drain];
+        free(buf);
     });
     return (Int)thisButton;
 }

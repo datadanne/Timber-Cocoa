@@ -47,7 +47,7 @@ mkCocoaLabel = class
         result textColor
         
     destroyComp = request
-        state := Destroyed
+        state := destroyState state
     
     getState = request
         result state

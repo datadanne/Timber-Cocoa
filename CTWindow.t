@@ -79,7 +79,7 @@ mkCocoaWindow = class
             Active ref = state
             _ = destroyCocoaWindow ref -- Is this the right order for Cocoa?
             rootContainer.destroyComp
-            state := Destroyed
+        state := destroyState state
 
     currentFocus := rootContainer
     setFocus cmp = request

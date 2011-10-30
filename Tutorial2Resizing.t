@@ -55,7 +55,7 @@ root w = class
         w1.addComponent rightContainer
 
     addButtonResponder = do
-        handler = new buttonHandler label
+        handler = new buttonHandler label env
         button.addResponder handler
 
     ta = new mkCocoaTextArea
@@ -72,7 +72,7 @@ root w = class
     result action
         osx.startApplication applicationDidFinishLaunching  
         
-buttonHandler label = class
+buttonHandler label env = class
     clickCount := 0
 
     respondToInputEvent (MouseEvent event) modifiers = request

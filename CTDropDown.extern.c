@@ -29,6 +29,7 @@ TUP0 dropDownAddOption_CTDropDown(Int cocoaRef,LIST str) {
 	    [thisDropDown addItemWithTitle:[NSString stringWithFormat:@"%s", buf]];
 	    [thisDropDown setNeedsDisplay];
 	    [pool drain];
+        free(buf);
     });
 }
 

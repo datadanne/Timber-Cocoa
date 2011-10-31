@@ -71,7 +71,11 @@ mkCocoaWindow = class
         resize size
     onWindowCloseRequest = request
         close
-        result overrideWindowCloseRequest
+        if overrideWindowCloseRequest then
+            result True
+        else
+            state := destroyState state
+            result False
 
     (resize,close,set) = new class
         windowResponder := Nothing

@@ -15,7 +15,7 @@ root w = class
     w1 = new mkCocoaWindow
     colorWindow = new mkCocoaWindow
     
-    applicationDidFinishLaunching app = action
+    start app = action
         w1.setSize ({width=400;height=400}) 
         w1.setBackgroundColor ({r=200;g=200;b=200})
 
@@ -31,7 +31,7 @@ root w = class
 
     label = new mkCocoaCallbackLabel            -- note! this labels have been updated to
     tabCountLabel = new mkCocoaCallbackLabel    -- be callback-labels
-    button = new mkCocoaButton env
+    button = new mkCocoaButton
     leftContainer = new mkCocoaContainer 
     rightContainer = new mkCocoaContainer 
     callbackLabel = new mkCocoaLabel
@@ -79,7 +79,7 @@ root w = class
         w1.addComponent ta
 
         windowResponderObj = new windowResponder ta env
-        w1.setWindowResponder windowResponderObj
+        w1.setWindowResponder windowResponderObj False
         replaceTabResponder
 
    -- Tutorial 3 : Consume tab event in text area.
@@ -100,7 +100,7 @@ root w = class
         rgbLabel.setPosition ({x=40; y=40})
         rightContainer.addComponent rgbLabel
         
-        colorButton = new mkCocoaButton env   
+        colorButton = new mkCocoaButton   
         colorButton.setTitle "Open ColorPicker"
         colorButton.setSize ({width=150;height=21})
         colorButton.setPosition ({x=40; y=75})
@@ -110,6 +110,12 @@ root w = class
         colorWindow.setSize ({width=215;height=215})
         colorWindow.setPosition ({x=445;y=300})
         colorWindow.setVisible False
+        colorWindow.setResizable False
+        colorWindow.setWindowResponder (new class
+            onWindowResize s = request
+            onWindowCloseRequest = request
+                result False
+            result RespondsToWindowEvents{..}) True
         
         initColorGrid = new colorPickerGrid colorWindow setColor env
         initColorGrid
@@ -128,7 +134,7 @@ root w = class
         callbackLabel.setText ("CB: " ++ newText)
 
     result action
-        osx.startApplication applicationDidFinishLaunching  
+        osx.startApplication start  
 
 -- Tutorial 2 : Responder for button click
 buttonHandler label = class
@@ -167,8 +173,6 @@ windowResponder textarea env = class
     onWindowCloseRequest = request
         result True
 
-    setWindowResponder responder = request 
-    
     result RespondsToWindowEvents {..}
     
 -- Tutorial 3 : Responder to overload TAB key

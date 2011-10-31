@@ -14,8 +14,8 @@ TUP0 buttonSetTitle_CTButton(Int cocoaRef, LIST s) {
 } 
 
 TUP0 buttonSetPosition_CTButton(Int cocoaRef, Position_CocoaDef pos) {
-    int x = pos->x_CocoaDef;
-    int y = pos->y_CocoaDef;
+    int x = pos->x_CocoaDef -6; // subtract x-border
+    int y = pos->y_CocoaDef -4; // subtract y-border
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         NSButton *thisButton = (NSButton*) cocoaRef;
@@ -38,8 +38,8 @@ Size_CocoaDef buttonSetSize_CTButton(Int cocoaRef, Size_CocoaDef size) {
         rr = [thisButton frame];
         NEW (Size_CocoaDef, newSize, WORDS(sizeof(struct Size_CocoaDef)));
         newSize->GCINFO = __GC__Size_CocoaDef;
-        newSize->width_CocoaDef = rr.size.width;
-        newSize->height_CocoaDef = rr.size.height;
+        newSize->width_CocoaDef = rr.size.width -13; // compensate for x-borders
+        newSize->height_CocoaDef = rr.size.height -11; // compensate for y-borders
         [pool drain]; 
     });
     return newSize;

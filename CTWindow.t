@@ -206,7 +206,7 @@ defaultInputResponder window rootContainer = class
 
     respondToInputEvent (MouseEvent me) modifiers = request
         cmps <- rootContainer.getAllChildren
-        scanList cmps (findMouseFocus me modifiers)
+        scanList (reverse cmps) (findMouseFocus me modifiers)
         result (<- rootContainer.respondToInputEvent (MouseEvent me) modifiers)
     
     foundFocus := False

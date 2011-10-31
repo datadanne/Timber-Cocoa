@@ -2,8 +2,7 @@ module CTButton where
 
 import COCOA   
 
-struct Button < Component, HasTitle where
-
+struct Button < Component, HasTitle
 --------------------------------------------------------------------------------------------------
 ------          ** BUTTON **            ----------------------------------------------------------
 

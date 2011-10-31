@@ -3,6 +3,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include "timber.h"
 #include "CocoaDef.h"
 
 extern pthread_mutex_t rts;
@@ -12,7 +13,7 @@ extern ADDR copy(ADDR obj);
 #define DEBUGGING 0
 #define DEBUG(...) if(DEBUGGING){printf("%s:%d ",__FILE__, __LINE__);printf(__VA_ARGS__);printf("\n");}
 
-CocoaEnv_CocoaDef cocoa_COCOA(World, Int);
+CocoaEnv_CocoaDef cocoa_COCOA(World,Int);
 TUP0 startApplication_COCOA (CocoaEnv_CocoaDef, CLOS, Int);
 
 App_CocoaDef getApp(void);

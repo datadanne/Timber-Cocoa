@@ -147,6 +147,15 @@ data CocoaKey = A | S | D | F | H | G | Z | X | C | V | Dummy1 |
                 ForwardDelete | F4 | End | F2 | PageDown | F1 |
                 LeftArrow | RightArrow | DownArrow | UpArrow
 
+type Modifiers = [CocoaKey]
+
+-- abstract types
+WindowID   :: *
+CocoaRef   :: *
+CocoaWorld :: *
+
+private
+
 type WindowID = Int
 type CocoaRef = Int
-type Modifiers = [CocoaKey]
+type CocoaWorld = World

@@ -2,7 +2,7 @@ module COCOA where
 
 import CTWindow
   
-extern cocoa :: World -> Class CocoaEnv
+extern cocoa :: CocoaWorld -> Class CocoaEnv
 
 private
 

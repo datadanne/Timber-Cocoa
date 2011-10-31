@@ -2,10 +2,7 @@ module CTButton where
 
 import COCOA   
 
-struct Button < Component where
-    setTitle :: String -> Request ()
-    getTitle :: Request String
-
+struct Button < Component, HasTitle
 --------------------------------------------------------------------------------------------------
 ------          ** BUTTON **            ----------------------------------------------------------
 

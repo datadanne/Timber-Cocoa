@@ -1,16 +1,25 @@
 #include "CTButton.extern.h"
                     
 // --------- Button ----------------------------------------------
-TUP0 buttonSetTitle_CTButton(Int cocoaRef, LIST s, Int dummy) {
+Size_CocoaDef buttonSetTitle_CTButton(Int cocoaRef, LIST s, Int dummy) {
     char* buf = listToChars(s);
-    dispatch_async(dispatch_get_main_queue(), ^{
+    __block Size_CocoaDef newSize;
+    dispatch_sync(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         NSButton *thisButton = (NSButton*) cocoaRef;
         [thisButton setTitle:[NSString stringWithFormat:@"%s", buf]];
         [thisButton sizeToFit]; 
+        
+        NSRect rr = [thisButton frame];
+        NEW (Size_CocoaDef, newSize, WORDS(sizeof(struct Size_CocoaDef)));
+        newSize->GCINFO = __GC__Size_CocoaDef;
+        newSize->width_CocoaDef = rr.size.width -13; // compensate for x-borders
+        newSize->height_CocoaDef = rr.size.height -11; // compensate for y-borders
+        
         [pool drain];
         free(buf);
     });
+    return newSize;
 } 
 
 TUP0 buttonSetPosition_CTButton(Int cocoaRef, Position_CocoaDef pos, Int dummy) {
@@ -45,17 +54,15 @@ Size_CocoaDef buttonSetSize_CTButton(Int cocoaRef, Size_CocoaDef size, Int dummy
     return newSize;
 }
 
-Int initButton_CTButton(World w, LIST s, Int dummy) {
-	char* buf = listToChars(s);
+Int initButton_CTButton(World w, Int dummy) {
     __block NSButton *thisButton;
     dispatch_sync(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
         thisButton = [[NSButton alloc] initWithFrame: NSMakeRect(0.0, 0.0, 120.0, 60.0)];
         [thisButton setBezelStyle:NSRoundedBezelStyle];
-        [thisButton setTitle:[NSString stringWithFormat:@"%s", buf]];
+        [thisButton setTitle:@"Click me!"];
         [thisButton sizeToFit];
         [pool drain];
-        free(buf);
     });
     return (Int)thisButton;
 }

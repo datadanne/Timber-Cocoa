@@ -43,9 +43,10 @@ mkCocoaButton w = class
         state := destroyState state
 
     initComp app = request
-        ref <- initButton w title
+        ref <- initButton w
         state := Active ref
-        setSizeImpl (<- buttonSetSize ref (<- getSize))
+        -- this will also set the size to fit the text
+        setSizeImpl (<- buttonSetTitle ref title)
         buttonSetPosition ref (<- getPosition)
         result ref
     
@@ -58,7 +59,7 @@ mkCocoaButton w = class
 
 private 
  
-extern initButton        :: World -> String -> Request CocoaRef
-extern buttonSetTitle    :: CocoaRef -> String -> Request ()
+extern initButton        :: World -> Request CocoaRef
+extern buttonSetTitle    :: CocoaRef -> String -> Request Size
 extern buttonSetPosition :: CocoaRef -> Position -> Request ()
 extern buttonSetSize     :: CocoaRef -> Size -> Request Size

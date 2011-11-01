@@ -2,14 +2,14 @@ module Tutorial4ColorPicker where
 
 import CTWindow
 
-colorPickerTile colorPickerX colorPickerY env = class
+colorPickerTile colorPickerX colorPickerY w = class
     color := ({r=128;g=16*colorPickerX;b=16*colorPickerY})
     
     initTile parent callback = request
         size = 12
-        responder = new tileResponder color callback env
+        responder = new tileResponder color callback
     
-        container = new mkCocoaContainer
+        container = new mkCocoaContainer w
         container.setSize ({width=size;height=size})
         container.setPosition ({x=size*colorPickerX;y=size*colorPickerY})
         container.setBackgroundColor color
@@ -17,7 +17,7 @@ colorPickerTile colorPickerX colorPickerY env = class
         
         parent.addComponent container
         
-    tileResponder tileColor setColor env = class
+    tileResponder tileColor setColor = class
         respondToInputEvent (MouseEvent event) modifiers = request
             setColor tileColor
             result False

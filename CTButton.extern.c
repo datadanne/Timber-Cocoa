@@ -1,7 +1,7 @@
 #include "CTButton.extern.h"
                     
 // --------- Button ----------------------------------------------
-TUP0 buttonSetTitle_CTButton(Int cocoaRef, LIST s) {
+TUP0 buttonSetTitle_CTButton(Int cocoaRef, LIST s, Int dummy) {
     char* buf = listToChars(s);
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -13,7 +13,7 @@ TUP0 buttonSetTitle_CTButton(Int cocoaRef, LIST s) {
     });
 } 
 
-TUP0 buttonSetPosition_CTButton(Int cocoaRef, Position_CocoaDef pos) {
+TUP0 buttonSetPosition_CTButton(Int cocoaRef, Position_CocoaDef pos, Int dummy) {
     int x = pos->x_CocoaDef -6; // subtract x-border
     int y = pos->y_CocoaDef -4; // subtract y-border
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -26,7 +26,7 @@ TUP0 buttonSetPosition_CTButton(Int cocoaRef, Position_CocoaDef pos) {
     });
 }
 
-Size_CocoaDef buttonSetSize_CTButton(Int cocoaRef, Size_CocoaDef size) {
+Size_CocoaDef buttonSetSize_CTButton(Int cocoaRef, Size_CocoaDef size, Int dummy) {
     int width = size->width_CocoaDef;
     __block Size_CocoaDef newSize;
     dispatch_sync(dispatch_get_main_queue(), ^{    
@@ -45,7 +45,7 @@ Size_CocoaDef buttonSetSize_CTButton(Int cocoaRef, Size_CocoaDef size) {
     return newSize;
 }
 
-Int initButton_CTButton(LIST s) {
+Int initButton_CTButton(World w, LIST s, Int dummy) {
 	char* buf = listToChars(s);
     __block NSButton *thisButton;
     dispatch_sync(dispatch_get_main_queue(), ^{
@@ -61,5 +61,5 @@ Int initButton_CTButton(LIST s) {
 }
 
 void _init_external_CTButton(void) {
-    // Nothing
+    // Do nothing
 }

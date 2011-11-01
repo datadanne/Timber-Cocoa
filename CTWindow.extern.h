@@ -4,6 +4,8 @@
 #import <Cocoa/Cocoa.h>
 
 #include "rts.h"
+#include "timber.h"
+
 extern pthread_mutex_t rts;
 extern int rootsDirty;
 
@@ -17,15 +19,17 @@ extern int rootsDirty;
 }
 - (void) setEventDispatcher:(bool(*)(NSEvent*))dispatcher;
 @end
+
 Bool compareKeys_CTWindow(CocoaKey_CocoaDef, CocoaKey_CocoaDef);
-TUP2 initCocoaWindow_CTWindow(TUP0);
-TUP0 destroyCocoaWindow_CTWindow(Int);
-TUP0 windowSetContentView_CTWindow(Int,Int);
-TUP0 windowSetHidden_CTWindow(Int);
-TUP0 windowSetVisible_CTWindow(Int);
-TUP0 windowSetSize_CTWindow(Int, Size_CocoaDef);
-TUP0 windowSetPosition_CTWindow(Int, Position_CocoaDef);
-TUP0 windowSetFocus_CTWindow(Int,Int);
-TUP0 windowSetResizable_CTWindow (Int, Bool);
+
+TUP2 initCocoaWindow_CTWindow(World,Int);
+TUP0 destroyCocoaWindow_CTWindow(Int,Int);
+TUP0 windowSetContentView_CTWindow(Int,Int,Int);
+TUP0 windowSetHidden_CTWindow(Int,Int);
+TUP0 windowSetVisible_CTWindow(Int,Int);
+TUP0 windowSetSize_CTWindow(Int,Size_CocoaDef,Int);
+TUP0 windowSetPosition_CTWindow(Int,Position_CocoaDef,Int);
+TUP0 windowSetFocus_CTWindow(Int,Int,Int);
+TUP0 windowSetResizable_CTWindow (Int,Bool,Int);
 
 #endif

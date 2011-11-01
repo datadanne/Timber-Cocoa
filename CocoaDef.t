@@ -156,10 +156,8 @@ type Modifiers = [CocoaKey]
 -- abstract types
 WindowID   :: *
 CocoaRef   :: *
-CocoaWorld :: *
 
 private
 
 type WindowID = Int
 type CocoaRef = Int
-type CocoaWorld = World

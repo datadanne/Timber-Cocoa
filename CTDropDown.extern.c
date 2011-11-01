@@ -4,7 +4,7 @@
 
 // --------- DropDown ----------------------------------------------
 
-Int initDropDown_CTDropDown(TUP0 dummy) {
+Int initDropDown_CTDropDown(World w, Int dummy) {
     __block NSPopUpButton *cocoaDropDown;
     dispatch_sync(dispatch_get_main_queue(), ^{
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
@@ -21,7 +21,7 @@ Int initDropDown_CTDropDown(TUP0 dummy) {
 	return (Int)cocoaDropDown;
 } 
 
-TUP0 dropDownAddOption_CTDropDown(Int cocoaRef,LIST str) {
+TUP0 dropDownAddOption_CTDropDown(Int cocoaRef, LIST str, Int dummy) {
 	char* buf = listToChars(str);    
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -33,7 +33,7 @@ TUP0 dropDownAddOption_CTDropDown(Int cocoaRef,LIST str) {
     });
 }
 
-LIST dropDownGetSelectedOption_CTDropDown(Int cocoaRef) {
+LIST dropDownGetSelectedOption_CTDropDown(Int cocoaRef, Int dummy) {
     __block LIST s;
     dispatch_sync(dispatch_get_main_queue(), ^{
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
@@ -45,7 +45,7 @@ LIST dropDownGetSelectedOption_CTDropDown(Int cocoaRef) {
     return s;
 }
 
-TUP0 dropDownSetPosition_CTDropDown(Int cocoaRef,Position_CocoaDef pos) {
+TUP0 dropDownSetPosition_CTDropDown(Int cocoaRef, Position_CocoaDef pos, Int dummy) {
     int x = pos->x_CocoaDef;
     int y = pos->y_CocoaDef;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -59,7 +59,7 @@ TUP0 dropDownSetPosition_CTDropDown(Int cocoaRef,Position_CocoaDef pos) {
     });
 }
 
-Size_CocoaDef dropDownSetSize_CTDropDown(Int cocoaRef, Size_CocoaDef size) {
+Size_CocoaDef dropDownSetSize_CTDropDown(Int cocoaRef, Size_CocoaDef size, Int dummy) {
     int width = size->width_CocoaDef;
     __block Size_CocoaDef newSize;
     dispatch_sync(dispatch_get_main_queue(), ^{

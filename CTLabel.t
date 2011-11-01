@@ -6,7 +6,8 @@ struct Label < Component, HasText where
     setTextColor :: Color -> Request ()
     getTextColor :: Request Color
 
-mkCocoaLabel = class
+mkCocoaLabel :: World -> Class Label
+mkCocoaLabel w = class
     state := Inactive
     textColor := {r=0;g=0;b=0}
     text := "Default Label"
@@ -16,20 +17,20 @@ mkCocoaLabel = class
     setPosition p = request  
         if isActive state then
             Active ref = state
-            _ = labelSetPosition ref p
+            labelSetPosition ref p
         setPositionImpl p
 
     setSize s = request
         if isActive state then
             Active ref = state
-            _ = labelSetSize ref s
+            labelSetSize ref s
         setSizeImpl s
 
     setText s = request
         text := s
         if isActive state then
             Active ref = state
-            _ = labelSetText ref s
+            labelSetText ref s
 
     getText = request
         result text     
@@ -40,7 +41,7 @@ mkCocoaLabel = class
     setTextColor c = request
         if isActive state then
             Active ref = state
-            _ = labelSetTextColor ref c
+            labelSetTextColor ref c
         textColor := c
     
     getTextColor = request
@@ -53,12 +54,12 @@ mkCocoaLabel = class
         result state
                             
     initComp app = request
-            ref = initLabel ()
+            ref <- initLabel w
             state := Active ref
-            _= labelSetText ref text
-            _= labelSetPosition ref (<- getPosition)
-            _= labelSetSize ref (<- getSize)
-            _= labelSetTextColor ref textColor
+            labelSetText ref text
+            labelSetPosition ref (<- getPosition)
+            labelSetSize ref (<- getSize)
+            labelSetTextColor ref textColor
             result ref
         
     this = Label{id=self;..}
@@ -67,8 +68,8 @@ mkCocoaLabel = class
 
 private
 
-extern initLabel         :: () -> CocoaRef
-extern labelSetText      :: CocoaRef -> String -> ()
-extern labelSetPosition  :: CocoaRef -> Position -> ()    
-extern labelSetSize      :: CocoaRef -> Size -> ()       
-extern labelSetTextColor :: CocoaRef -> Color -> ()
+extern initLabel         :: World -> Request CocoaRef
+extern labelSetText      :: CocoaRef -> String -> Request ()
+extern labelSetPosition  :: CocoaRef -> Position -> Request ()    
+extern labelSetSize      :: CocoaRef -> Size -> Request ()       
+extern labelSetTextColor :: CocoaRef -> Color -> Request ()

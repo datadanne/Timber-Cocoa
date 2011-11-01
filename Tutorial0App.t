@@ -7,7 +7,7 @@ root w = class
     env = new posix w
     osx = new cocoa w
     
-    w1 = new mkCocoaWindow
+    w1 = new mkCocoaWindow w
 
     start app = action   
         w1.setPosition({x=100;y=300})

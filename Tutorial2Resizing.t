@@ -11,7 +11,7 @@ root w = class
     env = new posix w
     osx = new cocoa w
     
-    w1 = new mkCocoaWindow
+    w1 = new mkCocoaWindow w
     
     applicationDidFinishLaunching app = action                         
         w1.setSize ({width=400;height=400}) 
@@ -25,16 +25,16 @@ root w = class
         
         addWindowResponder
            
-    label = new mkCocoaLabel
-    button = new mkCocoaButton
+    label = new mkCocoaLabel w
+    button = new mkCocoaButton w
     
     createComponentHierarchy = do
-        leftContainer = new mkCocoaContainer 
+        leftContainer = new mkCocoaContainer w
         leftContainer.setSize ({width=200; height=200})
         leftContainer.setBackgroundColor ({r=100;g=0;b=0})
         leftContainer.setPosition ({x=0;y=0})
 
-        rightContainer = new mkCocoaContainer
+        rightContainer = new mkCocoaContainer w
         rightContainer.setSize ({width=200; height=200})
         rightContainer.setBackgroundColor ({r=0;g=100;b=0})
         rightContainer.setPosition ({x=200; y=0})    
@@ -58,7 +58,7 @@ root w = class
         handler = new buttonHandler label env
         button.addResponder handler
 
-    ta = new mkCocoaTextArea
+    ta = new mkCocoaTextArea w
 
     addWindowResponder = do
         ta.setSize ({width=300; height=80})

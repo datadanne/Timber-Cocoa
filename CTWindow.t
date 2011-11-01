@@ -5,12 +5,12 @@ import CTContainer
 --------------------------------------------------------------------------------------------------
 ------          ** WINDOW **            ---------------------------------------------------------- 
 
-mkCocoaWindow :: Class CocoaWindow
-mkCocoaWindow = class    
+mkCocoaWindow :: World -> Class CocoaWindow
+mkCocoaWindow w = class    
     
     state := Inactive        
     
-    rootContainer = new mkCocoaContainer
+    rootContainer = new mkCocoaContainer w
     defaultResponder = new defaultInputResponder this rootContainer
     
     DefaultEventResponder {setResponders=setRespondersImpl;respondToInputEvent=respondToInputEventImpl;..} = 
@@ -32,7 +32,7 @@ mkCocoaWindow = class
     setSize size = request
         if isActive state then 
             Active ref = state
-            _ = windowSetSize ref size
+            windowSetSize ref size
         setSizeImpl size
 
     -- the position of the window may change, but the position of root container is (0,0)
@@ -42,7 +42,7 @@ mkCocoaWindow = class
     setPosition pos = request
         if isActive state then 
             Active ref = state
-            _ = windowSetPosition ref pos
+            windowSetPosition ref pos
         position := pos
 
     resizable := True
@@ -51,7 +51,7 @@ mkCocoaWindow = class
     setResizable bool = request
         if isActive state then 
             Active ref = state
-            _ = windowSetResizable ref bool
+            windowSetResizable ref bool
         resizable := bool
     
     title := "CocoaWindow"
@@ -60,7 +60,7 @@ mkCocoaWindow = class
     setTitle s = request
         if isActive state then
             Active ref = state
-            _ = windowSetTitle ref s
+            windowSetTitle ref s
         title := s
         
     overrideWindowCloseRequest := False
@@ -97,25 +97,25 @@ mkCocoaWindow = class
     isVisible := True
     initWindow app = request
         if isInactive state then
-            (ref,id) = initCocoaWindow ()
+            (ref,id) <- initCocoaWindow w
             state    := Active ref
             windowId := id
             container_ref <- rootContainer.initComp app
             rootContainer.setName "RootContainer"
             addResponder defaultResponder
-            _ = windowSetHidden ref
-            _ = windowSetContentView ref container_ref
-            _ = windowSetSize ref (<-getSize)        
-            _ = windowSetPosition ref position 
-            _ = windowSetResizable ref resizable
-            _ = windowSetTitle ref title
+            windowSetHidden ref
+            windowSetContentView ref container_ref
+            windowSetSize ref (<-getSize)        
+            windowSetPosition ref position 
+            windowSetResizable ref resizable
+            windowSetTitle ref title
             if isVisible then
-                _ = windowSetVisible ref
+                windowSetVisible ref
 
     destroyWindow = request
         if isActive state then 
             Active ref = state
-            _ = destroyCocoaWindow ref -- Is this the right order for Cocoa?
+            destroyCocoaWindow ref -- Is this the right order for Cocoa?
             rootContainer.destroyComp
         state := destroyState state
 
@@ -127,7 +127,7 @@ mkCocoaWindow = class
             cmp_state <- cmp.getState
             if isActive cmp_state then
                 Active cmp_ref = cmp_state
-                _ = windowSetFocus ref cmp_ref
+                windowSetFocus ref cmp_ref
     getFocus = request
         result currentFocus
 
@@ -142,9 +142,9 @@ mkCocoaWindow = class
         if isActive state then
             Active ref = state
             if isVisible then
-                _ = windowSetVisible ref
+                windowSetVisible ref
             else
-                _ = windowSetHidden ref
+                windowSetHidden ref
             result True
         else
             result False 
@@ -275,13 +275,14 @@ instance eqCocoaKey :: Eq CocoaKey where
 private
 
 extern compareKeys          :: CocoaKey -> CocoaKey -> Bool
-extern initCocoaWindow      :: () -> (CocoaRef, WindowID)
-extern destroyCocoaWindow   :: CocoaRef -> ()
-extern windowSetContentView :: CocoaRef -> CocoaRef -> ()
-extern windowSetHidden      :: CocoaRef -> ()
-extern windowSetVisible     :: CocoaRef -> ()
-extern windowSetSize        :: CocoaRef -> Size -> ()
-extern windowSetPosition    :: CocoaRef -> Position -> ()
-extern windowSetFocus       :: CocoaRef -> CocoaRef -> () 
-extern windowSetResizable   :: CocoaRef -> Bool -> ()  
-extern windowSetTitle       :: CocoaRef -> String -> ()
+
+extern initCocoaWindow      :: World -> Request (CocoaRef, WindowID)
+extern destroyCocoaWindow   :: CocoaRef -> Request ()
+extern windowSetContentView :: CocoaRef -> CocoaRef -> Request ()
+extern windowSetHidden      :: CocoaRef -> Request ()
+extern windowSetVisible     :: CocoaRef -> Request ()
+extern windowSetSize        :: CocoaRef -> Size -> Request ()
+extern windowSetPosition    :: CocoaRef -> Position -> Request ()
+extern windowSetFocus       :: CocoaRef -> CocoaRef -> Request () 
+extern windowSetResizable   :: CocoaRef -> Bool -> Request ()  
+extern windowSetTitle       :: CocoaRef -> String -> Request ()

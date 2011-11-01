@@ -7,8 +7,8 @@ import CTDropDown
 root :: RootType
 root w = class
     osx = new cocoa w
-    w1 = new mkCocoaWindow
-    dropD = new mkCocoaDropDown
+    w1 = new mkCocoaWindow w
+    dropD = new mkCocoaDropDown w
 
     start app = action                         
         app.addWindow w1

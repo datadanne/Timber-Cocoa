@@ -12,8 +12,8 @@ root w = class
     env = new posix w
     osx = new cocoa w
     
-    w1 = new mkCocoaWindow
-    colorWindow = new mkCocoaWindow
+    w1 = new mkCocoaWindow w
+    colorWindow = new mkCocoaWindow w
     
     start app = action
         w1.setSize ({width=400;height=400}) 
@@ -29,12 +29,12 @@ root w = class
         addWindowResponder
         setUpCallbacks
 
-    label = new mkCocoaCallbackLabel            -- note! this labels have been updated to
-    tabCountLabel = new mkCocoaCallbackLabel    -- be callback-labels
-    button = new mkCocoaButton
-    leftContainer = new mkCocoaContainer 
-    rightContainer = new mkCocoaContainer 
-    callbackLabel = new mkCocoaLabel
+    label = new mkCocoaCallbackLabel w            -- note! this labels have been updated to
+    tabCountLabel = new mkCocoaCallbackLabel w    -- be callback-labels
+    button = new mkCocoaButton w
+    leftContainer = new mkCocoaContainer w
+    rightContainer = new mkCocoaContainer w
+    callbackLabel = new mkCocoaLabel w
     
     createComponentHierarchy = do
         leftContainer.setSize ({width=200; height=200})
@@ -69,7 +69,7 @@ root w = class
         handler = new buttonHandler label
         button.addResponder handler
 
-    ta = new mkCocoaTextArea
+    ta = new mkCocoaTextArea w
 
     addWindowResponder = do
         ta.setSize ({width=300; height=80})
@@ -88,7 +88,7 @@ root w = class
         ta.setResponders [tabResponder]
 
     -- Tutorial 4 : Add a color picker window
-    rgbLabel = new mkCocoaLabel
+    rgbLabel = new mkCocoaLabel w
 
     setColor color = request
         rgbLabel.setText ("R:" ++ (show (color.r)) ++ " G: " ++ (show (color.g)) ++ " B: " ++ (show (color.b)) ++ "\n") 
@@ -100,7 +100,7 @@ root w = class
         rgbLabel.setPosition ({x=40; y=40})
         rightContainer.addComponent rgbLabel
         
-        colorButton = new mkCocoaButton   
+        colorButton = new mkCocoaButton w  
         colorButton.setTitle "Open ColorPicker"
         colorButton.setSize ({width=150;height=21})
         colorButton.setPosition ({x=40; y=75})
@@ -117,7 +117,7 @@ root w = class
                 result False
             result RespondsToWindowEvents{..}) True
         
-        initColorGrid = new colorPickerGrid colorWindow setColor env
+        initColorGrid = new colorPickerGrid colorWindow setColor w
         initColorGrid
         
     -- Tutorial 5 : Adding a new label and set up callbacks

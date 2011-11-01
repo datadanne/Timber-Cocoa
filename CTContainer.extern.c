@@ -1,7 +1,7 @@
 #include "CTContainer.extern.h"
 #import "CTContainer.extern.m"
 
-Int initContainer_CTContainer(TUP0 dmy) {
+Int initContainer_CTContainer(World w, Int dummy) {
     __block CocoaView *cocoaView;
     dispatch_sync(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -11,7 +11,7 @@ Int initContainer_CTContainer(TUP0 dmy) {
     return (Int)cocoaView;
 }
 
-TUP0 destroyContainer_CTContainer(Int cocoaRef) {
+TUP0 destroyContainer_CTContainer(Int cocoaRef, Int dummy) {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         CocoaView *thisView = (CocoaView*)cocoaRef;
@@ -19,7 +19,7 @@ TUP0 destroyContainer_CTContainer(Int cocoaRef) {
         [pool drain];
     });
 }
-TUP0 containerSetBackgroundColor_CTContainer(Int containerRef, Color_CocoaDef color) {    
+TUP0 containerSetBackgroundColor_CTContainer(Int containerRef, Color_CocoaDef color, Int dummy) {    
     int r = color->r_CocoaDef;
     int g = color->g_CocoaDef;
     int b = color->b_CocoaDef;
@@ -31,7 +31,7 @@ TUP0 containerSetBackgroundColor_CTContainer(Int containerRef, Color_CocoaDef co
     });
 } 
 
-TUP0 containerSetSize_CTContainer(Int containerRef, Size_CocoaDef size) {
+TUP0 containerSetSize_CTContainer(Int containerRef, Size_CocoaDef size, Int dummy) {
     int width = size->width_CocoaDef;
     int height = size->height_CocoaDef;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -43,7 +43,7 @@ TUP0 containerSetSize_CTContainer(Int containerRef, Size_CocoaDef size) {
     });
 }
 
-TUP0 containerSetPosition_CTContainer(Int containerRef, Position_CocoaDef pos) {
+TUP0 containerSetPosition_CTContainer(Int containerRef, Position_CocoaDef pos, Int dummy) {
     int x = pos->x_CocoaDef;
     int y = pos->y_CocoaDef;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -55,7 +55,7 @@ TUP0 containerSetPosition_CTContainer(Int containerRef, Position_CocoaDef pos) {
     });
 }
 
-TUP0 containerAddComponent_CTContainer(Int containerRef, Int cmpRef) {
+TUP0 containerAddComponent_CTContainer(Int containerRef, Int cmpRef, Int dummy) {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         CocoaView *thisView = (CocoaView*) containerRef;
@@ -66,7 +66,7 @@ TUP0 containerAddComponent_CTContainer(Int containerRef, Int cmpRef) {
     });
 }
 
-TUP0 containerRemoveComponent_CTContainer(Int containerRef, Int cmpRef) {
+TUP0 containerRemoveComponent_CTContainer(Int containerRef, Int cmpRef, Int dummy) {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         CocoaView *thisView = (CocoaView*) containerRef;
@@ -77,4 +77,5 @@ TUP0 containerRemoveComponent_CTContainer(Int containerRef, Int cmpRef) {
 }
 
 void _init_external_CTContainer(void) {
+    // Do nothing
 }

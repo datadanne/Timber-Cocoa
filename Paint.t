@@ -4,16 +4,16 @@ import CTWindow     -- <- this includes CTContainer
 import CTLabel
 import CTContainer  -- but still, removing this causes compiler panic
 
-mkPaintBackdrop env = class
+mkPaintBackdrop w = class
 
-    Container {getAllChildren=getAllChildrenImpl..} = new mkCocoaContainer
+    Container {getAllChildren=getAllChildrenImpl..} = new mkCocoaContainer w
     
     getAllChildren = request
         result []
        
     result Container{..}  
 
-paintHandler w1 label env = class
+paintHandler w1 label w = class
     pixelCount := 0
     
     posget (MousePressed p) = p
@@ -27,7 +27,7 @@ paintHandler w1 label env = class
         label.setText ("Pixel Count: " ++ show pixelCount)
         --label.setText ("Position: " ++ (show pos.x) ++ "," ++ (show pos.y))
     
-        blackBox = new mkCocoaContainer
+        blackBox = new mkCocoaContainer w
         blackBox.setSize ({width=7;height=7})
         blackBox.setBackgroundColor({r=pos.x `mod` 255;g=pos.y `mod` 255;b=2*(pos.y-pos.x) `mod` 255})
         blackBox.setName ("Container" ++ (show pixelCount))
@@ -46,11 +46,11 @@ root w = class
     env = new posix w
     osx = new cocoa w
 
-    w1 = new mkCocoaWindow
-    bg = new mkPaintBackdrop env
-    label = new mkCocoaLabel
+    w1 = new mkCocoaWindow w
+    bg = new mkPaintBackdrop w
+    label = new mkCocoaLabel w
 
-    painter = new paintHandler bg label env
+    painter = new paintHandler bg label w
 
     applicationDidFinishLaunching app = action
         app.addWindow w1

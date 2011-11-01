@@ -97,4 +97,5 @@ TUP0 startApplication_COCOA (CocoaEnv_CocoaDef env, CLOS clos, Int poly) {
 }
 
 void _init_external_COCOA(void) {
+    // Do nothing
 }

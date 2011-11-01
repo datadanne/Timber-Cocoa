@@ -5,8 +5,8 @@ import CocoaDef
 --------------------------------------------------------------------------------------------------
 ------          ** CONTAINER **         ----------------------------------------------------------
 
-mkCocoaContainer :: Class Container
-mkCocoaContainer = class
+mkCocoaContainer :: World -> Class Container
+mkCocoaContainer w = class
     myComponents := []    
     color        := {r=255; g=255; b=255}
     appRef       := Nothing
@@ -18,16 +18,15 @@ mkCocoaContainer = class
     setPosition p = request
         if isActive state then
             Active ref = state
-            _ = containerSetPosition ref p
+            containerSetPosition ref p
         setPositionImpl p
 
     setSize s = request
         if isActive state then
             Active ref = state
-            _ = containerSetSize ref s
+            containerSetSize ref s
         setSizeImpl s
     
-    -- TODO: test that it actually works!
     getAllChildren = request
         cs <- forall c <- myComponents do
             list <- c.getAllChildren
@@ -37,7 +36,7 @@ mkCocoaContainer = class
     setBackgroundColor c = request
         if isActive state then
             Active ref = state
-            _ = containerSetBackgroundColor ref c
+            containerSetBackgroundColor ref c
         color := c
 
     getBackgroundColor = request
@@ -49,7 +48,7 @@ mkCocoaContainer = class
         if isActive state then
             Active ref = state
             c_ref <- c.initComp (fromJust appRef)
-            _ = containerAddComponent ref c_ref
+            containerAddComponent ref c_ref
             
     removeComponent c = request
         myComponents := [x | x <- myComponents, not (x == c)]
@@ -58,7 +57,7 @@ mkCocoaContainer = class
             c.destroyComp
             (Destroyed c_ref) <- c.getState
             if isJust c_ref then
-                _ = containerRemoveComponent ref (fromJust c_ref)
+                containerRemoveComponent ref (fromJust c_ref)
             
     removeAllComponents = request
         removeAllComponentsImpl
@@ -70,7 +69,7 @@ mkCocoaContainer = class
                 s <- c.getState
                 if isActive s then
                     Active c_ref = s
-                    _ = containerRemoveComponent ref c_ref
+                    containerRemoveComponent ref c_ref
                 c.destroyComp
         myComponents := []
 
@@ -81,19 +80,19 @@ mkCocoaContainer = class
         if (isActive state) then
             removeAllComponentsImpl
             Active ref = state
-            _ = destroyContainer ref
+            destroyContainer ref
         state := destroyState state
         
     initComp app = request
         appRef := Just app
-        ref = initContainer ()
+        ref <- initContainer w
         state := Active ref
-        _ = containerSetSize ref (<-getSize)
-        _ = containerSetBackgroundColor ref color
-        _ = containerSetPosition ref (<-getPosition)
+        containerSetSize ref (<-getSize)
+        containerSetBackgroundColor ref color
+        containerSetPosition ref (<-getPosition)
         forall c <- myComponents do
             c_ref <- c.initComp app
-            _ = containerAddComponent ref c_ref
+            containerAddComponent ref c_ref
         result ref
     
     getState = request
@@ -143,10 +142,10 @@ wrapper s = class
     get = request result a
     result (get,set)
 
-extern initContainer :: () -> CocoaRef
-extern destroyContainer :: CocoaRef -> ()
-extern containerSetBackgroundColor :: CocoaRef -> Color -> ()
-extern containerSetSize :: CocoaRef -> Size -> ()
-extern containerSetPosition :: CocoaRef -> Position -> ()
-extern containerAddComponent :: CocoaRef -> CocoaRef -> ()
-extern containerRemoveComponent :: CocoaRef -> CocoaRef -> ()
+extern initContainer                :: World -> Request CocoaRef
+extern destroyContainer             :: CocoaRef -> Request ()
+extern containerSetBackgroundColor  :: CocoaRef -> Color -> Request ()
+extern containerSetSize             :: CocoaRef -> Size -> Request ()
+extern containerSetPosition         :: CocoaRef -> Position -> Request ()
+extern containerAddComponent        :: CocoaRef -> CocoaRef -> Request ()
+extern containerRemoveComponent     :: CocoaRef -> CocoaRef -> Request ()

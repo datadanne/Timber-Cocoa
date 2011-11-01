@@ -11,13 +11,11 @@ struct DropDown < Component, RespondsToSelectionEvents, HasSelectionResponder wh
 --------------------------------------------------------------------------------------------------
 ------          ** CTDropDown **        ----------------------------------------------------------
 
-mkCocoaDropDown :: Class DropDown
-mkCocoaDropDown = class
+mkCocoaDropDown :: World -> Class DropDown
+mkCocoaDropDown w = class
 
     state        := Inactive
     size         := {width=108; height=17}
---  extendedSize := {width=108; height=17}
---  sizeState    := Small
     title        := "DropDown"    
 
     BaseComponent {setPosition=setPositionImpl;setSize=dummy1;getSize=dummy2;..} = 
@@ -26,13 +24,13 @@ mkCocoaDropDown = class
     setPosition p = request
         if isActive state then
             Active ref = state
-            _ = dropDownSetPosition ref p
+            dropDownSetPosition ref p
         setPositionImpl p
     
     setSize s = request
         if isActive state then
             Active ref = state
-            size := dropDownSetSize ref s
+            size := (<- dropDownSetSize ref s)
         else 
             size := s
     
@@ -47,17 +45,17 @@ mkCocoaDropDown = class
     
     options := []
     addOption o = request
-        _ <- insertOption o
+        insertOption o
     setOptions opts = action
         options := []
         forall o <- (reverse opts) do
-            _ <- insertOption o
+            insertOption o
     insertOption o = do
         options := o : options
         if isActive state then
             Active ref = state
-            _ = dropDownAddOption ref o  
-            currentOption := dropDownGetSelectedOption ref
+            dropDownAddOption ref o  
+            currentOption := (<- dropDownGetSelectedOption ref)
     getOptions = request
         result options
     
@@ -65,7 +63,7 @@ mkCocoaDropDown = class
     refreshMyOptionAndPerformCallback = action
         if isActive state then
             Active ref = state
-            currentOption := dropDownGetSelectedOption ref
+            currentOption := (<- dropDownGetSelectedOption ref)
             send selectionChanged currentOption
     getCurrentOption = request
         result currentOption     
@@ -77,13 +75,13 @@ mkCocoaDropDown = class
         result state
         
     initComp app = request
-            ref = initDropDown ()
+            ref <- initDropDown w
             state := Active ref
             forall o <- options do
-                _ = dropDownAddOption ref o
-            _= dropDownSetPosition ref (<- getPosition)
-            size := dropDownSetSize ref size
-            currentOption := dropDownGetSelectedOption ref
+                dropDownAddOption ref o
+            dropDownSetPosition ref (<- getPosition)
+            size := (<- dropDownSetSize ref size)
+            currentOption := (<- dropDownGetSelectedOption ref)
             sh = new defaultHandler refreshMyOptionAndPerformCallback
             addResponder sh
             result ref
@@ -123,8 +121,8 @@ defaultHandler dropdownUpdateMethod = class
 
 private
 
-extern initDropDown              :: () -> Int
-extern dropDownAddOption         :: CocoaRef -> String -> ()
-extern dropDownSetPosition       :: CocoaRef -> Position -> ()
-extern dropDownSetSize           :: CocoaRef -> Size -> Size
-extern dropDownGetSelectedOption :: CocoaRef -> String
+extern initDropDown              :: World -> Request CocoaRef
+extern dropDownAddOption         :: CocoaRef -> String -> Request ()
+extern dropDownSetPosition       :: CocoaRef -> Position -> Request ()
+extern dropDownSetSize           :: CocoaRef -> Size -> Request Size
+extern dropDownGetSelectedOption :: CocoaRef -> Request String

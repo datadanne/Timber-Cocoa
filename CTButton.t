@@ -3,10 +3,12 @@ module CTButton where
 import COCOA   
 
 struct Button < Component, HasTitle
+
 --------------------------------------------------------------------------------------------------
 ------          ** BUTTON **            ----------------------------------------------------------
 
-mkCocoaButton = class
+mkCocoaButton :: World -> Class Button
+mkCocoaButton w = class
 
     state := Inactive
     title := "Click me!"
@@ -17,20 +19,20 @@ mkCocoaButton = class
     setPosition p = request
         if isActive state then
             Active ref = state
-            _ = buttonSetPosition ref p
+            buttonSetPosition ref p
         setPositionImpl p
 
     setSize s = request
         if isActive state then
             Active ref = state
-            setSizeImpl (buttonSetSize ref s)
+            setSizeImpl (<- buttonSetSize ref s)
         else
             setSizeImpl s
 
     setTitle s = request
         if isActive state then
             Active ref = state
-            _ = buttonSetTitle ref s
+            buttonSetTitle ref s
         title := s
         setName s
    
@@ -41,10 +43,10 @@ mkCocoaButton = class
         state := destroyState state
 
     initComp app = request
-        ref = initButton title
+        ref <- initButton w title
         state := Active ref
-        setSizeImpl (buttonSetSize ref (<- getSize))
-        _ = buttonSetPosition ref (<- getPosition)
+        setSizeImpl (<- buttonSetSize ref (<- getSize))
+        buttonSetPosition ref (<- getPosition)
         result ref
     
     getState = request
@@ -56,7 +58,7 @@ mkCocoaButton = class
 
 private 
  
-extern initButton        :: String -> CocoaRef
-extern buttonSetTitle    :: CocoaRef -> String -> ()
-extern buttonSetPosition :: CocoaRef -> Position -> ()
-extern buttonSetSize     :: CocoaRef -> Size -> Size
+extern initButton        :: World -> String -> Request CocoaRef
+extern buttonSetTitle    :: CocoaRef -> String -> Request ()
+extern buttonSetPosition :: CocoaRef -> Position -> Request ()
+extern buttonSetSize     :: CocoaRef -> Size -> Request Size

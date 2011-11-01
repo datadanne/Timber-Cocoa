@@ -4,7 +4,8 @@ import COCOA
 
 struct TextArea < Component, HasText, IsScrollable
 
-mkCocoaTextArea = class
+mkCocoaTextArea :: World -> Class TextArea
+mkCocoaTextArea w = class
     text := ""
     
     state := Inactive
@@ -18,13 +19,13 @@ mkCocoaTextArea = class
     setPosition p = request
         if isActive state then
             Active ref = state
-            _ = textAreaSetPosition ref p 
+            textAreaSetPosition ref p 
         setPositionImpl p
 
     setSize s = request
         if isActive state then
             Active ref = state
-            _ = textAreaSetSize ref s
+            textAreaSetSize ref s
         setSizeImpl s
 
     setResponders rs = request
@@ -39,8 +40,8 @@ mkCocoaTextArea = class
         if isActive state then
             Active ref = state
             (hoz,vert) = s
-            _ = textAreaSetHorizontalScroll ref hoz
-            _ = textAreaSetVerticalScroll ref vert
+            textAreaSetHorizontalScroll ref hoz
+            textAreaSetVerticalScroll ref vert
 
     appendText s = request
         text := text ++ s
@@ -49,7 +50,7 @@ mkCocoaTextArea = class
         text := s
         if isActive state then
             Active ref = state
-            _= textAreaSetText ref s
+            textAreaSetText ref s
    
     getText = request
         result text
@@ -58,16 +59,16 @@ mkCocoaTextArea = class
         state := destroyState state
 
     initComp app = request
-        ref = initTextArea ()
+        ref <- initTextArea w
         state := Active ref
         
-        _= textAreaSetText ref text
-        _= textAreaSetPosition ref (<- getPosition)
-        _= textAreaSetSize ref (<- getSize)
+        textAreaSetText ref text
+        textAreaSetPosition ref (<- getPosition)
+        textAreaSetSize ref (<- getSize)
 
         (hoz,vert) = scrollable
-        _= textAreaSetHorizontalScroll ref hoz
-        _= textAreaSetVerticalScroll ref vert
+        textAreaSetHorizontalScroll ref hoz
+        textAreaSetVerticalScroll ref vert
        
         addResponder dts
         result ref
@@ -81,9 +82,10 @@ defaultTextScrollResponder textArea = class
     
     scrollTo deltaX deltaY = do
         scrolledState := (deltaX, deltaY)
-        case (<-textArea.getState) of
-            (Active ref) -> _= textAreaScrollTo ref deltaX deltaY
-            _ ->
+        state <- textArea.getState
+        if isActive state then
+            Active ref = state
+            textAreaScrollTo ref deltaX deltaY
     
     respondToInputEvent (MouseEvent t) _ = request
         case t of
@@ -101,10 +103,10 @@ defaultTextScrollResponder textArea = class
 --------------------------------------------------------------------------------------------------
 ------          ** EXTERN **            ----------------------------------------------------------  
 
-extern initTextArea                :: () -> CocoaRef
-extern textAreaSetText             :: CocoaRef -> String -> ()
-extern textAreaSetPosition         :: CocoaRef -> Position -> ()
-extern textAreaSetSize             :: CocoaRef -> Size -> ()
-extern textAreaSetHorizontalScroll :: CocoaRef -> Bool -> ()
-extern textAreaSetVerticalScroll   :: CocoaRef -> Bool -> ()
-extern textAreaScrollTo            :: CocoaRef -> Float -> Float -> ()
+extern initTextArea                :: World -> Request CocoaRef
+extern textAreaSetText             :: CocoaRef -> String -> Request ()
+extern textAreaSetPosition         :: CocoaRef -> Position -> Request ()
+extern textAreaSetSize             :: CocoaRef -> Size -> Request ()
+extern textAreaSetHorizontalScroll :: CocoaRef -> Bool -> Request ()
+extern textAreaSetVerticalScroll   :: CocoaRef -> Bool -> Request ()
+extern textAreaScrollTo            :: CocoaRef -> Float -> Float -> Request ()

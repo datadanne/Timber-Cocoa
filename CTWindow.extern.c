@@ -121,20 +121,9 @@ bool dispatchEventToTimber(NSEvent* event) {
 }
 
 // --------- Window ----------------------------------------------
-/*
-void scanEventReceived() {
-	DISABLE(rts);
-	if(receivedEvent)
-		receivedEvent = (InputEvent_CocoaDef)copy((ADDR)receivedEvent);
-	ENABLE(rts);
-}
-
-struct Scanner eventScanner = {scanEventReceived, NULL};
-*/
-
 static WindowDelegate *delegate;
 
-TUP2 initCocoaWindow_CTWindow(TUP0 dummy) {   
+TUP2 initCocoaWindow_CTWindow(World w, Int dummy) {   
 	DEBUG("Initializing window...");
     __block CocoaWindow *window;
     // Keep this as sync to ensure window is completely created before use.
@@ -164,7 +153,7 @@ TUP2 initCocoaWindow_CTWindow(TUP0 dummy) {
     return initResult;
 }
 
-TUP0 destroyCocoaWindow_CTWindow(Int cocoaRef) {
+TUP0 destroyCocoaWindow_CTWindow(Int cocoaRef, Int dummy) {
     dispatch_async(dispatch_get_main_queue(), ^{
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
@@ -173,7 +162,7 @@ TUP0 destroyCocoaWindow_CTWindow(Int cocoaRef) {
     });
 }
 
-TUP0 windowSetContentView_CTWindow(Int windowRef, Int cmpRef) {
+TUP0 windowSetContentView_CTWindow(Int windowRef, Int cmpRef, Int dummy) {
     dispatch_async(dispatch_get_main_queue(), ^{   
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];  
         CocoaWindow *wnd = (CocoaWindow*) windowRef;
@@ -183,7 +172,7 @@ TUP0 windowSetContentView_CTWindow(Int windowRef, Int cmpRef) {
     });
 }
 
-TUP0 windowSetVisible_CTWindow(Int cocoaRef) {  
+TUP0 windowSetVisible_CTWindow(Int cocoaRef, Int dummy) {  
     dispatch_async(dispatch_get_main_queue(), ^{ 
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
@@ -192,7 +181,7 @@ TUP0 windowSetVisible_CTWindow(Int cocoaRef) {
     });
 }
 
-TUP0 windowSetHidden_CTWindow(Int cocoaRef) {
+TUP0 windowSetHidden_CTWindow(Int cocoaRef, Int dummy) {
     dispatch_async(dispatch_get_main_queue(), ^{ 
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
@@ -201,7 +190,7 @@ TUP0 windowSetHidden_CTWindow(Int cocoaRef) {
     });
 }
 
-TUP0 windowSetFocus_CTWindow(Int cocoaRef, Int cmpRef) {
+TUP0 windowSetFocus_CTWindow(Int cocoaRef, Int cmpRef, Int dummy) {
     dispatch_async(dispatch_get_main_queue(), ^{ 
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
@@ -211,7 +200,7 @@ TUP0 windowSetFocus_CTWindow(Int cocoaRef, Int cmpRef) {
     });
 }
 
-TUP0 windowSetSize_CTWindow (Int cocoaRef, Size_CocoaDef size) {
+TUP0 windowSetSize_CTWindow (Int cocoaRef, Size_CocoaDef size, Int dummy) {
     int width = size->width_CocoaDef;
     int height = size->height_CocoaDef;
 	dispatch_async(dispatch_get_main_queue(), ^{
@@ -222,7 +211,7 @@ TUP0 windowSetSize_CTWindow (Int cocoaRef, Size_CocoaDef size) {
     });
 }
 
-TUP0 windowSetPosition_CTWindow (Int cocoaRef, Position_CocoaDef pos) {
+TUP0 windowSetPosition_CTWindow (Int cocoaRef, Position_CocoaDef pos, Int dummy) {
     int y = pos->y_CocoaDef;
     int x = pos->x_CocoaDef;
 	dispatch_async(dispatch_get_main_queue(), ^{
@@ -237,7 +226,7 @@ TUP0 windowSetPosition_CTWindow (Int cocoaRef, Position_CocoaDef pos) {
 	});
 } 
 
-TUP0 windowSetResizable_CTWindow (Int cocoaRef, Bool resizable) {
+TUP0 windowSetResizable_CTWindow (Int cocoaRef, Bool resizable, Int dummy) {
     NSUInteger styleMask;
     if (resizable) {
         styleMask = (NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask);
@@ -252,7 +241,7 @@ TUP0 windowSetResizable_CTWindow (Int cocoaRef, Bool resizable) {
     });
 }
 
-TUP0 windowSetTitle_CTWindow (Int cocoaRef, LIST title) {
+TUP0 windowSetTitle_CTWindow (Int cocoaRef, LIST title, Int dummy) {
     char *buf = listToChars(title); 
     dispatch_async(dispatch_get_main_queue(), ^{
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -264,10 +253,5 @@ TUP0 windowSetTitle_CTWindow (Int cocoaRef, LIST title) {
 }
 
 void _init_external_CTWindow(void) {
-/*
-    DISABLE(rts);
-	addRootScanner(&eventScanner);
-	rootsDirty = 1;
-	ENABLE(rts);
-*/
+    // Do nothing
 }

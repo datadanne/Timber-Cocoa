@@ -4,7 +4,8 @@ import COCOA
 
 struct TextField < Component, HasText    
 
-mkCocoaTextField = class
+mkCocoaTextField :: World -> Class TextField
+mkCocoaTextField w = class
     text := ""
 
     state := Inactive
@@ -15,7 +16,7 @@ mkCocoaTextField = class
     setPosition p = request
         if isActive state then
             Active ref = state
-            _ = textFieldSetPosition ref p
+            textFieldSetPosition ref p
         setPositionImpl p    
 
     appendText s = request
@@ -25,7 +26,7 @@ mkCocoaTextField = class
         text := s
         if isActive state then
             Active ref = state
-            _ = textFieldSetText ref s
+            textFieldSetText ref s
    
     getText = request
         result text
@@ -34,10 +35,10 @@ mkCocoaTextField = class
         state := destroyState state
 
     initComp app = request
-        ref = initTextField ()
+        ref <- initTextField w
         state := Active ref
-        _ = textFieldSetText ref text
-        _ = textFieldSetPosition ref (<- getPosition)
+        textFieldSetText ref text
+        textFieldSetPosition ref (<- getPosition)
         result ref
                 
     this = TextField{id=self;..}
@@ -48,6 +49,6 @@ mkCocoaTextField = class
 ------          ** EXTERN **            ----------------------------------------------------------  
 
 private
-extern initTextField        :: () -> CocoaRef
-extern textFieldSetText     :: CocoaRef -> String -> ()
-extern textFieldSetPosition :: CocoaRef -> Position -> ()
+extern initTextField        :: World -> Request CocoaRef
+extern textFieldSetText     :: CocoaRef -> String -> Request ()
+extern textFieldSetPosition :: CocoaRef -> Position -> Request ()

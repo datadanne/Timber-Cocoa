@@ -9,9 +9,9 @@ root w = class
     env = new posix w
     osx = new cocoa w
 
-    w1 = new mkCocoaWindow
-    textA = new mkCocoaTextArea
-    textB = new mkCocoaTextField
+    w1 = new mkCocoaWindow w
+    textA = new mkCocoaTextArea w
+    textB = new mkCocoaTextField w
     
     start app = action                         
         app.addWindow w1        

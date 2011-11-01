@@ -3,12 +3,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-Int initContainer_CTContainer(TUP0);
-TUP0 destroyContainer_CTContainer(Int);
-TUP0 containerSetBackgroundColor_CTContainer(Int, Color_CocoaDef);
-TUP0 containerSetSize_CTContainer(Int, Size_CocoaDef);
-TUP0 containerSetPosition_CTContainer(Int, Position_CocoaDef);
-TUP0 containerAddComponent_CTContainer(Int, Int);
-TUP0 containerRemoveComponent_CTContainer(Int, Int);
+Int initContainer_CTContainer(World,Int);
+TUP0 destroyContainer_CTContainer(Int,Int);
+TUP0 containerSetBackgroundColor_CTContainer(Int,Color_CocoaDef,Int);
+TUP0 containerSetSize_CTContainer(Int,Size_CocoaDef,Int);
+TUP0 containerSetPosition_CTContainer(Int,Position_CocoaDef,Int);
+TUP0 containerAddComponent_CTContainer(Int,Int,Int);
+TUP0 containerRemoveComponent_CTContainer(Int,Int,Int);
 
 #endif

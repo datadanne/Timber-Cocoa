@@ -1,6 +1,6 @@
 #include "CTTextField.extern.h"
 // --------- TextField ----------------------------------------------
-Int initTextField_CTTextField(TUP0 d) {
+Int initTextField_CTTextField(World w, Int dummy) {
     __block NSTextField *cocoaTextField;
     dispatch_sync(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
@@ -12,7 +12,7 @@ Int initTextField_CTTextField(TUP0 d) {
     return (Int)cocoaTextField;
 }
 
-TUP0 textFieldSetText_CTTextField(Int cocoaRef, LIST str) {
+TUP0 textFieldSetText_CTTextField(Int cocoaRef, LIST str, Int dummy) {
 	char* buf = listToChars(str);
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -24,7 +24,7 @@ TUP0 textFieldSetText_CTTextField(Int cocoaRef, LIST str) {
     });
 }
 
-TUP0 textFieldSetPosition_CTTextField(Int cocoaRef, Position_CocoaDef pos) {
+TUP0 textFieldSetPosition_CTTextField(Int cocoaRef, Position_CocoaDef pos, Int dummy) {
     int x = pos->x_CocoaDef-5;
     int y = pos->y_CocoaDef-20; // TODO: Remove hardcoded offset.
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -38,5 +38,5 @@ TUP0 textFieldSetPosition_CTTextField(Int cocoaRef, Position_CocoaDef pos) {
 }                                            
 
 void _init_external_CTTextField(void) {
-    // Nothing
+    // Do nothing
 }

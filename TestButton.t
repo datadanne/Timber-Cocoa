@@ -7,10 +7,10 @@ import CTButton
 root :: RootType
 root w = class
     osx = new cocoa w
-    w1 = new mkCocoaWindow
-    c2 = new mkCocoaContainer
-    button1 = new mkCocoaButton
-    button2 = new mkCocoaButton
+    w1 = new mkCocoaWindow w
+    c2 = new mkCocoaContainer w
+    button1 = new mkCocoaButton w
+    button2 = new mkCocoaButton w
     
     start app = action                         
         app.addWindow w1

@@ -3,4 +3,4 @@ rm *.o
 rm *.js
 mv $(ls | grep -v "extern.c$" | grep ".c$") tmp
 mv $(ls | grep -v "extern.h$" | grep ".h$") tmp
-mv $(ls | egrep -v "\.|makeTest|cleanFolder|tmp|old|Old|stuff") tmp
+mv $(ls | egrep -v "\.|makeTest|cleanFolder|tmp|old|Old|stuff|Makefile") tmp

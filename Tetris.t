@@ -14,11 +14,11 @@ root w = class
     env = new posix w
     osx = new cocoa w
     
-    gameWindow = new mkCocoaWindow
-    gameGrid = new tetrisGrid gameGridWidth gameGridHeight env
+    gameWindow = new mkCocoaWindow w
+    gameGrid = new tetrisGrid gameGridWidth gameGridHeight env w
     gu = new gridUpdater gameGrid env
     
-    startButton = new mkCocoaButton
+    startButton = new mkCocoaButton w
     
     -- Responder for keyboard events
     keyboardResponder event modifiers = request
@@ -196,7 +196,7 @@ struct GameGrid < Container where
     clear :: Request ()
     update :: Request ()
     
-tetrisGrid width height env = class
+tetrisGrid width height env w = class
     -- Grid of tiles. Each tile has (X,Y,TileValue,Container)
     grid :: [(Int, Int, TileValue, Container)]
     grid := []
@@ -262,7 +262,7 @@ tetrisGrid width height env = class
         
         forall row <- [1..height] do
             forall col <- [1..width] do
-               tile = new mkCocoaContainer
+               tile = new mkCocoaContainer w
                tile.setSize ({width=tileSize;height=tileSize})
                tile.setBackgroundColor backgroundColor
                tile.setPosition ({x=(col-1)*(tileSize+1)+1;y=(row-1)*(tileSize+1)+1})
@@ -272,7 +272,7 @@ tetrisGrid width height env = class
         
 
     -- Fill out rest of interface using base container --
-    base = new mkCocoaContainer
+    base = new mkCocoaContainer w
     Container {..} = base
                
     result GameGrid {initComp=initGrid;..}

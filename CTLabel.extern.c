@@ -1,6 +1,6 @@
 #include "CTLabel.extern.h"
 
-Int initLabel_CTLabel(TUP0 dummy) {
+Int initLabel_CTLabel(World w, Int dummy) {
     __block NSTextField *textField;
     dispatch_sync(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
@@ -15,7 +15,7 @@ Int initLabel_CTLabel(TUP0 dummy) {
 	return (Int)textField;
 }
 
-TUP0 labelSetTextColor_CTLabel(Int cocoaRef, Color_CocoaDef color) {
+TUP0 labelSetTextColor_CTLabel(Int cocoaRef, Color_CocoaDef color, Int dummy) {
     float r = color->r_CocoaDef/255.0;
     float g = color->g_CocoaDef/255.0;
     float b = color->b_CocoaDef/255.0;
@@ -29,7 +29,7 @@ TUP0 labelSetTextColor_CTLabel(Int cocoaRef, Color_CocoaDef color) {
     });
 }                         
 
-TUP0 labelSetText_CTLabel(Int cocoaRef, LIST str) {
+TUP0 labelSetText_CTLabel(Int cocoaRef, LIST str, Int dummy) {
     char* buf = listToChars(str); 
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -41,7 +41,7 @@ TUP0 labelSetText_CTLabel(Int cocoaRef, LIST str) {
     });
 }
 
-TUP0 labelSetSize_CTLabel(Int cocoaRef, Size_CocoaDef size) {
+TUP0 labelSetSize_CTLabel(Int cocoaRef, Size_CocoaDef size, Int dummy) {
     int width = size->width_CocoaDef;
     int height = size->height_CocoaDef;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -53,7 +53,7 @@ TUP0 labelSetSize_CTLabel(Int cocoaRef, Size_CocoaDef size) {
     });
 }
 
-TUP0 labelSetPosition_CTLabel(Int cocoaRef, Position_CocoaDef pos) {
+TUP0 labelSetPosition_CTLabel(Int cocoaRef, Position_CocoaDef pos, Int dummy) {
     int x = pos->x_CocoaDef;
     int y = pos->y_CocoaDef;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -67,5 +67,5 @@ TUP0 labelSetPosition_CTLabel(Int cocoaRef, Position_CocoaDef pos) {
 }                                            
 
 void _init_external_CTLabel(void) {
-    // Nothing
+    // Do nothing
 }

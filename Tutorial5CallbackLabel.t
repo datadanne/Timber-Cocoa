@@ -5,10 +5,10 @@ import CTLabel
 struct Tutorial5CallbackLabel < Label where
     installOnTextChangeCallback :: (String -> Action) -> Request ()
    
-mkCocoaCallbackLabel = class
+mkCocoaCallbackLabel w = class
     textChangeCallback := Nothing
 
-    Label {setText=setTextImpl;appendText=appendTextImpl..} = new mkCocoaLabel
+    Label {setText=setTextImpl;appendText=appendTextImpl..} = new mkCocoaLabel w
     
     setText s = request
         setTextImpl s

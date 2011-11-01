@@ -5,10 +5,10 @@
 
 #include "CocoaDef.h"
 
-Int initLabel_CTLabel(TUP0);
-TUP0 labelSetText_CTLabel(Int, LIST);
-TUP0 labelSetPosition_CTLabel(Int, Position_CocoaDef);
-TUP0 labelSetSize_CTLabel(Int, Size_CocoaDef);
-TUP0 labelSetTextColor_CTLabel(Int, Color_CocoaDef);
+Int initLabel_CTLabel(World,Int);
+TUP0 labelSetText_CTLabel(Int,LIST,Int);
+TUP0 labelSetPosition_CTLabel(Int,Position_CocoaDef,Int);
+TUP0 labelSetSize_CTLabel(Int,Size_CocoaDef,Int);
+TUP0 labelSetTextColor_CTLabel(Int,Color_CocoaDef,Int);
 
 #endif

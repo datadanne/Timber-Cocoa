@@ -1,7 +1,7 @@
 #include "CTTextArea.extern.h"
 
 // --------- TextArea ----------------------------------------------
-Int initTextArea_CTTextArea(TUP0 d) {
+Int initTextArea_CTTextArea(World w, Int dummy) {
     __block NSScrollView *scrollView;
     dispatch_sync(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
@@ -27,7 +27,7 @@ Int initTextArea_CTTextArea(TUP0 d) {
 	return (Int)scrollView;
 }
 
-TUP0 textAreaSetText_CTTextArea(Int cocoaRef, LIST str) {
+TUP0 textAreaSetText_CTTextArea(Int cocoaRef, LIST str, Int dummy) {
 	char* buf = listToChars(str);
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -41,7 +41,7 @@ TUP0 textAreaSetText_CTTextArea(Int cocoaRef, LIST str) {
     });
 } 
 
-TUP0 textAreaSetPosition_CTTextArea(Int cocoaRef, Position_CocoaDef pos) {
+TUP0 textAreaSetPosition_CTTextArea(Int cocoaRef, Position_CocoaDef pos, Int dummy) {
     int x = pos->x_CocoaDef-5; // TODO: Remove hardcoded offset.
     int y = pos->y_CocoaDef-20;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -55,7 +55,7 @@ TUP0 textAreaSetPosition_CTTextArea(Int cocoaRef, Position_CocoaDef pos) {
         [pool drain]; 
     });
 }
-TUP0 textAreaSetSize_CTTextArea(Int cocoaRef, Size_CocoaDef size) {
+TUP0 textAreaSetSize_CTTextArea(Int cocoaRef, Size_CocoaDef size, Int dummy) {
     int width = size->width_CocoaDef;
     int height = size->height_CocoaDef;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -74,7 +74,7 @@ TUP0 textAreaSetSize_CTTextArea(Int cocoaRef, Size_CocoaDef size) {
     });
 }
 
-TUP0 textAreaSetHorizontalScroll_CTTextArea(Int cocoaRef, Bool enabled) {
+TUP0 textAreaSetHorizontalScroll_CTTextArea(Int cocoaRef, Bool enabled, Int dummy) {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         NSScrollView *scrollView = (NSScrollView*) cocoaRef;
@@ -87,7 +87,7 @@ TUP0 textAreaSetHorizontalScroll_CTTextArea(Int cocoaRef, Bool enabled) {
     });
 }
 
-TUP0 textAreaSetVerticalScroll_CTTextArea(Int cocoaRef, Bool enabled) {
+TUP0 textAreaSetVerticalScroll_CTTextArea(Int cocoaRef, Bool enabled, Int dummy) {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         NSScrollView *scrollView = (NSScrollView*) cocoaRef;
@@ -106,7 +106,7 @@ TUP0 textAreaSetVerticalScroll_CTTextArea(Int cocoaRef, Bool enabled) {
 static float x = 0;
 static float y = 0;   
 
-TUP0 textAreaScrollTo_CTTextArea(Int cocoaRef, Float dx, Float dy) {
+TUP0 textAreaScrollTo_CTTextArea(Int cocoaRef, Float dx, Float dy, Int dummy) {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSScrollView *scrollview = (NSScrollView*) cocoaRef;
         NSTextView *theTextView = [scrollview documentView];
@@ -122,5 +122,5 @@ TUP0 textAreaScrollTo_CTTextArea(Int cocoaRef, Float dx, Float dy) {
 }
 
 void _init_external_CTTextArea(void) {
-    // Nothing
+    // Do nothing
 }

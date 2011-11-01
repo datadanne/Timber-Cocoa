@@ -261,7 +261,8 @@ TUP0 windowSetTitle_CTWindow (Int cocoaRef, LIST title) {
 	   	[pool drain];         
         free(buf);
     });
-}  
+}
+
 void _init_external_CTWindow(void) {
 /*
     DISABLE(rts);

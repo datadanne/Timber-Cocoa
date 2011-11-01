@@ -69,6 +69,7 @@ mkCocoaWindow = class
         set resp
     onWindowResize size = request
         resize size
+        setSizeImpl size
     onWindowCloseRequest = request
         close
         if overrideWindowCloseRequest then

@@ -8,7 +8,7 @@ Int initDropDown_CTDropDown(TUP0 dummy) {
     __block NSPopUpButton *cocoaDropDown;
     dispatch_sync(dispatch_get_main_queue(), ^{
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
-	    cocoaDropDown = [[NSPopUpButton alloc] initWithFrame: NSMakeRect(20.0, 20.0, 120.0, 60.0) pullsDown:FALSE];
+	    cocoaDropDown = [[NSPopUpButton alloc] initWithFrame: NSMakeRect(0.0, 0.0, 120.0, DROPDOWN_HEIGHT) pullsDown:FALSE];
 	    [cocoaDropDown setBezelStyle:NSRoundedBezelStyle];
 	    [cocoaDropDown setTitle: @"dropDownDefaultTitle"];
 	
@@ -39,7 +39,7 @@ LIST dropDownGetSelectedOption_CTDropDown(Int cocoaRef) {
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
 	    NSPopUpButton *thisDropDown = (NSPopUpButton*) cocoaRef;
         const char *optionStr = [[thisDropDown titleOfSelectedItem] UTF8String]; 
-        LIST s = getStr((char *) optionStr);
+        s = getStr((char *) optionStr);
         [pool drain]; 
     });
     return s;
@@ -52,25 +52,31 @@ TUP0 dropDownSetPosition_CTDropDown(Int cocoaRef,Position_CocoaDef pos) {
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         NSPopUpButton *thisDropDown = (NSPopUpButton*) cocoaRef;
         [[thisDropDown target] setCoordsX: x andY: y];
-        NSPoint p = NSMakePoint(x-5,y-20); // TODO: Remove hardcoded offset.
+        NSPoint p = NSMakePoint(x,y);
 	    [thisDropDown setFrameOrigin: p];
 	    [thisDropDown setNeedsDisplay];
    	    [pool drain]; 
     });
 }
 
-TUP0 dropDownSetSize_CTDropDown(Int cocoaRef, Size_CocoaDef size) {
+Size_CocoaDef dropDownSetSize_CTDropDown(Int cocoaRef, Size_CocoaDef size) {
     int width = size->width_CocoaDef;
-    int height = size->height_CocoaDef;
-    dispatch_async(dispatch_get_main_queue(), ^{
+    __block Size_CocoaDef newSize;
+    dispatch_sync(dispatch_get_main_queue(), ^{
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
 	    NSPopUpButton *thisDropDown = (NSPopUpButton*) cocoaRef;
-        [[thisDropDown target] setWidth: width andHeight: height];	
-        NSSize s = NSMakeSize(width,height);
-	    [thisDropDown setFrameSize: s];
+        [[thisDropDown target] setWidth: width andHeight: DROPDOWN_HEIGHT];	
+        NSSize s = NSMakeSize(width, DROPDOWN_HEIGHT);
+	    [thisDropDown setFrameSize: s];    
+        NSRect rr = [thisDropDown frame];
+        NEW (Size_CocoaDef, newSize, WORDS(sizeof(struct Size_CocoaDef)));
+        newSize->GCINFO = __GC__Size_CocoaDef;
+        newSize->width_CocoaDef = rr.size.width;
+        newSize->height_CocoaDef = DROPDOWN_HEIGHT;
 	    [thisDropDown setNeedsDisplay];
    	    [pool drain]; 
     });
+    return newSize;
 }
 
 void _init_external_CTDropDown(void) {

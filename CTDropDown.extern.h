@@ -6,6 +6,8 @@
 #include "CocoaDef.h"
 #include "rts.h"
 
+#define DROPDOWN_HEIGHT 22
+
 @interface DropDownClickHandler : NSObject {
     float x;
     float y;
@@ -23,7 +25,7 @@
 Int  initDropDown_CTDropDown(TUP0);
 TUP0 dropDownAddOption_CTDropDown(Int,LIST);
 TUP0 dropDownSetPosition_CTDropDown(Int,Position_CocoaDef);
-TUP0 dropDownSetSize_CTDropDown(Int, Size_CocoaDef);
+Size_CocoaDef dropDownSetSize_CTDropDown(Int, Size_CocoaDef);
 LIST dropDownGetSelectedOption_CTDropDown(Int);
 
 #endif

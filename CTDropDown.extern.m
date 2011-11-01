@@ -13,9 +13,11 @@
     Thread current_thread = CURRENT();
 	TIMERGET(current_thread->msg->baseline);
 
-    NSPopUpButton *pop = (NSPopUpButton*) sender;    
+    NSPopUpButton *pop = (NSPopUpButton*) sender;
+    // Y coordinate needs to be set to (rootcontainer height - dropdown y),
+    // since top left corner is 0,0 in Timber.
     float eventX = x + width/2;
-    float eventY = y + height/2;
+    float eventY = [[[sender window] contentView] frame].size.height - y - height/2;
     NSInteger windowId = [[sender window] windowNumber];     
    	App_CocoaDef app = getApp(); 
     Position_CocoaDef pos = NULL;

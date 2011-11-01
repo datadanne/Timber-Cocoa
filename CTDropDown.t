@@ -32,8 +32,9 @@ mkCocoaDropDown = class
     setSize s = request
         if isActive state then
             Active ref = state
-            _ = dropDownSetSize ref s
-        size := s
+            size := dropDownSetSize ref s
+        else 
+            size := s
     
     getSize = request
         result size
@@ -81,7 +82,7 @@ mkCocoaDropDown = class
             forall o <- options do
                 _ = dropDownAddOption ref o
             _= dropDownSetPosition ref (<- getPosition)
-            _= dropDownSetSize ref size
+            size := dropDownSetSize ref size
             currentOption := dropDownGetSelectedOption ref
             sh = new defaultHandler refreshMyOptionAndPerformCallback
             addResponder sh
@@ -125,5 +126,5 @@ private
 extern initDropDown              :: () -> Int
 extern dropDownAddOption         :: CocoaRef -> String -> ()
 extern dropDownSetPosition       :: CocoaRef -> Position -> ()
-extern dropDownSetSize           :: CocoaRef -> Size -> ()
+extern dropDownSetSize           :: CocoaRef -> Size -> Size
 extern dropDownGetSelectedOption :: CocoaRef -> String

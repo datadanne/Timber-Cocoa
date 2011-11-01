@@ -183,13 +183,13 @@ myTabResponder label = class
 colorPickerToggle this window env = class
     toggle := True
     respondToInputEvent (MouseEvent event) modifiers = request
-        _ <- window.setVisible toggle
-        --send action this.setTitle ((if (toggle) then "Open" else "Close") ++ " ColorPicker")
+        window.setVisible toggle
+        send action this.setTitle ((if (toggle) then "Open" else "Close") ++ " ColorPicker")
         
         toggle := not toggle
-        result True
+        result False
         
-    respondToInputEvent _ modifiers = request
+    respondToInputEvent _ _ = request
         result False
         
     result RespondsToInputEvents {..}

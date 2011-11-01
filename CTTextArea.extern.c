@@ -42,8 +42,8 @@ TUP0 textAreaSetText_CTTextArea(Int cocoaRef, LIST str, Int dummy) {
 } 
 
 TUP0 textAreaSetPosition_CTTextArea(Int cocoaRef, Position_CocoaDef pos, Int dummy) {
-    int x = pos->x_CocoaDef-5; // TODO: Remove hardcoded offset.
-    int y = pos->y_CocoaDef-20;
+    int x = pos->x_CocoaDef;
+    int y = pos->y_CocoaDef;
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
         NSScrollView *scrollView = (NSScrollView*) cocoaRef;

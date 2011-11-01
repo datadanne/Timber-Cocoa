@@ -12,7 +12,7 @@ mkCocoaTextField w = class
     getState = request
         result state
 
-    BaseComponent {setPosition=setPositionImpl;..} = new basicComponent True Nothing "TextField"
+    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl..} = new basicComponent True Nothing "TextField"
     setPosition p = request
         if isActive state then
             Active ref = state
@@ -30,6 +30,13 @@ mkCocoaTextField w = class
    
     getText = request
         result text
+
+    setSize s = request
+        if isActive state then
+            Active ref = state
+            setSizeImpl (<- textFieldSetSize ref s)
+        else
+            setSizeImpl s
         
     destroyComp = request
         state := destroyState state
@@ -39,6 +46,7 @@ mkCocoaTextField w = class
         state := Active ref
         textFieldSetText ref text
         textFieldSetPosition ref (<- getPosition)
+        setSizeImpl (<- textFieldSetSize ref (<- getSize))
         result ref
                 
     this = TextField{id=self;..}
@@ -52,3 +60,4 @@ private
 extern initTextField        :: World -> Request CocoaRef
 extern textFieldSetText     :: CocoaRef -> String -> Request ()
 extern textFieldSetPosition :: CocoaRef -> Position -> Request ()
+extern textFieldSetSize     :: CocoaRef -> Size -> Request Size

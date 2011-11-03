@@ -1,8 +1,8 @@
 #ifndef CTWINDOW_EXTERN_H_
 #define CTWINDOW_EXTERN_H_
 
+#include "CocoaDef.h"
 #include "rts.h"
-#include "timber.h"
 
 extern pthread_mutex_t rts;
 extern int rootsDirty;

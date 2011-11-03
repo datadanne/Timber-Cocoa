@@ -1,6 +1,8 @@
 #ifndef CTCONTAINER_EXTERN_H_
 #define CTCONTAINER_EXTERN_H_
 
+#include "CocoaDef.h"
+
 Int initContainer_CTContainer(World,Int);
 TUP0 destroyContainer_CTContainer(Int,Int);
 TUP0 containerSetBackgroundColor_CTContainer(Int,Color_CocoaDef,Int);

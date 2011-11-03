@@ -1,6 +1,8 @@
 #ifndef CTTEXTAREA_EXTERN_H_
 #define CTTEXTAREA_EXTERN_H_
 
+#include "CocoaDef.h"
+
 Int initTextArea_CTTextArea(World,Int);
 TUP0 textAreaSetText_CTTextArea(Int,LIST,Int);
 TUP0 textAreaSetPosition_CTTextArea(Int,Position_CocoaDef,Int);

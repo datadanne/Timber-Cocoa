@@ -2,7 +2,6 @@
 #define CTDROPDOWN_EXTERN_H_
 
 #include "CocoaDef.h"
-#include "rts.h"
 
 #define DROPDOWN_HEIGHT 22
 

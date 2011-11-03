@@ -1,7 +1,6 @@
 #ifndef COCOA_EXTERN_H
 #define COCOA_EXTERN_H
 
-#include "timber.h"
 #include "CocoaDef.h"
 
 extern pthread_mutex_t rts;

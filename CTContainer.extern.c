@@ -1,4 +1,5 @@
 #include "CTContainer.extern.h"
+#import <Cocoa/Cocoa.h>
 #import "CTContainer.extern.m"
 
 Int initContainer_CTContainer(World w, Int dummy) {

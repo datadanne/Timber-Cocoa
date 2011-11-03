@@ -1,4 +1,3 @@
-#import <Cocoa/Cocoa.h>
 #include "CTDropDown.extern.h"
 
 @interface DropDownClickHandler : NSObject {

@@ -1,4 +1,5 @@
 #include "CTWindow.extern.h"
+#import <Cocoa/Cocoa.h>
 #import "CTWindow.extern.m"
 
 Bool compareKeys_CTWindow(CocoaKey_CocoaDef aKey, CocoaKey_CocoaDef anotherKey) {

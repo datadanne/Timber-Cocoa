@@ -1,5 +1,5 @@
-#import <Cocoa/Cocoa.h>
 #include "Cocoa.extern.h"
+#include "rts.h"
 
 // ------------- WindowDelegate ---------------------------- 
 // Window delegate allows interception of window close events

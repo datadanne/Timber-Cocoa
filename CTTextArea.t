@@ -5,9 +5,7 @@ import COCOA
 struct TextArea < Component, HasText, IsScrollable
 
 mkCocoaTextArea :: World -> Class TextArea
-mkCocoaTextArea w = class
-    text := ""
-    
+mkCocoaTextArea w = class   
     state := Inactive
     getState = request
         result state
@@ -31,29 +29,31 @@ mkCocoaTextArea w = class
     setResponders rs = request
         setRespondersImpl (dts:rs)
 
-    scrollable := (True, True)
-    getScrollable = request
-        result scrollable
+    documentSize := {width=1; height=1}
+    getDocumentSize = request
+        result documentSize
     
-    setScrollable s = request
-        scrollable := s
+    setDocumentSize s = request
+        documentSize := s
         if isActive state then
             Active ref = state
-            (hoz,vert) = s
-            textAreaSetHorizontalScroll ref hoz
-            textAreaSetVerticalScroll ref vert
+            textAreaSetDocumentSize ref s
 
+    text := ""
+    getText = request
+        result text      
+        
     appendText s = request
         text := text ++ s
+        if isActive state then
+            Active ref = state
+            textAreaSetText ref text
         
     setText s = request
         text := s
         if isActive state then
             Active ref = state
             textAreaSetText ref s
-   
-    getText = request
-        result text
     
     destroyComp = request
         state := destroyState state
@@ -65,10 +65,7 @@ mkCocoaTextArea w = class
         textAreaSetText ref text
         textAreaSetPosition ref (<- getPosition)
         textAreaSetSize ref (<- getSize)
-
-        (hoz,vert) = scrollable
-        textAreaSetHorizontalScroll ref hoz
-        textAreaSetVerticalScroll ref vert
+        textAreaSetDocumentSize ref documentSize
        
         addResponder dts
         result ref
@@ -107,6 +104,5 @@ extern initTextArea                :: World -> Request CocoaRef
 extern textAreaSetText             :: CocoaRef -> String -> Request ()
 extern textAreaSetPosition         :: CocoaRef -> Position -> Request ()
 extern textAreaSetSize             :: CocoaRef -> Size -> Request ()
-extern textAreaSetHorizontalScroll :: CocoaRef -> Bool -> Request ()
-extern textAreaSetVerticalScroll   :: CocoaRef -> Bool -> Request ()
+extern textAreaSetDocumentSize     :: CocoaRef -> Size -> Request ()
 extern textAreaScrollTo            :: CocoaRef -> Float -> Float -> Request ()

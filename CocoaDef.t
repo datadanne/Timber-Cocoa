@@ -121,9 +121,9 @@ struct HasText where
     appendText :: String -> Request ()
     
 struct IsScrollable where
-    setScrollable :: (Bool, Bool) -> Request ()
-    getScrollable :: Request (Bool, Bool)
-    
+    setDocumentSize :: Size -> Request ()
+    getDocumentSize :: Request Size
+
 struct IsFocusable where
     setIsFocusable :: Bool -> Request ()
     getIsFocusable :: Request Bool

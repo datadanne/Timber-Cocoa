@@ -8,21 +8,26 @@ Int initTextArea_CTTextArea(World w, Int dummy) {
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
         scrollView = [[NSScrollView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)];
         NSSize contentSize = [scrollView contentSize];
-        [scrollView setBorderType:NSNoBorder];
-        [scrollView setHasVerticalScroller:NO];
-        [scrollView setHasHorizontalScroller:NO];
+        [scrollView setBorderType: NSNoBorder];
+        [scrollView setHasVerticalScroller: YES];
+        [scrollView setHasHorizontalScroller: YES]; 
+        
         NSTextView *theTextView = [[NSTextView alloc] 
-        initWithFrame:NSMakeRect(0, 0, contentSize.width, contentSize.height)];
-        [theTextView setMinSize:NSMakeSize(0.0, contentSize.height)];
-        [theTextView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
-        // [theTextView setVerticallyResizable:YES];
-        // [theTextView setHorizontallyResizable:NO];
-        [theTextView setAutoresizingMask:NSViewWidthSizable];
-        [[theTextView textContainer]
-         setContainerSize:NSMakeSize(contentSize.width, FLT_MAX)];
-        [[theTextView textContainer] setWidthTracksTextView:YES];
-        [scrollView setDocumentView:theTextView];
-        [theTextView setString: @"defaultTextAreaString"];
+                                    initWithFrame: NSMakeRect(0, 0, 1, 1)];
+
+        [theTextView setMinSize:NSMakeSize(0.0, 0.0)];
+        [theTextView setMaxSize:NSMakeSize(1.0, 1.0)];
+
+        [theTextView setVerticallyResizable: YES];
+        [theTextView setHorizontallyResizable: YES];       
+        [theTextView setAutoresizingMask: (NSViewWidthSizable | NSViewHeightSizable)]; 
+        
+        [[theTextView textContainer] setContainerSize: NSMakeSize(1, 1)];
+        [[theTextView textContainer] setWidthTracksTextView: NO];
+        
+        [scrollView setDocumentView: theTextView];
+        
+        [theTextView setString: @""];
         [pool drain];
     });
 	return (Int)scrollView;
@@ -34,8 +39,8 @@ TUP0 textAreaSetText_CTTextArea(Int cocoaRef, LIST str, Int dummy) {
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         NSScrollView *scrollView = (NSScrollView*) cocoaRef;
         NSTextView *theTextView = [scrollView documentView];
-        [theTextView setString:[NSString stringWithFormat:@"%s", buf]];
-        [theTextView setNeedsDisplay:YES];
+        [theTextView setString: [NSString stringWithFormat:@"%s", buf]];
+        [theTextView setNeedsDisplay: YES];
         [theTextView displayIfNeeded];
         [pool drain];
         free(buf);
@@ -51,7 +56,7 @@ TUP0 textAreaSetPosition_CTTextArea(Int cocoaRef, Position_CocoaDef pos, Int dum
         NSTextView *theTextView = [scrollView documentView];
         NSPoint p = NSMakePoint(x,y);
         [scrollView setFrameOrigin: p];
-        [theTextView setNeedsDisplay:YES];
+        [theTextView setNeedsDisplay: YES];
         [theTextView displayIfNeeded];
         [pool drain]; 
     });
@@ -64,46 +69,28 @@ TUP0 textAreaSetSize_CTTextArea(Int cocoaRef, Size_CocoaDef size, Int dummy) {
         NSScrollView *scrollView = (NSScrollView*) cocoaRef;
         NSTextView *theTextView = [scrollView documentView];
         [scrollView setFrameSize: NSMakeSize(width,height)];
-        [theTextView setMinSize:NSMakeSize(width,height)];
-        [theTextView setMaxSize:NSMakeSize(FLT_MAX, FLT_MAX)];
-        [theTextView setVerticallyResizable:YES];
-        [theTextView setHorizontallyResizable:YES];//???
-        [theTextView setAutoresizingMask:NSViewWidthSizable];
-        [[theTextView textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
-        [theTextView setNeedsDisplay:YES];
+        [scrollView setNeedsDisplay:YES];
         [pool drain];
     });
 }
 
-TUP0 textAreaSetHorizontalScroll_CTTextArea(Int cocoaRef, Bool enabled, Int dummy) {
+TUP0 textAreaSetDocumentSize_CTTextArea(Int cocoaRef, Size_CocoaDef size, Int dummy) {   
+    int width = size->width_CocoaDef;
+    int height = size->height_CocoaDef;     
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         NSScrollView *scrollView = (NSScrollView*) cocoaRef;
         NSTextView *theTextView = [scrollView documentView];
-        [scrollView setHasHorizontalScroller:enabled];
-        [theTextView setHorizontallyResizable:enabled];
-        [[theTextView textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
+       
+        [theTextView setMaxSize: NSMakeSize(width, height)];   
+        [[theTextView textContainer] setContainerSize: NSMakeSize(width, height)];
+
         [theTextView setNeedsDisplay:YES];
         [pool drain];
     });
-}
-
-TUP0 textAreaSetVerticalScroll_CTTextArea(Int cocoaRef, Bool enabled, Int dummy) {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        NSScrollView *scrollView = (NSScrollView*) cocoaRef;
-        NSTextView *theTextView = [scrollView documentView];
-        [scrollView setHasVerticalScroller:enabled];
-        [theTextView setVerticallyResizable:enabled];
-        // NSUInteger mask = (enabled) ? [theTextView autoresizingMask]:0;
-        // [theTextView setAutoresizingMask:(mask | NSViewHeightSizable)];
-        [[theTextView textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
-    
-        [theTextView setNeedsDisplay:YES];
-        [pool drain];
-    });
-}                               
-
+}                         
+                
+// TODO: move to extended NSTextView to support more than one textarea!
 static float x = 0;
 static float y = 0;   
 

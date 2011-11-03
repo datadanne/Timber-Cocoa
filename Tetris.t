@@ -3,6 +3,7 @@ module Tetris where
 import POSIX
 import COCOA
 import CTButton
+import CTLabel
 import RandomGenerator
 
 data TileValue = EmptyTile | RedTile | OrangeTile | BlueTile | OutOfBoundsTile
@@ -19,6 +20,7 @@ root w = class
     gu = new gridUpdater gameGrid env
     
     startButton = new mkCocoaButton w
+    scoreLabel = new mkCocoaLabel w
     
     -- Responder for keyboard events
     keyboardResponder event modifiers = request
@@ -32,6 +34,7 @@ root w = class
                          gameGrid.update
                     D -> gu.movePiece 1 0
                          gameGrid.update
+                    Space -> gu.rotate
                     _ -> 
             _ ->
         result False
@@ -42,17 +45,24 @@ root w = class
             (MouseEvent m) ->
                 if (not started) then
                     started := True
-                    after (millisec 500) send gameLoop env
+                    send gameLoop env
+                    send action gameWindow.addResponder ({respondToInputEvent=keyboardResponder}) 
+
             _ ->
         result False
         
     gameLoop env = action
         if (not (<- gu.checkGameOver)) then
             gu.movePiece 0 1
-            gu.clearFilledLines
+            gu.clearFilledLines scoreCallback
             gameGrid.update
             after (millisec 500) send gameLoop env
 
+    linesCleared := 0
+    scoreCallback lines = action
+        linesCleared := linesCleared + lines
+        scoreLabel.setText ("Lines cleared: " ++ (show linesCleared))
+    
     applicationDidFinishLaunching app = action
         app.addWindow gameWindow
         
@@ -61,21 +71,26 @@ root w = class
 
         startButton.setPosition ({x=270;y=20})
         startButton.setTitle "New Game"
+        startButton.setIsFocusable False
         startButton.addResponder ({respondToInputEvent=newGameResponder})
-        
+        scoreLabel.setPosition ({x=270;y=50})
+        scoreLabel.setSize ({width=200;height=30})
+        scoreLabel.setText "Game not started"
+        scoreLabel.setTextColor ({r=250;g=250;b=250})
+        gameWindow.addComponent scoreLabel
         gameWindow.setSize ({width=400;height=500})
         gameWindow.setBackgroundColor ({r=100;g=100;b=100})
         gameWindow.setPosition ({x=100;y=100})
         gameWindow.addComponent startButton
         gameWindow.addComponent gameGrid
-        gameWindow.addResponder ({respondToInputEvent=keyboardResponder}) 
 
         osx.startApplication applicationDidFinishLaunching
 
 
 struct GridUpdater < HasPosition where
     movePiece :: Int -> Int -> Request Bool
-    clearFilledLines :: Request ()
+    rotate :: Request ()
+    clearFilledLines :: (Int -> Action) -> Request ()
     checkGameOver :: Request Bool
     
 gridUpdater gameGrid env = class
@@ -98,6 +113,19 @@ gridUpdater gameGrid env = class
 
     checkGameOver = request
         result gameOver
+        
+    rotate = request
+        (x:xs) = currentPiece
+        currentPiece := xs ++ [x]
+        (startX,startY,newShape) = (head currentPiece)
+
+        setPieceValues EmptyTile
+
+        collides <- testCollision newShape 0 0
+        if (not collides) then
+        --    raise 5
+            shape := newShape
+        setPieceValues color
 
     movePiece addX addY = request 
         -- Ensure we have a valid piece.
@@ -106,7 +134,7 @@ gridUpdater gameGrid env = class
         
         -- Perform collision test. Begin by removing the piece to avoid it interfering.
         setPieceValues EmptyTile
-        collides <- testCollision addX addY
+        collides <- testCollision shape addX addY
         if (not collides) then
             position := {x=position.x+addX;y=position.y+addY}
         elsif (addX == 0 && addY == 1) then
@@ -123,11 +151,11 @@ gridUpdater gameGrid env = class
         result (not collides)
         
     collision := False
-    testCollision offsetX offsetY = do
+    testCollision piece offsetX offsetY = do
         collision := False
         forall ty <- [0..4] do
             forall tx <- [0..4] do
-                if (shape!(5*ty+tx) > 0) then
+                if (piece!(5*ty+tx) > 0) then
                     gridValue <- gameGrid.getValueAt (tx+position.x+offsetX) (ty+position.y+offsetY)
                     collision := collision || (isSolid gridValue)
         result collision
@@ -136,8 +164,10 @@ gridUpdater gameGrid env = class
     isSolid (EmptyTile) = False
     isSolid _ = True  
 
-    blocksInRow := 0
-    clearFilledLines = request
+    blocksInRow     := 0
+    linesClearedNow := 0
+    clearFilledLines cb = request
+        linesClearedNow := 0
         setPieceValues EmptyTile
         forall row <- [1..gameGridHeight] do
                 blocksInRow := 0
@@ -149,6 +179,7 @@ gridUpdater gameGrid env = class
                         _ -> blocksInRow := blocksInRow + 1 
 
                 if (blocksInRow == gameGridWidth) then
+                    linesClearedNow := linesClearedNow + 1
                     forall col <- [1..gameGridWidth] do
                         forall r <- [0 .. (row-2)] do
                             above <- gameGrid.getValueAt col (row-r-1)
@@ -159,10 +190,13 @@ gridUpdater gameGrid env = class
                                 _ ->
                                     gameGrid.setValueAt col (row-r) above
         setPieceValues color
+        send cb linesClearedNow
 
-    nextShape := square
+    nextPiece := squarePiece
+    currentPiece := []
     createNextPiece = do
-        (startX,startY, newShape) = nextShape
+        currentPiece := nextPiece
+        (startX,startY, newShape) = (head currentPiece)
         shape := newShape
         position := {x=startX;y=startY}
         color := case ((<- randomizer.next) `mod` 3 +1) of
@@ -170,10 +204,13 @@ gridUpdater gameGrid env = class
                     2 -> OrangeTile
                     _ -> RedTile
 
-        nextShape := case ((<- randomizer.next) `mod` 3 + 1) of
-                        1 -> square
-                        2 -> linePiece0
-                        _ -> linePiece90
+        nextPiece := case ((<- randomizer.next) `mod` 6 + 1) of
+                        1 -> squarePiece
+                        2 -> zigPiece
+                        3 -> zagPiece
+                        4 -> cornerPiece1
+                        5 -> cornerPiece2
+                        _ -> linePiece
     
     setPieceValues val = do
         forall tx <- [0..4] do
@@ -268,6 +305,7 @@ tetrisGrid width height env w = class
                tile.setPosition ({x=(col-1)*(tileSize+1)+1;y=(row-1)*(tileSize+1)+1})
                grid := (col,row, EmptyTile, tile) : grid
                base.addComponent tile
+        base.setBackgroundColor({r=150;g=150;b=150})
         result ref
         
 
@@ -282,14 +320,91 @@ tetrisGrid width height env w = class
     
     Structure is: (offsetX, offsetY, shape)
 -}
-
+squarePiece = [square]                         
+linePiece = [linePiece0, linePiece90]
+cornerPiece1 = [corner1,corner2,corner3,corner4]
+cornerPiece2 = [corner21,corner22,corner23,corner24]
+zigPiece = [zig0, zig1]
+zagPiece = [zag0, zag1]
 
 square = (4,(-2), array [0,0,0,0,0, 
-                       0,0,0,0,0, 
-                       0,0,2,1,0, 
-                       0,0,1,1,0, 
-                       0,0,0,0,0])
-               
+                         0,0,0,0,0, 
+                         0,0,2,1,0, 
+                         0,0,1,1,0, 
+                         0,0,0,0,0])
+                         
+zig0    = (4,(-1), array [0,0,0,0,0, 
+                          0,0,0,1,0, 
+                          0,0,2,1,0, 
+                          0,0,1,0,0, 
+                          0,0,0,0,0])
+                          
+zig1    = (2,(-2), array [0,0,0,0,0, 
+                          0,0,0,0,0, 
+                          0,1,2,0,0, 
+                          0,0,1,1,0, 
+                          0,0,0,0,0])       
+                          
+zag0    = (2,(-1), array [0,0,0,0,0, 
+                          0,1,0,0,0, 
+                          0,1,2,0,0, 
+                          0,0,1,0,0, 
+                          0,0,0,0,0])
+                          
+zag1    = (2,(-2), array [0,0,0,0,0, 
+                          0,0,0,0,0, 
+                          0,0,2,1,0, 
+                          0,1,1,0,0, 
+                          0,0,0,0,0])
+                          
+corner1 = (2,(-1), array [0,0,0,0,0, 
+                          0,0,1,0,0, 
+                          0,0,2,0,0, 
+                          0,0,1,1,0, 
+                          0,0,0,0,0])
+
+corner2 = (2,(-2), array [0,0,0,0,0, 
+                          0,0,0,0,0, 
+                          0,1,2,1,0, 
+                          0,1,0,0,0, 
+                          0,0,0,0,0])
+                          
+corner3 = (2,(-1), array [0,0,0,0,0, 
+                          0,1,1,0,0, 
+                          0,0,2,0,0, 
+                          0,0,1,0,0, 
+                          0,0,0,0,0])
+                          
+corner4 = (2,(-1), array [0,0,0,0,0, 
+                          0,0,0,1,0, 
+                          0,1,2,1,0, 
+                          0,0,0,0,0, 
+                          0,0,0,0,0])
+
+corner21 = (2,(-1), array [0,0,0,0,0, 
+                          0,0,1,0,0, 
+                          0,0,2,0,0, 
+                          0,1,1,0,0, 
+                          0,0,0,0,0])
+
+corner22 = (2,(-1), array [0,0,0,0,0, 
+                          0,1,0,0,0, 
+                          0,1,2,1,0, 
+                          0,0,0,0,0, 
+                          0,0,0,0,0])
+                          
+corner23 = (2,(-1), array [0,0,0,0,0, 
+                           0,0,1,1,0, 
+                           0,0,2,0,0, 
+                           0,0,1,0,0, 
+                           0,0,0,0,0])
+                          
+corner24 = (2,(-2), array [0,0,0,0,0, 
+                           0,0,0,0,0, 
+                           0,1,2,1,0, 
+                           0,0,0,1,0, 
+                           0,0,0,0,0])
+                          
 linePiece0 = (3,(-2), array [0,0,0,0,0, 
                            0,0,0,0,0, 
                            0,1,2,1,1, 
@@ -301,15 +416,3 @@ linePiece90 = (4,(-1), array [0,0,0,0,0,
                             0,0,2,0,0, 
                             0,0,1,0,0, 
                             0,0,1,0,0])
-                     
-linePiece180 = (2,(-2), array [0,0,0,0,0, 
-                             0,0,0,0,0, 
-                             1,1,2,1,0, 
-                             0,0,0,0,0, 
-                             0,0,0,0,0])
-                     
-linePiece270 = (4,0, array [0,0,1,0,0, 
-                             0,0,1,0,0, 
-                             0,0,2,0,0, 
-                             0,0,1,0,0, 
-                             0,0,0,0,0])

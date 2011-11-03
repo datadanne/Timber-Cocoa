@@ -1,4 +1,5 @@
 #include "CTTextArea.extern.h"
+#import <Cocoa/Cocoa.h>
 
 // --------- TextArea ----------------------------------------------
 Int initTextArea_CTTextArea(World w, Int dummy) {

@@ -1,3 +1,5 @@
+#import <Cocoa/Cocoa.h>
+
 // ------------- CocoaView ----------------------------               
 @interface CocoaView : NSView {
 @private

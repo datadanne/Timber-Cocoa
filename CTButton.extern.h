@@ -1,8 +1,6 @@
 #ifndef CTBUTTON_EXTERN_H_
 #define CTBUTTON_EXTERN_H_
 
-#import <Cocoa/Cocoa.h>
-
 Int initButton_CTButton(World,Int);
 Size_CocoaDef buttonSetTitle_CTButton(Int,LIST,Int);
 TUP0 buttonSetPosition_CTButton(Int,Position_CocoaDef,Int);

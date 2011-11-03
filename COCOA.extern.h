@@ -1,8 +1,6 @@
 #ifndef COCOA_EXTERN_H
 #define COCOA_EXTERN_H
 
-#import <Cocoa/Cocoa.h>
-
 #include "timber.h"
 #include "CocoaDef.h"
 

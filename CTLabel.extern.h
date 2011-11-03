@@ -1,8 +1,6 @@
 #ifndef CTLABEL_EXTERN_H_
 #define CTLABEL_EXTERN_H_
 
-#import <Cocoa/Cocoa.h>
-
 #include "CocoaDef.h"
 
 Int initLabel_CTLabel(World,Int);

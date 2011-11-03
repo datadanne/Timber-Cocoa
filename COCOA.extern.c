@@ -1,4 +1,5 @@
 #include "COCOA.extern.h"
+#import <Cocoa/Cocoa.h>
 #import "COCOA.extern.m"
 
 int length (LIST list) {

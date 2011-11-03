@@ -1,4 +1,5 @@
 #include "CTLabel.extern.h"
+#import <Cocoa/Cocoa.h>
 
 Int initLabel_CTLabel(World w, Int dummy) {
     __block NSTextField *textField;

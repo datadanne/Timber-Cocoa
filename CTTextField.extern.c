@@ -1,4 +1,6 @@
 #include "CTTextField.extern.h"
+#import <Cocoa/Cocoa.h>
+
 // --------- TextField ----------------------------------------------
 Int initTextField_CTTextField(World w, Int dummy) {
     __block NSTextField *cocoaTextField;

@@ -1,6 +1,11 @@
-#include "COCOA.extern.h"
+#import <Cocoa/Cocoa.h>
+#include "Cocoa.extern.h"
 
 // ------------- WindowDelegate ---------------------------- 
+// Window delegate allows interception of window close events
+@interface WindowDelegate : NSObject <NSWindowDelegate>
+@end
+
 @implementation WindowDelegate
 -(BOOL) windowShouldClose:(id)sender {
     Thread current_thread = CURRENT();
@@ -29,6 +34,13 @@
 @end
 
 // ------------- CocoaWindow ----------------------------
+@interface CocoaWindow : NSWindow {
+@private
+	bool (*dispatch)(NSEvent* event);
+}
+- (void) setEventDispatcher:(bool(*)(NSEvent*))dispatcher;
+@end
+
 @implementation CocoaWindow
 - (void) setEventDispatcher:(bool(*)(NSEvent*))dispatcher {
 	dispatch = dispatcher;

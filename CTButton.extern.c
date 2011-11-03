@@ -1,4 +1,5 @@
 #include "CTButton.extern.h"
+#import <Cocoa/Cocoa.h>
                     
 // --------- Button ----------------------------------------------
 Size_CocoaDef buttonSetTitle_CTButton(Int cocoaRef, LIST s, Int dummy) {

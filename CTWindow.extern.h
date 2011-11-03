@@ -1,24 +1,11 @@
 #ifndef CTWINDOW_EXTERN_H_
 #define CTWINDOW_EXTERN_H_
 
-#import <Cocoa/Cocoa.h>
-
 #include "rts.h"
 #include "timber.h"
 
 extern pthread_mutex_t rts;
 extern int rootsDirty;
-
-// Window delegate allows interception of window close events.
-@interface WindowDelegate : NSObject <NSWindowDelegate>
-@end
-
-@interface CocoaWindow : NSWindow {
-@private
-	bool (*dispatch)(NSEvent* event);
-}
-- (void) setEventDispatcher:(bool(*)(NSEvent*))dispatcher;
-@end
 
 Bool compareKeys_CTWindow(CocoaKey_CocoaDef, CocoaKey_CocoaDef);
 

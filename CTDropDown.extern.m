@@ -1,4 +1,18 @@
+#import <Cocoa/Cocoa.h>
 #include "CTDropDown.extern.h"
+
+@interface DropDownClickHandler : NSObject {
+    float x;
+    float y;
+    float width;
+    float height;   
+    
+    float lastEventX;
+    float lastEventY;
+} 
+- (void) setCoordsX: (float) xarg andY: (float) yarg;
+- (void) setWidth: (float) w andHeight: (float) h;
+@end   
 
 @implementation DropDownClickHandler   
 - (id) init {

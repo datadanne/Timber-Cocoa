@@ -168,49 +168,62 @@ getMousePosition (MouseReleased p)        = p
 getMousePosition (MouseClicked p)         = p
 getMousePosition (MouseWheelScroll p _ _) = p   
 
+tabPressed (KeyPressed Tab) = True
+tabPressed _ = False
+
 defaultInputResponder :: CocoaWindow -> Container -> Class RespondsToInputEvents
 defaultInputResponder window rootContainer = class
     
     currentFocus := rootContainer
-    focusables := []
     
     respondToInputEvent (KeyEvent keyEventType) modifiers = request
+        {- default implementation that uses rootContainer as the default focus target.
+           allows the currently focused component to respond to the event, and if its not consumed it will in case of a tab or shift-tab
+           event pass focus to the "next" (ordered by time added) focusable component. -}
         currentFocus := (<- window.getFocus)
         
         if isDestroyed (<- currentFocus.getState) then
             window.setFocus rootContainer
-
-        consumed <- currentFocus.respondToInputEvent (KeyEvent keyEventType) modifiers
-        if (not consumed) then
-            theKey = getKey keyEventType
-            isPressed = case keyEventType of (KeyPressed _) -> True; _ -> False
-            if (theKey == Tab && isPressed) then
-                cmps <- rootContainer.getAllChildren
-                foundFocus := False
-                focusables := []
-            
-                forall c <- cmps do
-                    if (<- c.getIsFocusable) then
-                        focusables := c : focusables
-            
-                if (elem Shift modifiers) then
-                    focusables := reverse focusables
         
-                scanList focusables findKeyFocus
-
-                if (length focusables > 0 && currentFocus == rootContainer) then
-                    window.setFocus (head focusables)
+        -- first let the current focus target be able to consume the event
+        consumed <- currentFocus.respondToInputEvent (KeyEvent keyEventType) modifiers
+        
+        if (not consumed) then
+            if tabPressed keyEventType then
+                -- the focused component did not consume the event AND it was a tab-event.
+                
+                -- step 1. get a list of all components that are focusable  
+                cmps <- rootContainer.getAllChildren
+                focusables = concat (<- forall c <- cmps do
+                                            if (<- c.getIsFocusable) then
+                                                result [c]
+                                            else
+                                                result [])
+                                                
+                -- change the order of the list to move focus in the right direction in relation to if shift is pressed
+                listToScan = if (elem Shift modifiers) then focusables else reverse focusables
+                
+                -- step 2. scan the list of focusables until we find the currently focused component, and set focus to the successor in the list
+                foundFocus := False
+                scanList listToScan findKeyFocus
+                
+                -- special case. if the currently focused component is the last element in the list (or if it has removed), 
+                -- the head of the list should be focused
+                if (length listToScan > 0 && currentFocus == rootContainer) then
+                    window.setFocus (head listToScan)
 
         -- TODO: Allow menu to consume key events
-        
         result False
 
     respondToInputEvent (MouseEvent me) modifiers = request
+        {- default implementation of mouse event dispatching, that "flattens out" the component-structure to a list where the first component is the component that was added last. the list is then traversed and each component that contains the point of the event inside its coordinates is given the possibility to consume it until one component has consumed it. -}
         cmps <- rootContainer.getAllChildren
         scanList (reverse cmps) (findMouseFocus me modifiers)
         result (<- rootContainer.respondToInputEvent (MouseEvent me) modifiers)
     
     foundFocus := False
+    {- this procedure is used in combination with scanList to scan the list of focusable components until we find the currently focused component
+    and then set focus to its successor -}
     findKeyFocus cmp = do
         if (foundFocus) then
             currentFocus := cmp
@@ -222,18 +235,19 @@ defaultInputResponder window rootContainer = class
             result False
         else
             result False
-
+    
+    {- this procedure is used in combination with scanList to scan the list of components and allow each component where the position of the event is inside its rectangle to consume it, and once its been consumed the dispatching stops. -}
     findMouseFocus event modifiers cmp = do
-        originBottomLeft = getMousePosition event
-        windowSize <- window.getSize
-        eventPosition = ({x=originBottomLeft.x; y=windowSize.height-originBottomLeft.y})
-        parentPosition <- getParentPosition cmp
-        relativePosition = getRelativePosition parentPosition eventPosition
+        originBottomLeft  = getMousePosition event
+        windowSize        <- window.getSize
+        eventPosition     = ({x=originBottomLeft.x; y=windowSize.height-originBottomLeft.y})
+        parentPosition    <- getParentPosition cmp
+        relativePosition  = getRelativePosition parentPosition eventPosition
 
         -- Construct new event based on local coordinates.
         eventInLocalCoords = mkNewEventAt event relativePosition
         
-        cmpPos <- cmp.getPosition
+        cmpPos  <- cmp.getPosition
         cmpSize <- cmp.getSize
         if clickInsideBox relativePosition cmpPos cmpSize then
             if (<- cmp.getIsFocusable) then
@@ -244,15 +258,16 @@ defaultInputResponder window rootContainer = class
         
     result RespondsToInputEvents {..}
 
+-- procedure that runs cmd with each element in the list as a parameter (one at a time starting with the first, then the second etc) 
+-- until cmd elem results in True
 scanList [] _ = do 
     result False 
-    
 scanList x cmd = do
     if (<- cmd (head x)) then
         result True
     else
         result (<- (scanList (tail x) cmd))
-    
+
 getParentPosition cmp = do
     parent <- cmp.getParent
     if (isJust parent) then
@@ -260,11 +275,12 @@ getParentPosition cmp = do
     else
         result ({x=0;y=0})
 
-getRelativePosition from to = {x=to.x-from.x; y=to.y-from.y}
+getRelativePosition from to =
+    {x=to.x-from.x; y=to.y-from.y}
 
 clickInsideBox mousePos boxPos boxSize = 
     (inInterval mousePos.x boxPos.x boxSize.width) && (inInterval mousePos.y boxPos.y boxSize.height)
-    
+
 inInterval x startPos width = 
     (x >= startPos && x <= (startPos+width))
 

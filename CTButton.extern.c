@@ -59,10 +59,8 @@ Int initButton_CTButton(World w, Int dummy) {
     __block NSButton *thisButton;
     dispatch_sync(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
-        thisButton = [[NSButton alloc] initWithFrame: NSMakeRect(0.0, 0.0, 120.0, 60.0)];
+        thisButton = [[NSButton alloc] initWithFrame: NSMakeRect(0.0, 0.0, 120.0, 20.0)];
         [thisButton setBezelStyle:NSRoundedBezelStyle];
-        [thisButton setTitle:@"Click me!"];
-        [thisButton sizeToFit];
         [pool drain];
     });
     return (Int)thisButton;

@@ -53,5 +53,8 @@
 	    [super sendEvent:event];
 	}
 }
-
+- (void)noResponderFor:(SEL)eventSelector {
+    // This is to shadow the default implementation, which beeps on unhandled keyDown events.
+    // Cocoa should not beep, as the key might be listened on in Timber.
+}
 @end

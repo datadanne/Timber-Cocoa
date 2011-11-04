@@ -83,17 +83,17 @@ void createCocoaApplication(Thread current_thread) {
 }
 
 TUP0 startApplication_COCOA (CocoaEnv_CocoaDef env, CLOS clos, Int poly) {
+    DISABLE(rts);
 	if (!app) {
 		app = cocoaApplication_COCOA(0);
 		toRunWhenAppFinished = (AppCallback)clos;
-
-	    DISABLE(rts);
     	addRootScanner(&appScanner);
     	rootsDirty = 1;
     	ENABLE(rts);
-    	
         runAsMainContinuation(createCocoaApplication);
-	}
+	} else {
+        ENABLE(rts);
+    }
     return 0;
 }
 

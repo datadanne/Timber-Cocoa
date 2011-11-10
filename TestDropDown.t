@@ -11,17 +11,19 @@ root w = class
     dropD = new mkCocoaDropDown w
 
     start app = action                         
+        w1.setPosition ({x=100;y=100})
+        w1.setSize ({width=400;height=300})
+        w1.setTitle "TestDropDown"
+        w1.setBackgroundColor ({r=100;b=0;g=130})
+                                              
+        dropD.setOptions ["first", "second", "third"]
+        dropD.setPosition ({x=100;y=100})
+        dropD.setSelectionResponder (new defaultSelectionResponder)
+        w1.addComponent dropD
+        
         app.addWindow w1
     
     result action
-        w1.setSize ({width=700;height=500})
-        w1.setPosition ({x=0;y=0})                                         
-        dropD.setSize ({width=300;height=300})
-        dropD.setPosition ({x=100;y=100})  
-        dropD.setOptions ["first", "second", "third"]
-        dropD.setSelectionResponder (new defaultSelectionResponder)
-        w1.addComponent dropD
-        w1.setBackgroundColor ({r=100;b=0;g=130})
         osx.startApplication start
 
 defaultSelectionResponder = class

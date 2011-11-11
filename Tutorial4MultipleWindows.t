@@ -110,7 +110,6 @@ root w = class
         colorWindow.setWindowResponder (new class
             onWindowResize s = request
             onWindowCloseRequest = request
-                result False
             result RespondsToWindowEvents{..}) True
         
         initColorGrid = new colorPickerGrid colorWindow setColor w
@@ -154,7 +153,6 @@ windowResponder textarea env = class
         result ()
     
     onWindowCloseRequest = request
-        result True
 
     setWindowResponder responder = request 
     

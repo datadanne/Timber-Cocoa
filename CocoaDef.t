@@ -9,18 +9,24 @@ struct App < AppImpl where
 struct AppImpl where
     {- a consumed event should not be handled by Cocoa -}
     sendInputEvent         :: InputEvent -> WindowID -> Request Consumed 
+    {- this event is always handled by Cocoa -}
     sendWindowResize       :: Size -> WindowID -> Request ()
     {- True: close window, False: ignore close request -}
     sendWindowCloseRequest :: WindowID -> Request Bool
 
-struct CocoaWindow < RespondsToWindowEvents, RespondsToInputEvents, HasSize, HasBackgroundColor, 
-    ContainsComponents, HasTitle, HasResponders, HasWindowResponder, IsResizable where 
-    getId         :: Request WindowID
-    initWindow    :: App -> Request ()
-    destroyWindow :: Request ()
-    setVisible    :: Bool -> Request Bool
-    setFocus      :: Component -> Request ()
-    getFocus      :: Request Component
+struct CocoaWindow < RespondsToInputEvents, HasSize, HasBackgroundColor, 
+    ContainsComponents, HasTitle, HasResponders, IsResizable where 
+    getId          :: Request WindowID
+    initWindow     :: App -> Request ()
+    {- True: override window close events, False: don't override  -}
+    setWindowResponder :: RespondsToWindowEvents -> Bool -> Request ()
+    {- True: close window, False: ignore close request -}
+    windowClosing  :: Request Bool
+    windowResizing :: Size -> Request ()
+    destroyWindow  :: Request ()
+    setVisible     :: Bool -> Request Bool
+    setFocus       :: Component -> Request ()
+    getFocus       :: Request Component
 
 struct Component < BaseComponent where 
     initComp    :: App -> Request CocoaRef
@@ -70,7 +76,7 @@ struct HasResponders where
 struct RespondsToInputEvents where
     respondToInputEvent :: InputEvent -> Modifiers -> Request Consumed
     
-data Consumed = Consumed | NotConsumed -- Consumed(1) = True(1)
+data Consumed = Consumed | NotConsumed -- Consumed = True == (1)
 
 instance eqConsumed :: Eq Consumed where
     (==) Consumed Consumed       = True
@@ -81,13 +87,9 @@ instance eqConsumed :: Eq Consumed where
 isConsumed Consumed = True
 isConsumed _        = False
 
-struct HasWindowResponder where
-    setWindowResponder :: RespondsToWindowEvents -> Bool -> Request ()
-
 struct RespondsToWindowEvents where
     onWindowResize       :: Size -> Request ()
-    {- True: close window, False: ignore close request -}
-    onWindowCloseRequest :: Request Bool 
+    onWindowCloseRequest :: Request () 
 
 struct DefaultEventResponder < HasResponders, RespondsToInputEvents
 
@@ -110,18 +112,18 @@ struct Color where
     r :: Int
     g :: Int
     b :: Int
-    
-BLACK   = {r=0;   g=0;   b=0}
-BLUE    = {r=44;  g=38;  b=249}
-BROWN   = {r=169; g=121; b=72}
-CYAN    = {r=2;   g=254; b=254}
-GREEN   = {r=0;   g=252; b=56}
-MAGENTA = {r=255; g=48;  b=250}
-ORANGE  = {r=254; g=146; b=40}
-PURPLE  = {r=148; g=23;  b=143}
-RED     = {r=255; g=27;  b=24}
-YELLOW  = {r=252; g=253; b=63}
-WHITE   = {r=255; g=255; b=255}
+
+black   = (Color {r=0;   g=0;   b=0})
+blue    = {r=44;  g=38;  b=249}
+brown   = {r=169; g=121; b=72}
+cyan    = {r=2;   g=254; b=254}
+green   = {r=0;   g=252; b=56}
+magenta = {r=255; g=48;  b=250}
+orange  = {r=254; g=146; b=40}
+purple  = {r=148; g=23;  b=143}
+red     = {r=255; g=27;  b=24}
+yellow  = {r=252; g=253; b=63}
+white   = {r=255; g=255; b=255}
                                               
 struct HasPosition where
     setPosition :: Position -> Request ()

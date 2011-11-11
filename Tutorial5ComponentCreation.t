@@ -3,7 +3,6 @@ module Tutorial5ComponentCreation where
 import POSIX
 
 import Tutorial4ColorPicker 
-import Tutorial5CallbackLabel
 import CTButton
 import CTLabel
 import CTTextArea
@@ -113,7 +112,6 @@ root w = class
         colorWindow.setWindowResponder (new class
             onWindowResize s = request
             onWindowCloseRequest = request
-                result False
             result RespondsToWindowEvents{..}) True
         
         initColorGrid = new colorPickerGrid colorWindow setColor w
@@ -167,7 +165,6 @@ windowResponder textarea env = class
         result ()
     
     onWindowCloseRequest = request
-        result True
 
     result RespondsToWindowEvents {..}
     
@@ -205,7 +202,6 @@ colorPickerToggle this window env = class
     result RespondsToInputEvents {..}
     
 -- Tutorial 5: Customized label
-
 mkCocoaCallbackLabel :: (Class Label) -> (String->Action) -> Class Label
 mkCocoaCallbackLabel mkLabel cb = class
     Label {setText=setTextImpl;appendText=appendTextImpl;id=idImpl;..} = new mkLabel

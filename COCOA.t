@@ -47,7 +47,7 @@ cocoaApplication = class
     sendWindowResize toSize windowId = request
         forall window <- activeWindows do
             if (<- window.getId == windowId) then
-                window.onWindowResize toSize
+                window.windowResizing toSize
 
     shouldClose := True
 
@@ -55,7 +55,7 @@ cocoaApplication = class
         shouldClose := True
         forall window <- activeWindows do
             if (<- window.getId == windowId) then
-                shouldClose := (<- window.onWindowCloseRequest)
+                shouldClose := (<- window.windowClosing)
         result shouldClose
     
     updateList key = do

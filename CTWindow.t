@@ -67,11 +67,11 @@ mkCocoaWindow w = class
     setWindowResponder resp override = request 
         overrideWindowCloseRequest := override
         set resp
-    onWindowResize size = request
+    windowResizing size = request
         resize size 
         containerSize = {width=size.width;height=(size.height-23)}
         setSizeImpl containerSize
-    onWindowCloseRequest = request
+    windowClosing = request
         close
         if overrideWindowCloseRequest then
             result True

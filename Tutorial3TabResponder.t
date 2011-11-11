@@ -116,7 +116,6 @@ windowResponder textarea env = class
         result ()
     
     onWindowCloseRequest = request
-        result True
 
     setWindowResponder responder = request 
     

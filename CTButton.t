@@ -3,7 +3,7 @@ module CTButton where
 import COCOA   
 
 struct HasClickResponder where
-    setClickResponder    :: RespondsToClickEvents -> Request ()
+    setClickResponder    :: Action -> Request ()
 
 struct RespondsToClickEvents where
     clickPerformed       :: Action
@@ -60,9 +60,9 @@ mkCocoaButton w = class
         title := s
         setName s
 
-    dcr := new class result RespondsToClickEvents {clickPerformed = action}
+    dcr := new class result action
     clickPerformed = action
-        dcr.clickPerformed
+        dcr
     setClickResponder resp = request
         dcr := resp
     

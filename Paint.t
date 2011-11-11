@@ -1,8 +1,7 @@
 module Paint where
 
-import CTWindow     -- <- this includes CTContainer
+import COCOA
 import CTLabel
-import CTContainer  -- but still, removing this causes compiler panic
 
 mkPaintBackdrop w = class
 
@@ -40,7 +39,7 @@ paintHandler w1 label w = class
             _ ->
         result NotConsumed
         
-    respondToInputEvent _ modifiers = request
+    respondToInputEvent _ _ = request
         result NotConsumed
         
     result RespondsToInputEvents {..}
@@ -63,10 +62,12 @@ root w = class
         label.setSize ({width=300;height=50})
         label.setPosition ({x=50;y=200})
         label.setText "PainT_Timber"
-        bg.setSize ({width=300;height=300})
+        bg.setSize ({width=600;height=600})
+        bg.setPosition ({x=0;y=0})
         w1.setBackgroundColor ({r=150;g=150;b=150})
         w1.addComponent bg
         w1.addComponent label
-        w1.setSize ({width=500;height=500})
+        w1.setSize ({width=600;height=600})
+        w1.setPosition ({x=100;y=100})
 
         osx.startApplication applicationDidFinishLaunching

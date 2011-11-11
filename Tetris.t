@@ -40,15 +40,11 @@ root w = class
         result NotConsumed
 
     started := False
-    newGameResponder event modifiers = request
-        case event of
-            (MouseEvent m) ->
-                if (not started) then
-                    started := True
-                    send gameLoop env
-                    send action gameWindow.addResponder ({respondToInputEvent=keyboardResponder}) 
-            _ ->
-        result NotConsumed
+    newGameResponder = action
+        if (not started) then
+            started := True
+            send gameLoop env
+            send action gameWindow.addResponder ({respondToInputEvent=keyboardResponder}) 
         
     gameLoop env = action
         if (not (<- gu.checkGameOver)) then
@@ -71,7 +67,7 @@ root w = class
         startButton.setPosition ({x=270;y=20})
         startButton.setTitle "New Game"
         startButton.setIsFocusable False
-        startButton.addResponder ({respondToInputEvent=newGameResponder})
+        startButton.setClickResponder newGameResponder
         scoreLabel.setPosition ({x=270;y=50})
         scoreLabel.setSize ({width=200;height=30})
         scoreLabel.setText "Game not started"

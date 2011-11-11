@@ -16,7 +16,7 @@ root w = class
     
     start app = action
         w1.setSize ({width=400;height=400}) 
-        w1.setBackgroundColor ({r=200;g=200;b=200})
+        w1.setBackgroundColor cyan
 
         createComponentHierarchy
         addColorPicker
@@ -66,7 +66,7 @@ root w = class
     -- Tutorial 2 : Respond to button clicks. Add a text area
     addButtonResponder = do
         handler = new buttonHandler label
-        button.addResponder handler
+        button.setClickResponder handler
 
     ta = new mkCocoaTextArea w
 
@@ -102,7 +102,7 @@ root w = class
         colorButton.setTitle "Open ColorPicker"
         colorButton.setSize ({width=150;height=21})
         colorButton.setPosition ({x=40; y=75})
-        colorButton.addResponder (new colorPickerToggle colorButton colorWindow env)
+        colorButton.setClickResponder (new colorPickerToggle colorWindow.setVisible colorButton.setTitle)
         leftContainer.addComponent colorButton
         
         colorWindow.setSize ({width=215;height=215})
@@ -110,7 +110,7 @@ root w = class
         colorWindow.setVisible False
         colorWindow.setResizable False
         colorWindow.setWindowResponder (new class
-            onWindowResize s = request
+            onWindowResize _ = request
             onWindowCloseRequest = request
             result RespondsToWindowEvents{..}) True
         
@@ -133,21 +133,9 @@ root w = class
 -- Tutorial 2 : Responder for button click
 buttonHandler label = class
     clickCount := 0
-
-    respondToInputEvent (MouseEvent event) modifiers = request
-        -- here we will place the code for handling mouse events
-        case event of
-            MouseClicked pos ->
-                clickCount := clickCount + 1
-                label.setText ("Click #" ++ show clickCount)
-                result Consumed
-            _ ->
-                result NotConsumed     
-        
-    respondToInputEvent _ modifiers = request
-        result NotConsumed
-    
-    result RespondsToInputEvents {..}
+    result action
+        clickCount := clickCount + 1
+        label.setText ("Click #" ++ show clickCount)
                       
 -- Tutorial 2 : Responder to resize a component on window resize 
 windowResponder :: TextArea -> POSIX.Env -> Class RespondsToWindowEvents
@@ -188,18 +176,12 @@ myTabResponder label = class
     result RespondsToInputEvents {..}
 
 -- Tutorial4 : Responder to toggle visibility the color picker window 
-colorPickerToggle this window env = class
+colorPickerToggle setVisible setTitle = class
     toggle := True
-    respondToInputEvent (MouseEvent (MouseClicked pos)) modifiers = request
-        window.setVisible toggle
-        send action this.setTitle ((if (toggle) then "Open" else "Close") ++ " ColorPicker")
+    result action
+        setVisible toggle
+        send action setTitle ((if (toggle) then "Open" else "Close") ++ " ColorPicker")
         toggle := not toggle
-        result NotConsumed
-        
-    respondToInputEvent _ _ = request
-        result NotConsumed
-        
-    result RespondsToInputEvents {..}
     
 -- Tutorial 5: Customized label
 mkCocoaCallbackLabel :: (Class Label) -> (String->Action) -> Class Label

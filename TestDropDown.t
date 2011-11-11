@@ -14,7 +14,7 @@ root w = class
         w1.setPosition ({x=100;y=100})
         w1.setSize ({width=400;height=300})
         w1.setTitle "TestDropDown"
-        w1.setBackgroundColor ({r=100;b=0;g=130})
+        w1.setBackgroundColor green
                                               
         dropD.setOptions ["first", "second", "third"]
         dropD.setPosition ({x=100;y=100})

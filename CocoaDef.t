@@ -7,9 +7,9 @@ struct App < AppImpl where
     addWindow :: CocoaWindow -> Request ()  
 
 struct AppImpl where
-    sendInputEvent         :: InputEvent -> WindowID -> Request Bool
+    sendInputEvent         :: InputEvent -> WindowID -> Request Bool -- True: consumed (should not be handled by Cocoa), False: not consumed
     sendWindowResize       :: Size -> WindowID -> Request ()
-    sendWindowCloseRequest :: WindowID -> Request Bool       
+    sendWindowCloseRequest :: WindowID -> Request Bool -- True: close window, False: ignore request      
 
 struct CocoaWindow < RespondsToWindowEvents, RespondsToInputEvents, HasSize, HasBackgroundColor, 
     ContainsComponents, HasTitle, HasResponders, HasWindowResponder, IsResizable where 
@@ -67,13 +67,15 @@ struct HasResponders where
 
 struct RespondsToInputEvents where
     respondToInputEvent :: InputEvent -> Modifiers -> Request Bool
+    
+data Consumed = Consumed | NotConsumed -- Consumed(1) = True(1)
 
 struct HasWindowResponder where
     setWindowResponder   :: RespondsToWindowEvents -> Bool -> Request ()
 
 struct RespondsToWindowEvents where
     onWindowResize       :: Size -> Request ()
-    onWindowCloseRequest :: Request Bool
+    onWindowCloseRequest :: Request Bool -- True: close window, False: ignore request
 
 struct DefaultEventResponder < HasResponders, RespondsToInputEvents
 

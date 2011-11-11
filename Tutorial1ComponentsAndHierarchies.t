@@ -8,16 +8,17 @@ import CTLabel
 root w = class
     env = new posix w
     osx = new cocoa w
-    w1 = new mkCocoaWindow w
     label = new mkCocoaLabel w
     button = new mkCocoaButton w
+    w1 = new mkCocoaWindow w
     
     start app = action                         
+        w1.setPosition({x=100;y=100})
         w1.setSize ({width=400; height=400})    
         w1.setBackgroundColor ({r=200;g=200;b=200})
+    	w1.setTitle "Tutorial"
         createComponentHierarchy
         app.addWindow w1
-        addButtonResponder
     
     createComponentHierarchy = do
         leftContainer = new mkCocoaContainer w
@@ -33,11 +34,14 @@ root w = class
         button.setTitle "Click me!"
         button.setSize ({width=110;height=21})
         button.setPosition ({x=40; y=100})
+        button.addResponder (new eventHandler isMouseClicked label.setText "Button clicked ")
 
         label.setText "This is a label"
         label.setSize ({width=100; height=36})
         label.setPosition ({x=40; y=100})
         label.setTextColor ({r=80; b=140; g=90})
+        -- label.setBackground ({}) red
+        label.addResponder (new eventHandler isMouseMoved env.stdout.write "Mouse moved ")
 
         leftContainer.addComponent button
         rightContainer.addComponent label
@@ -45,41 +49,22 @@ root w = class
         w1.addComponent leftContainer
         w1.addComponent rightContainer
 
-    addButtonResponder = do
-        handler = new buttonHandler label env
-        button.addResponder handler
-
     result action
-        osx.startApplication start  
-        
-buttonHandler label env = class
+        osx.startApplication start      
+
+isMouseClicked (MouseEvent (MouseClicked _)) = True
+isMouseClicked _ = False
+
+isMouseMoved (MouseEvent (MouseMoved _)) = True
+isMouseMoved _ = False
+
+eventHandler test write s = class
     clickCount := 0
-
-    respondToInputEvent (MouseEvent event) modifiers = request
-        -- here we will place the code for handling mouse events
-        case event of
-            MouseClicked pos ->
-                clickCount := clickCount + 1
-                label.setText ("Click #" ++ show clickCount)
-                result True
-            MousePressed pos ->
-                env.stdout.write "Mouse PressEvent Received\n"
-                result True
-            MouseReleased pos -> 
-                env.stdout.write "REALESED\n"
-                result True
-
-            MouseMoved pos ->
-                env.stdout.write "mousemoved\n"
-                result True
-            MouseWheelScroll pos x y -> 
-                env.stdout.write "hello\n"
-                result True
-            _ ->
-                env.stdout.write "Mouse Event Received\n"
-                result False     
-
-    respondToInputEvent _ modifiers = request
-        result False
-
-    result RespondsToInputEvents {..}        
+    respondToInputEvent e _ = request
+        if (test e) then
+            clickCount := clickCount + 1
+            write (s ++ show clickCount ++ "\n")
+            result True   
+        else
+            result False
+    result RespondsToInputEvents {..}  

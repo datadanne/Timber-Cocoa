@@ -18,8 +18,13 @@ colorPickerTile colorPickerX colorPickerY w = class
         parent.addComponent container
         
     tileResponder tileColor setColor = class
-        respondToInputEvent (MouseEvent event) modifiers = request
+        respondToInputEvent (MouseEvent (MouseClicked _)) modifiers = request
             setColor tileColor
+            result False
+
+        respondToInputEvent (MouseEvent (MouseMoved _)) modifiers = request
+            if elem Shift modifiers then
+                setColor tileColor
             result False
 
         respondToInputEvent _ modifiers = request

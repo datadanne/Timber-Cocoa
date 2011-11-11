@@ -154,27 +154,11 @@ mkCocoaWindow w = class
     
     result this
 
-getKey (KeyPressed k)  = k
-getKey (KeyReleased k) = k
-getKey _               = raise 99
-
 mkNewEventAt (MousePressed _) p           = MousePressed p
 mkNewEventAt (MouseReleased _) p          = MouseReleased p
 mkNewEventAt (MouseClicked _) p           = MouseClicked p
 mkNewEventAt (MouseMoved _) p             = MouseMoved p
 mkNewEventAt (MouseWheelScroll _ dx dy) p = MouseWheelScroll p dx dy
-
-getMousePosition (MousePressed p)         = p 
-getMousePosition (MouseReleased p)        = p 
-getMousePosition (MouseClicked p)         = p
-getMousePosition (MouseMoved p)           = p
-getMousePosition (MouseWheelScroll p _ _) = p   
-
-tabPressed (KeyPressed Tab) = True
-tabPressed _ = False
-
-isMouseClick (MouseClicked _) = True
-isMouseClick _ = False
 
 defaultInputResponder :: CocoaWindow -> Container -> Class RespondsToInputEvents
 defaultInputResponder window rootContainer = class
@@ -283,12 +267,6 @@ getParentPosition cmp = do
 
 getRelativePosition from to =
     {x=to.x-from.x; y=to.y-from.y}
-
-clickInsideBox mousePos boxPos boxSize = 
-    (inInterval mousePos.x boxPos.x boxSize.width) && (inInterval mousePos.y boxPos.y boxSize.height)
-
-inInterval x startPos width = 
-    (x >= startPos && x <= (startPos+width))
 
 instance eqCocoaKey :: Eq CocoaKey where
   (==) = compareKeys

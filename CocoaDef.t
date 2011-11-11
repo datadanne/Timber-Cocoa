@@ -37,8 +37,10 @@ data ComponentState =  Inactive | Active CocoaRef | Destroyed (Maybe CocoaRef)
 
 isActive (Active _)       = True
 isActive _                = False
+
 isInactive Inactive       = True
 isInactive _              = False
+
 isDestroyed (Destroyed _) = True
 isDestroyed _             = False
 
@@ -150,6 +152,33 @@ data CocoaKey = A | S | D | F | H | G | Z | X | C | V | Dummy1 |
                 F10 | Dummy14 | F12 | Dummy15 | F15 | Help |Home | PageUp |
                 ForwardDelete | F4 | End | F2 | PageDown | F1 |
                 LeftArrow | RightArrow | DownArrow | UpArrow
+
+getMousePosition :: MouseEventType -> Position
+getMousePosition (MousePressed p)         = p 
+getMousePosition (MouseReleased p)        = p 
+getMousePosition (MouseClicked p)         = p
+getMousePosition (MouseMoved p)           = p
+getMousePosition (MouseWheelScroll p _ _) = p   
+
+isMouseClick :: MouseEventType -> Bool
+isMouseClick (MouseClicked _) = True
+isMouseClick _                = False
+
+getKey :: KeyEventType -> CocoaKey
+getKey (KeyPressed k)  = k
+getKey (KeyReleased k) = k
+
+tabPressed :: KeyEventType -> Bool
+tabPressed (KeyPressed Tab) = True
+tabPressed _                = False
+
+clickInsideBox :: Position -> Position -> Size -> Bool
+clickInsideBox mousePos boxPos boxSize = 
+    (inInterval mousePos.x boxPos.x boxSize.width) && (inInterval mousePos.y boxPos.y boxSize.height)
+
+inInterval :: Int -> Int -> Int -> Bool
+inInterval x startPos width = 
+    (x >= startPos && x <= (startPos+width))
 
 type Modifiers = [CocoaKey]
 

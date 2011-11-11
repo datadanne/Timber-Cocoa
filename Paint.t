@@ -16,25 +16,28 @@ mkPaintBackdrop w = class
 paintHandler w1 label w = class
     pixelCount := 0
     
-    posget (MousePressed p) = p
-    posget (MouseReleased p) = p
-    posget (MouseClicked p) = p
-    posget (MouseWheelScroll p _ _) = p   
-
+    pixelList := []
+    
     respondToInputEvent (MouseEvent event) modifiers = request
-        pos = (posget event)
+        case event of
+            MouseMoved pos -> 
+                if (elem Shift modifiers) then
+                    pixelCount := 1 + pixelCount
+                    label.setText ("Pixel Count: " ++ show pixelCount)
     
-        label.setText ("Pixel Count: " ++ show pixelCount)
-        --label.setText ("Position: " ++ (show pos.x) ++ "," ++ (show pos.y))
-    
-        blackBox = new mkCocoaContainer w
-        blackBox.setSize ({width=7;height=7})
-        blackBox.setBackgroundColor({r=pos.x `mod` 255;g=pos.y `mod` 255;b=2*(pos.y-pos.x) `mod` 255})
-        blackBox.setName ("Container" ++ (show pixelCount))
-        blackBox.setPosition pos
-        w1.addComponent blackBox
+                    blackBox = new mkCocoaContainer w
+                    blackBox.setSize ({width=7;height=7})
+                    blackBox.setBackgroundColor({r=pos.x `mod` 255;g=pos.y `mod` 255;b=2*(pos.y-pos.x) `mod` 255})
+                    blackBox.setName ("Container" ++ (show pixelCount))
+                    blackBox.setPosition pos
+                    pixelList := blackBox : pixelList
+                    
+                    w1.addComponent blackBox
+                elsif (elem Control modifiers) then
+                    forall pixel <- pixelList do
+                        w1.removeComponent pixel
         
-        pixelCount := 1 + pixelCount
+            _ ->
         result False
         
     respondToInputEvent _ modifiers = request

@@ -65,7 +65,25 @@ bool dispatchEventToTimber(NSEvent* event) {
 	    ((_KeyEvent_CocoaDef)receivedEvent)->Tag = 0;
         ((_KeyEvent_CocoaDef)receivedEvent)->a = (KeyEventType_CocoaDef)pressed;
 
-	} else if ([event type] == NSScrollWheel) {
+	} else if ([event type] == NSMouseMoved) {
+	    Position_CocoaDef pos;
+	    NEW (Position_CocoaDef, pos, WORDS(sizeof(struct Position_CocoaDef)));
+	    pos->GCINFO = __GC__Position_CocoaDef;
+		NSPoint p = [event locationInWindow];
+	    pos->x_CocoaDef = p.x;
+		pos->y_CocoaDef = p.y;
+
+	    _MouseMoved_CocoaDef clicked;
+	    NEW (_MouseMoved_CocoaDef, clicked, WORDS(sizeof(struct _MouseMoved_CocoaDef)));
+	    clicked->GCINFO = __GC___MouseMoved_CocoaDef;
+	    clicked->Tag = 0;
+	    clicked->a = pos;
+	   
+	    NEW (InputEvent_CocoaDef, receivedEvent, WORDS(sizeof(struct _MouseEvent_CocoaDef)));
+	    ((_MouseEvent_CocoaDef)receivedEvent)->GCINFO = __GC___MouseEvent_CocoaDef;
+	    ((_MouseEvent_CocoaDef)receivedEvent)->Tag = 1;
+	    ((_MouseEvent_CocoaDef)receivedEvent)->a = (MouseEventType_CocoaDef)clicked;
+	}  else if ([event type] == NSScrollWheel) {
 
         DEBUG("Scrolling event! \n");            
 
@@ -137,7 +155,7 @@ TUP2 initCocoaWindow_CTWindow(World w, Int dummy) {
             backing:NSBackingStoreBuffered defer:NO]; 
         [window setTitle:@"CocoaWindow"];
         [window setEventDispatcher:dispatchEventToTimber];
-
+        [window setAcceptsMouseMovedEvents:YES];
         if (!delegate)
         	delegate = [[WindowDelegate alloc] init];
 

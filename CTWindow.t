@@ -167,10 +167,14 @@ mkNewEventAt (MouseWheelScroll _ dx dy) p = MouseWheelScroll p dx dy
 getMousePosition (MousePressed p)         = p 
 getMousePosition (MouseReleased p)        = p 
 getMousePosition (MouseClicked p)         = p
+getMousePosition (MouseMoved p)           = p
 getMousePosition (MouseWheelScroll p _ _) = p   
 
 tabPressed (KeyPressed Tab) = True
 tabPressed _ = False
+
+isMouseClick (MouseClicked _) = True
+isMouseClick _ = False
 
 defaultInputResponder :: CocoaWindow -> Container -> Class RespondsToInputEvents
 defaultInputResponder window rootContainer = class
@@ -251,7 +255,8 @@ defaultInputResponder window rootContainer = class
         cmpPos  <- cmp.getPosition
         cmpSize <- cmp.getSize
         if clickInsideBox relativePosition cmpPos cmpSize then
-            if (<- cmp.getIsFocusable) then
+            isFocusable <- cmp.getIsFocusable
+            if (isMouseClick event && isFocusable) then
                 window.setFocus cmp
             result (<- cmp.respondToInputEvent (MouseEvent eventInLocalCoords) modifiers)
         else

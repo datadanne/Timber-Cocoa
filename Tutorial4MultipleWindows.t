@@ -182,7 +182,7 @@ myTabResponder label = class
 -- Tutorial4 : Responder to toggle visibility the color picker window 
 colorPickerToggle this window env = class
     toggle := True
-    respondToInputEvent (MouseEvent event) modifiers = request
+    respondToInputEvent (MouseEvent (MouseClicked pos)) modifiers = request
         window.setVisible toggle
         send action this.setTitle ((if (toggle) then "Open" else "Close") ++ " ColorPicker")
         

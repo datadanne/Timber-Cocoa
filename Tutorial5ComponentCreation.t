@@ -74,8 +74,7 @@ root w = class
     addWindowResponder = do
         ta.setSize ({width=300; height=80})
         ta.setPosition ({x=50; y=250})  
-        ta.setScrollable (True,True)
-
+        ta.setDocumentSize ({width=400;height=800})
         w1.addComponent ta
 
         windowResponderObj = new windowResponder ta env
@@ -197,7 +196,7 @@ myTabResponder label = class
 -- Tutorial4 : Responder to toggle visibility the color picker window 
 colorPickerToggle this window env = class
     toggle := True
-    respondToInputEvent (MouseEvent event) modifiers = request
+    respondToInputEvent (MouseEvent (MouseClicked pos)) modifiers = request
         window.setVisible toggle
         send action this.setTitle ((if (toggle) then "Open" else "Close") ++ " ColorPicker")
         

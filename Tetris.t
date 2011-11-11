@@ -35,6 +35,7 @@ root w = class
                     D -> gu.movePiece 1 0
                          gameGrid.update
                     Space -> gu.rotate
+                             gameGrid.update
                     _ -> 
             _ ->
         result False

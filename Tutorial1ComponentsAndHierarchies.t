@@ -5,7 +5,6 @@ import COCOA
 import CTButton
 import CTLabel
 
-root :: RootType
 root w = class
     env = new posix w
     osx = new cocoa w

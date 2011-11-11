@@ -1,4 +1,4 @@
-module Tutorial5ComponentCreation where
+module Tutorial5CompCreation where
 
 import POSIX
 

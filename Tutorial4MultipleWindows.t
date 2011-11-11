@@ -129,12 +129,12 @@ buttonHandler label = class
             MouseClicked pos ->
                 clickCount := clickCount + 1
                 label.setText ("Click #" ++ show clickCount)
-                result True
+                result Consumed
             _ ->
-                result False     
+                result NotConsumed     
         
     respondToInputEvent _ modifiers = request
-        result False
+        result NotConsumed
     
     result RespondsToInputEvents {..}
                       
@@ -172,10 +172,10 @@ myTabResponder label = class
         if (key == Tab) then
             tabCount := tabCount + 1
             label.setText ("Tabs blocked #" ++ (show tabCount))
-        result True
+        result Consumed
 
     respondToInputEvent _ modifiers = request
-        result False
+        result NotConsumed
 
     result RespondsToInputEvents {..}
 
@@ -185,12 +185,11 @@ colorPickerToggle this window env = class
     respondToInputEvent (MouseEvent (MouseClicked pos)) modifiers = request
         window.setVisible toggle
         send action this.setTitle ((if (toggle) then "Open" else "Close") ++ " ColorPicker")
-        
         toggle := not toggle
-        result False
+        result NotConsumed
         
     respondToInputEvent _ _ = request
-        result False
+        result NotConsumed
         
     result RespondsToInputEvents {..}
         

@@ -7,9 +7,11 @@ struct App < AppImpl where
     addWindow :: CocoaWindow -> Request ()  
 
 struct AppImpl where
-    sendInputEvent         :: InputEvent -> WindowID -> Request Bool -- True: consumed (should not be handled by Cocoa), False: not consumed
+    {- a consumed event should not be handled by Cocoa -}
+    sendInputEvent         :: InputEvent -> WindowID -> Request Consumed 
     sendWindowResize       :: Size -> WindowID -> Request ()
-    sendWindowCloseRequest :: WindowID -> Request Bool -- True: close window, False: ignore request      
+    {- True: close window, False: ignore close request -}
+    sendWindowCloseRequest :: WindowID -> Request Bool
 
 struct CocoaWindow < RespondsToWindowEvents, RespondsToInputEvents, HasSize, HasBackgroundColor, 
     ContainsComponents, HasTitle, HasResponders, HasWindowResponder, IsResizable where 
@@ -66,16 +68,26 @@ struct HasResponders where
     getResponders :: Request [RespondsToInputEvents]
 
 struct RespondsToInputEvents where
-    respondToInputEvent :: InputEvent -> Modifiers -> Request Bool
+    respondToInputEvent :: InputEvent -> Modifiers -> Request Consumed
     
 data Consumed = Consumed | NotConsumed -- Consumed(1) = True(1)
 
+instance eqConsumed :: Eq Consumed where
+    (==) Consumed Consumed       = True
+    (==) NotConsumed NotConsumed = True
+    (==) _ _                     = False
+    (/=) a b                     = not (a == b)
+
+isConsumed Consumed = True
+isConsumed _        = False
+
 struct HasWindowResponder where
-    setWindowResponder   :: RespondsToWindowEvents -> Bool -> Request ()
+    setWindowResponder :: RespondsToWindowEvents -> Bool -> Request ()
 
 struct RespondsToWindowEvents where
     onWindowResize       :: Size -> Request ()
-    onWindowCloseRequest :: Request Bool -- True: close window, False: ignore request
+    {- True: close window, False: ignore close request -}
+    onWindowCloseRequest :: Request Bool 
 
 struct DefaultEventResponder < HasResponders, RespondsToInputEvents
 
@@ -83,7 +95,7 @@ struct HasSelectionResponder where
     setSelectionResponder :: RespondsToSelectionEvents -> Request ()
     
 struct RespondsToSelectionEvents where
-    selectionChanged      :: String -> Action
+    selectionChanged :: String -> Action
 
 struct Position where
     x :: Int

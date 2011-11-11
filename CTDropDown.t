@@ -100,7 +100,7 @@ data SizeState = Small | Expanded
 defaultHandler dropdownUpdateMethod = class 
     sizeState := Small    
     respondToInputEvent (KeyEvent t) modifiers = request
-        result False 
+        result NotConsumed 
     respondToInputEvent (MouseEvent t) modifiers = request
         case t of
             MouseClicked pos ->
@@ -111,9 +111,9 @@ defaultHandler dropdownUpdateMethod = class
                         sizeState := Small
                         dropdownUpdateMethod
             _ ->    
-        result True 
+        result Consumed 
     respondToInputEvent _ modifiers = request
-        result False 
+        result NotConsumed 
     result RespondsToInputEvents {..}
     
 --------------------------------------------------------------------------------------------------

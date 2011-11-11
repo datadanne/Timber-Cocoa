@@ -10,5 +10,9 @@ test:
 	timberc --make Tutorial4MultipleWindows
 	timberc --make Tutorial5ComponentCreation
 
+demo:
+	timberc --make Tetris
+	timberc --make Paint
+
 clean:
 	./cleanFolder

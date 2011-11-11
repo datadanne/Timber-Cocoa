@@ -18,7 +18,7 @@ mkCocoaWindow w = class
     
     respondToInputEvent e m = request
         respond e m
-        result False -- do not block Cocoa from processing events
+        result NotConsumed -- do not block Cocoa from processing events
     
     respond = new class
         act e m = action
@@ -175,9 +175,9 @@ defaultInputResponder window rootContainer = class
             window.setFocus rootContainer
         
         -- first let the current focus target be able to consume the event
-        consumed <- currentFocus.respondToInputEvent (KeyEvent keyEventType) modifiers
+        res <- currentFocus.respondToInputEvent (KeyEvent keyEventType) modifiers
         
-        if (not consumed) then
+        if res == NotConsumed then
             if tabPressed keyEventType then
                 -- the focused component did not consume the event AND it was a tab-event.
                 
@@ -202,7 +202,7 @@ defaultInputResponder window rootContainer = class
                     window.setFocus (head listToScan)
 
         -- TODO: Allow menu to consume key events
-        result False
+        result NotConsumed
 
     respondToInputEvent (MouseEvent me) modifiers = request
         {- default implementation of mouse event dispatching, that "flattens out" the component-structure to a list where the first component is the component that was added last. the list is then traversed and each component that contains the point of the event inside its coordinates is given the possibility to consume it until one component has consumed it. -}
@@ -242,7 +242,7 @@ defaultInputResponder window rootContainer = class
             isFocusable <- cmp.getIsFocusable
             if (isMouseClick event && isFocusable) then
                 window.setFocus cmp
-            result (<- cmp.respondToInputEvent (MouseEvent eventInLocalCoords) modifiers)
+            result isConsumed (<- cmp.respondToInputEvent (MouseEvent eventInLocalCoords) modifiers)
         else
             result False
         

@@ -1,7 +1,7 @@
 module TestFocusHierarchy where
 
 import POSIX
-import COCOAttt
+import COCOA
 import CTButton
 
 positions = [(200, 100), (140, 140), (80, 180), (80, 220), (140, 260), 

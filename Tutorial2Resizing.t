@@ -81,12 +81,12 @@ buttonHandler label env = class
             MouseClicked pos ->
                 clickCount := clickCount + 1
                 label.setText ("Click #" ++ show clickCount)
-                result True
+                result Consumed
             _ ->
-                result False     
+                result NotConsumed  
         
     respondToInputEvent _ modifiers = request
-        result False
+        result NotConsumed
     
     result RespondsToInputEvents {..}
                        

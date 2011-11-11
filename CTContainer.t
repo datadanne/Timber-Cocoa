@@ -30,7 +30,7 @@ mkCocoaContainer w = class
     getAllChildren = request
         cs <- forall c <- myComponents do
             list <- c.getAllChildren
-            result list ++ [c] -- order is important here (for reactions to mouse events)
+            result list ++ [c] -- order is important here for reactions to mouse events
         result concat cs
 
     setBackgroundColor c = request
@@ -113,11 +113,11 @@ basicHasResponders = class
     getResponders = request
         result responders
     -- return true (block cocoa) if any of the installed responders say so
-    returnVal := False    
+    returnVal := NotConsumed    
     respondToInputEvent inputEvent modifiers = request
-        returnVal := False
+        returnVal := NotConsumed
         forall h <- responders do
-            if returnVal == False then
+            if returnVal == NotConsumed then
                 returnVal := <- h.respondToInputEvent inputEvent modifiers
         result returnVal
     result DefaultEventResponder {..}

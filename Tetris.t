@@ -27,8 +27,7 @@ root w = class
         case event of
             (KeyEvent (KeyPressed theKey)) ->
                 case (theKey) of
-                    A -> 
-                         gu.movePiece (-1) 0
+                    A -> gu.movePiece (-1) 0
                          gameGrid.update
                     S -> gu.movePiece 0 1
                          gameGrid.update
@@ -38,7 +37,7 @@ root w = class
                              gameGrid.update
                     _ -> 
             _ ->
-        result False
+        result NotConsumed
 
     started := False
     newGameResponder event modifiers = request
@@ -48,9 +47,8 @@ root w = class
                     started := True
                     send gameLoop env
                     send action gameWindow.addResponder ({respondToInputEvent=keyboardResponder}) 
-
             _ ->
-        result False
+        result NotConsumed
         
     gameLoop env = action
         if (not (<- gu.checkGameOver)) then

@@ -9,13 +9,11 @@ private
 cocoaApplication :: Class App
 cocoaApplication = class
     activeWindows := []
-    blockDefaultCocoaBehavior := False
-
+    modifiers := []
+        
     addWindow w = request
         w.initWindow this
         activeWindows := w:activeWindows
-
-    modifiers := []
 
     sendInputEvent (KeyEvent k) windowId = request
         name = case k of 
@@ -28,17 +26,18 @@ cocoaApplication = class
             Command -> updateList name
             _ -> 
         sendInputToWindow (KeyEvent k) windowId
-        result False -- Let keys pass through so that they appear in text fields etc.
+        {- Let key events pass through so that they appear in text fields etc. -}
+        result NotConsumed
     
     sendInputEvent (MouseEvent m) windowId = request
         sendInputToWindow (MouseEvent m) windowId
-        
         case m of
-            (MouseWheelScroll _ _ _) -> result True -- Block scroll since we control it in Timber instead.
-            _ -> result blockDefaultCocoaBehavior
+            {- Block scrolling events since we control them in Timber instead -}
+            (MouseWheelScroll _ _ _) -> result Consumed 
+            _ -> result NotConsumed 
   
     sendInputEvent _ _ = request
-        result blockDefaultCocoaBehavior
+        result NotConsumed
         
     sendInputToWindow recvEvent windowId = do
         forall window <- activeWindows do

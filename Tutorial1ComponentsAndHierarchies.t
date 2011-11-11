@@ -64,7 +64,7 @@ eventHandler test write s = class
         if (test e) then
             clickCount := clickCount + 1
             write (s ++ show clickCount ++ "\n")
-            result True   
+            result Consumed   
         else
-            result False
+            result NotConsumed
     result RespondsToInputEvents {..}  

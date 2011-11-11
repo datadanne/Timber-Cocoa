@@ -90,10 +90,10 @@ defaultTextScrollResponder textArea = class
             MouseWheelScroll pos deltaX deltaY -> 
                 scrollTo deltaX deltaY
             _ ->                    
-        result True
+        result Consumed
     
     respondToInputEvent _ _ = request
-        result False
+        result NotConsumed
     
     result RespondsToInputEvents {..}
     

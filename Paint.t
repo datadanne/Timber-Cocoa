@@ -38,10 +38,10 @@ paintHandler w1 label w = class
                         w1.removeComponent pixel
         
             _ ->
-        result False
+        result NotConsumed
         
     respondToInputEvent _ modifiers = request
-        result False
+        result NotConsumed
         
     result RespondsToInputEvents {..}
 

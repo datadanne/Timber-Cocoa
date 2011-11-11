@@ -92,12 +92,12 @@ buttonHandler label = class
             MouseClicked pos ->
                 clickCount := clickCount + 1
                 label.setText ("Click #" ++ show clickCount)
-                result True
+                result Consumed
             _ ->
-                result False     
+                result NotConsumed     
         
     respondToInputEvent _ modifiers = request
-        result False
+        result NotConsumed
     
     result RespondsToInputEvents {..}
                        
@@ -134,9 +134,9 @@ myTabResponder label = class
         if (key == Tab) then
             tabCount := tabCount + 1
             label.setText ("Tabs blocked #" ++ (show tabCount))
-        result True
+        result Consumed
 
     respondToInputEvent _ modifiers = request
-        result False
+        result NotConsumed
 
     result RespondsToInputEvents {..}

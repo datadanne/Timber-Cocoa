@@ -20,15 +20,15 @@ colorPickerTile colorPickerX colorPickerY w = class
     tileResponder tileColor setColor = class
         respondToInputEvent (MouseEvent (MouseClicked _)) modifiers = request
             setColor tileColor
-            result False
+            result NotConsumed
 
         respondToInputEvent (MouseEvent (MouseMoved _)) modifiers = request
             if elem Shift modifiers then
                 setColor tileColor
-            result False
+            result NotConsumed
 
         respondToInputEvent _ modifiers = request
-            result False
+            result NotConsumed
 
         result RespondsToInputEvents {..}
         

@@ -35,7 +35,7 @@ root w = class
 buttonClickHandler otherButton = class
     respondToInputEvent (MouseEvent (MouseClicked _)) _ = request
         otherButton.setSize ({width=200;height=150})
-        result True                    
+        result Consumed                    
     respondToInputEvent _ _ = request 
-        result False
+        result NotConsumed
     result RespondsToInputEvents {..}

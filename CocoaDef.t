@@ -110,6 +110,18 @@ struct Color where
     r :: Int
     g :: Int
     b :: Int
+    
+BLACK   = {r=0;   g=0;   b=0}
+BLUE    = {r=44;  g=38;  b=249}
+BROWN   = {r=169; g=121; b=72}
+CYAN    = {r=2;   g=254; b=254}
+GREEN   = {r=0;   g=252; b=56}
+MAGENTA = {r=255; g=48;  b=250}
+ORANGE  = {r=254; g=146; b=40}
+PURPLE  = {r=148; g=23;  b=143}
+RED     = {r=255; g=27;  b=24}
+YELLOW  = {r=252; g=253; b=63}
+WHITE   = {r=255; g=255; b=255}
                                               
 struct HasPosition where
     setPosition :: Position -> Request ()

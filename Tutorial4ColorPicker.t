@@ -33,6 +33,22 @@ colorPickerTile colorPickerX colorPickerY w = class
         result RespondsToInputEvents {..}
         
     result initTile
+{-
+c cb = class
+    changeColor color (MouseEvent (MouseClicked _)) modifiers = request
+        ...
+    changeColor color (MouseEvent (MouseMoved _)) modifiers = request
+        ...
+    result changeColor
+
+i grid-klassen:
+    changeColor = new c
+    forall tiles do
+        ... changeColor
+
+i tile-klassen:
+    container.addResponder ({respondToInputEvent = changeColor color})
+-}
 
 colorPickerGrid container cb env = class
     callback := cb
@@ -42,5 +58,5 @@ colorPickerGrid container cb env = class
             forall col <- [1..16] do    
                initTile = new colorPickerTile col row env
                initTile container callback
-
+               
     result initGrid

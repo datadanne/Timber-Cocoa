@@ -1,28 +1,14 @@
 module Tutorial5CallbackLabel where
 
 import CTLabel
-
-struct Tutorial5CallbackLabel < Label where
-    installOnTextChangeCallback :: (String -> Action) -> Request ()
    
-mkCocoaCallbackLabel w = class
-    textChangeCallback := Nothing
-
-    Label {setText=setTextImpl;appendText=appendTextImpl..} = new mkCocoaLabel w
-    
+mkCocoaCallbackLabel :: (Class Label) -> (String->Action) -> Class Label
+mkCocoaCallbackLabel mkLabel cb = class
+    Label {setText=setTextImpl;appendText=appendTextImpl;id=idImpl;..} = new mkLabel
     setText s = request
         setTextImpl s
-        if (isJust textChangeCallback) then
-            send (fromJust textChangeCallback) s
-
+        send cb s
     appendText s = request
         appendTextImpl s
-        if (isJust textChangeCallback) then
-            send (fromJust textChangeCallback) (<- getText)
-
-    installOnTextChangeCallback a = request
-        textChangeCallback := Just a
-    
-    this = Tutorial5CallbackLabel{id=self;..}
-
-    result this
+        send cb (<- getText)
+    result Label{id=self;..}

@@ -29,8 +29,8 @@ root w = class
         addWindowResponder
         setUpCallbacks
 
-    label = new mkCocoaCallbackLabel w            -- note! this labels have been updated to
-    tabCountLabel = new mkCocoaCallbackLabel w    -- be callback-labels
+    label = new mkCocoaCallbackLabel (mkCocoaLabel w) textChangeCallback -- note! this labels have been updated to
+    tabCountLabel = new mkCocoaCallbackLabel (mkCocoaLabel w) textChangeCallback    -- be callback-labels
     button = new mkCocoaButton w
     leftContainer = new mkCocoaContainer w
     rightContainer = new mkCocoaContainer w
@@ -125,10 +125,7 @@ root w = class
         callbackLabel.setPosition ({x=40; y=10})    
         callbackLabel.setText "Callback label"
         rightContainer.addComponent callbackLabel
-        
-        label.installOnTextChangeCallback textChangeCallback
-        tabCountLabel.installOnTextChangeCallback textChangeCallback
-        
+                
     textChangeCallback newText = action
         callbackLabel.setText ("CB: " ++ newText)
 

@@ -29,7 +29,7 @@ mkCocoaTextArea w = class
     setResponders rs = request
         setRespondersImpl (dts:rs)
 
-    documentSize := {width=1; height=1}
+    documentSize := {width=1000; height=10000}
     getDocumentSize = request
         result documentSize
     

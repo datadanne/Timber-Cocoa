@@ -11,10 +11,12 @@ mkCocoaWindow w = class
     state := Inactive        
     
     rootContainer = new mkCocoaContainer w
-    defaultResponder = new defaultInputResponder this rootContainer
     
-    DefaultEventResponder {setResponders=setRespondersImpl;respondToInputEvent=respondToInputEventImpl;..} = 
-        new basicHasResponders 
+    defaultResponder = new defaultInputResponder this rootContainer
+    defaultResponderAdded := False
+    
+    DefaultEventResponder {setResponders=setRespondersImpl;addResponder=addResponderImpl;
+        respondToInputEvent=respondToInputEventImpl;..} = new basicHasResponders 
     
     respondToInputEvent e m = request
         respond e m
@@ -24,6 +26,12 @@ mkCocoaWindow w = class
         act e m = action
             respondToInputEventImpl e m
         result act
+
+    addResponder r = request
+        if not defaultResponderAdded then
+            addResponderImpl defaultResponder
+            defaultResponderAdded := True
+        addResponderImpl r
     
     setResponders rs = request
         setRespondersImpl (defaultResponder:rs)
@@ -103,7 +111,9 @@ mkCocoaWindow w = class
             windowId := id
             container_ref <- rootContainer.initComp app
             rootContainer.setName "RootContainer"
-            addResponder defaultResponder
+            if not defaultResponderAdded then
+                addResponderImpl defaultResponder
+                defaultResponderAdded := True
             windowSetHidden ref
             windowSetContentView ref container_ref
             windowSetSize ref (<-getSize)        
@@ -167,8 +177,9 @@ defaultInputResponder window rootContainer = class
     
     respondToInputEvent (KeyEvent keyEventType) modifiers = request
         {- default implementation that uses rootContainer as the default focus target.
-           allows the currently focused component to respond to the event, and if its not consumed it will in case of a tab or shift-tab
-           event pass focus to the "next" (ordered by time added) focusable component. -}
+           allows the currently focused component to respond to the event, and if its not 
+           consumed it will in case of a tab or shift-tab event pass focus to the "next" 
+           (ordered by time added) focusable component. -}
         currentFocus := (<- window.getFocus)
         
         if isDestroyed (<- currentFocus.getState) then
@@ -189,15 +200,17 @@ defaultInputResponder window rootContainer = class
                                             else
                                                 result [])
                                                 
-                -- change the order of the list to move focus in the right direction in relation to if shift is pressed
+                {- change the order of the list to move focus in the right direction in 
+                relation to if shift is pressed -}
                 listToScan = if (elem Shift modifiers) then focusables else reverse focusables
                 
-                -- step 2. scan the list of focusables until we find the currently focused component, and set focus to the successor in the list
+                {- step 2. scan the list of focusables until we find the currently focused 
+                   component, and set focus to the successor in the list -}
                 foundFocus := False
                 scanList listToScan findKeyFocus
                 
-                -- special case. if the currently focused component is the last element in the list (or if it has removed), 
-                -- the head of the list should be focused
+                {- a special case: if the currently focused component is the last element in 
+                    the list (or if it has removed), the head of the list should be focused -}
                 if (length listToScan > 0 && currentFocus == rootContainer) then
                     window.setFocus (head listToScan)
 
@@ -205,14 +218,18 @@ defaultInputResponder window rootContainer = class
         result NotConsumed
 
     respondToInputEvent (MouseEvent me) modifiers = request
-        {- default implementation of mouse event dispatching, that "flattens out" the component-structure to a list where the first component is the component that was added last. the list is then traversed and each component that contains the point of the event inside its coordinates is given the possibility to consume it until one component has consumed it. -}
+        {- default implementation of mouse event dispatching, that "flattens out" the component 
+           structure to a list where the first component is the component that was added last. 
+           The list is then traversed and each component that contains the point of the event 
+           inside its coordinates is given the possibility to consume it until one component 
+           has consumed it. -}
         cmps <- rootContainer.getAllChildren
         scanList (reverse cmps) (findMouseFocus me modifiers)
         result (<- rootContainer.respondToInputEvent (MouseEvent me) modifiers)
     
     foundFocus := False
-    {- this procedure is used in combination with scanList to scan the list of focusable components until we find the currently focused component
-    and then set focus to its successor -}
+    {- this procedure is used in combination with scanList to scan the list of focusable components 
+       until we find the currently focused component and then set focus to its successor -}
     findKeyFocus cmp = do
         if (foundFocus) then
             currentFocus := cmp

@@ -20,7 +20,10 @@ mkCocoaButton w = class
     sizeHasBeenSet := False
 
     der = new defaultButtonInputResponder this
-    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl;setResponders=setRespondersImpl..} =
+    derAdded := False
+    
+    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl;setResponders=setRespondersImpl;
+        addResponder=addResponderImpl;..} =
         new basicComponent True Nothing "BUTTON"
 
     setPosition p = request
@@ -37,14 +40,11 @@ mkCocoaButton w = class
         else
             setSizeImpl s         
     
-    respondersToAddAtInit := [der]
-    addRespondersSuggestionImpl rs = request
-        if isActive state then
-            addResponder rs -- should be addResponderImpl then
-        else
-            respondersToAddAtInit := (respondersToAddAtInit ++ [rs])
-        
-        -- and then at init do addResponder respondersToAddAtInit
+    addResponder r = request
+        if not derAdded then
+            addResponderImpl der
+            derAdded := True
+        addResponderImpl der
             
     setResponders rs = request
         setRespondersImpl (der:rs)
@@ -60,7 +60,7 @@ mkCocoaButton w = class
         title := s
         setName s
 
-    dcr := new defaultClickResponder
+    dcr := new class result RespondsToClickEvents {clickPerformed = action}
     clickPerformed = action
         dcr.clickPerformed
     setClickResponder resp = request
@@ -71,16 +71,16 @@ mkCocoaButton w = class
 
     initComp app = request
         ref <- initButton w
-        state := Active ref
-        
+        state := Active ref        
         newSize <- buttonSetTitle ref title
         if sizeHasBeenSet then
             setSizeImpl (<-buttonSetSize ref (<- getSize))
         else
             setSizeImpl newSize
         buttonSetPosition ref (<- getPosition)
-        
-        addResponder der
+        if not derAdded then
+            addResponderImpl der
+            derAdded := True
         result ref
     
     getState = request
@@ -91,21 +91,11 @@ mkCocoaButton w = class
     result this
 
 private 
- 
+
 extern initButton        :: World -> Request CocoaRef
 extern buttonSetTitle    :: CocoaRef -> String -> Request Size
 extern buttonSetPosition :: CocoaRef -> Position -> Request ()
 extern buttonSetSize     :: CocoaRef -> Size -> Request Size
-
--- from CTWindow.t, should be changed to import CTWindow instead or move the functions
-clickInsideBox mousePos boxPos boxSize = 
-    (inInterval mousePos.x boxPos.x boxSize.width) && (inInterval mousePos.y boxPos.y boxSize.height)
-inInterval x startPos width = 
-    (x >= startPos && x <= (startPos+width))
-
-defaultClickResponder = class
-    clickPerformed = action
-    result RespondsToClickEvents {..}
 
 defaultButtonInputResponder btn = class
     respondToInputEvent (MouseEvent (MouseClicked pos)) _ = request

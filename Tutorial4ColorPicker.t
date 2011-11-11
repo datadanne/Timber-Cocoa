@@ -1,9 +1,24 @@
 module Tutorial4ColorPicker where
 
-import CTWindow
+import COCOA
 
-colorPickerGrid parent callback w = class
-    initGrid = request
+mkColorPicker :: World -> (Color -> Action) -> Class CocoaWindow
+mkColorPicker w callback = class
+
+    CocoaWindow{initWindow=initWindowImpl;..} = new mkCocoaWindow w
+    
+    initWindow app = request
+        setSize ({width=215;height=215})
+        setVisible False
+        setResizable False
+        setWindowResponder (new class
+            onWindowResize _ = request
+            onWindowCloseRequest = request
+            result RespondsToWindowEvents{..}) True 
+        initGrid
+        initWindowImpl app
+    
+    initGrid = do
         tileSize = 12
         forall x <- [1..16] do
             forall y <- [1..16] do
@@ -13,15 +28,15 @@ colorPickerGrid parent callback w = class
                 tileColor = ({r=128;g=16*x;b=16*y})
                 tile.setBackgroundColor tileColor
                 tile.addResponder ({respondToInputEvent=invokeCallback tileColor})
-                parent.addComponent tile
+                addComponent tile    
     
-    invokeCallback color event modifiers  = request
-        case event of
-            (MouseEvent (MouseClicked _)) ->
-                callback color
-            (MouseEvent (MouseMoved _)) ->
-                if elem Shift modifiers then
-                    callback color
-            _ -> 
+    invokeCallback color (MouseEvent (MouseClicked _)) _  = request
+        send callback color
         result Consumed
-    result initGrid
+    invokeCallback color (MouseEvent (MouseMoved _)) modifiers = request
+        if elem Shift modifiers then send callback color
+        result Consumed
+    invokeCallback _ _ _ = request 
+        result Consumed
+    
+    result CocoaWindow{..}

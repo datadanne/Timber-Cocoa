@@ -12,24 +12,26 @@ root w = class
     osx = new cocoa w
     
     w1 = new mkCocoaWindow w
-    colorWindow = new mkCocoaWindow w
     
     start app = action
+        w1.setPosition ({x=100;y=100})
         w1.setSize ({width=400;height=400}) 
         w1.setBackgroundColor cyan
+        w1.setTitle "Tutorial"
 
         createComponentHierarchy
-        addColorPicker
+        addColorPicker app
         
         app.addWindow w1
-        app.addWindow colorWindow
 
         addButtonResponder
         addWindowResponder
         setUpCallbacks
-
-    label = new mkCocoaCallbackLabel (mkCocoaLabel w) textChangeCallback -- note! this labels have been updated to
-    tabCountLabel = new mkCocoaCallbackLabel (mkCocoaLabel w) textChangeCallback    -- be callback-labels
+    
+    -- these two labels have been updated to callback-labels
+    label = new mkCocoaCallbackLabel (mkCocoaLabel w) textChangeCallback 
+    tabCountLabel = new mkCocoaCallbackLabel (mkCocoaLabel w) textChangeCallback
+    
     button = new mkCocoaButton w
     leftContainer = new mkCocoaContainer w
     rightContainer = new mkCocoaContainer w
@@ -86,38 +88,30 @@ root w = class
         ta.setResponders [tabResponder]
 
     -- Tutorial 4 : Add a color picker window
-    rgbLabel = new mkCocoaLabel w
+    rgbLabel    = new mkCocoaLabel w
+    colorButton = new mkCocoaButton w 
+    colorWindow = new mkColorPicker w setColor
 
-    setColor color = request
-        rgbLabel.setText ("R:" ++ (show (color.r)) ++ " G: " ++ (show (color.g)) ++ " B: " ++ (show (color.b)) ++ "\n") 
+    setColor color = action
+        rgbLabel.setText (show color) 
         leftContainer.setBackgroundColor color
 
-    addColorPicker = do
-        rgbLabel.setText "R: 0; G=0; B=0"
+    addColorPicker app = do        
+        rgbLabel.setText "R: 100; G=100; B=200"
         rgbLabel.setSize ({width=150; height=36})
         rgbLabel.setPosition ({x=40; y=40})
         rightContainer.addComponent rgbLabel
-        
-        colorButton = new mkCocoaButton w  
+         
         colorButton.setTitle "Open ColorPicker"
         colorButton.setSize ({width=150;height=21})
         colorButton.setPosition ({x=40; y=75})
-        colorButton.setClickResponder (new colorPickerToggle colorWindow.setVisible colorButton.setTitle)
+        colorButton.setClickResponder (new mkColorToggle colorWindow colorButton)
         leftContainer.addComponent colorButton
-        
-        colorWindow.setSize ({width=215;height=215})
-        colorWindow.setPosition ({x=445;y=300})
-        colorWindow.setVisible False
-        colorWindow.setResizable False
-        colorWindow.setWindowResponder (new class
-            onWindowResize _ = request
-            onWindowCloseRequest = request
-            result RespondsToWindowEvents{..}) True
-        
-        initColorGrid = new colorPickerGrid colorWindow setColor w
-        initColorGrid
-        
-    -- Tutorial 5 : Adding a new label and set up callbacks
+
+        colorWindow.setPosition ({x=500;y=0})
+        app.addWindow colorWindow
+                        
+    -- Tutorial 5 : Adding a new label and setting up callbacks
     setUpCallbacks = do                       
         callbackLabel.setSize ({width=150; height=36})
         callbackLabel.setPosition ({x=40; y=10})    
@@ -128,7 +122,21 @@ root w = class
         callbackLabel.setText ("CB: " ++ newText)
 
     result action
-        osx.startApplication start  
+        osx.startApplication start 
+
+-- Tutorial 4
+mkColorToggle colorWindow colorButton = class 
+    toggle := True
+    result action
+        colorWindow.setVisible toggle
+        colorButton.setTitle 
+            (if toggle then "Open ColorPicker" else "Close ColorPicker")
+        toggle := not toggle
+
+instance showColor :: Show Color where
+    show c =  "R: " ++ (show c.r) ++ 
+             " G: " ++ (show c.g) ++ 
+             " B: " ++ (show c.b) ++ "\n"
 
 -- Tutorial 2 : Responder for button click
 buttonHandler label = class
@@ -174,14 +182,6 @@ myTabResponder label = class
         result NotConsumed
 
     result RespondsToInputEvents {..}
-
--- Tutorial4 : Responder to toggle visibility the color picker window 
-colorPickerToggle setVisible setTitle = class
-    toggle := True
-    result action
-        setVisible toggle
-        send action setTitle ((if (toggle) then "Open" else "Close") ++ " ColorPicker")
-        toggle := not toggle
     
 -- Tutorial 5: Customized label
 mkCocoaCallbackLabel :: (Class Label) -> (String->Action) -> Class Label

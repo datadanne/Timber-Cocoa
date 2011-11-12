@@ -59,16 +59,15 @@ mkCocoaTextArea w = class
         state := destroyState state
 
     initComp app = request
-        ref <- initTextArea w
-        state := Active ref
-        
-        textAreaSetText ref text
-        textAreaSetPosition ref (<- getPosition)
-        textAreaSetSize ref (<- getSize)
-        textAreaSetDocumentSize ref documentSize
-       
-        addResponder dts
-        result ref
+        if isInactive state then
+            ref <- initTextArea w
+            state := Active ref
+            textAreaSetText ref text
+            textAreaSetPosition ref (<- getPosition)
+            textAreaSetSize ref (<- getSize)
+            textAreaSetDocumentSize ref documentSize
+            addResponder dts
+        result state
         
     this = TextArea{id=self;..}
 

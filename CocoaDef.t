@@ -29,7 +29,7 @@ struct CocoaWindow < RespondsToInputEvents, HasSize, HasBackgroundColor,
     getFocus       :: Request Component
 
 struct Component < BaseComponent where 
-    initComp    :: App -> Request CocoaRef
+    initComp    :: App -> Request ComponentState
     destroyComp :: Request ()
     getState    :: Request ComponentState
     id          :: OID

@@ -9,10 +9,10 @@ struct Label < Component, HasText, HasBackgroundColor where
 mkCocoaLabel :: World -> Class Label
 mkCocoaLabel w = class
     state := Inactive
-    textColor := {r=0;g=0;b=0}
+    textColor := black
     text := "Default Label"
-    color := {r=255; g=255; b=255}    
-    alpha := 1.0
+    color := white    
+    alpha := 0.0
 
     BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl..} = new basicComponent False Nothing "Label"
 
@@ -67,6 +67,7 @@ mkCocoaLabel w = class
         result state
                             
     initComp app = request
+        if isInactive state then
             ref <- initLabel w
             state := Active ref
             labelSetText ref text
@@ -74,7 +75,7 @@ mkCocoaLabel w = class
             labelSetSize ref (<- getSize)
             labelSetTextColor ref textColor
             labelSetBackgroundColor ref color alpha
-            result ref
+        result state
         
     this = Label{id=self;..}
 

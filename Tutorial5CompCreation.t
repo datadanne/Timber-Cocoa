@@ -54,7 +54,7 @@ root w = class
         label.setSize ({width=150; height=36})
         label.setPosition ({x=40; y=100})
         
-        tabCountLabel.setText "TextArea Tab counter"
+        tabCountLabel.setText "Tab counter"
         tabCountLabel.setSize ({width=150; height=36})
         tabCountLabel.setPosition ({x=40; y=70})
 

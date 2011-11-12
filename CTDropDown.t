@@ -90,17 +90,18 @@ mkCocoaDropDown w = class
         result state
         
     initComp app = request
-        ref <- initDropDown w
-        state := Active ref
-        forall o <- (reverse options) do
-            dropDownAddOption ref o
-        dropDownSetPosition ref (<- getPosition)
-        size := (<- dropDownSetSize ref size)
-        currentOption := (<- dropDownGetSelectedOption ref)
-        if not derAdded then
-            addResponderImpl der
-            derAdded := True
-        result ref
+        if isInactive state then
+            ref <- initDropDown w
+            state := Active ref
+            forall o <- (reverse options) do
+                dropDownAddOption ref o
+            dropDownSetPosition ref (<- getPosition)
+            size := (<- dropDownSetSize ref size)
+            currentOption := (<- dropDownGetSelectedOption ref)
+            if not derAdded then
+                addResponderImpl der
+                derAdded := True
+        result state
 
     this = DropDown{id=self;..}
 

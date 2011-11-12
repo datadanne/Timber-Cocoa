@@ -50,8 +50,10 @@ mkCocoaContainer w = class
         c.setParent this
         if isActive state then
             Active ref = state
-            c_ref <- c.initComp (fromJust appRef)
-            containerAddComponent ref c_ref
+            s <- c.initComp (fromJust appRef)
+            if isActive s then
+                Active c_ref = s
+                containerAddComponent ref c_ref
             
     removeComponent c = request
         myComponents := [x | x <- myComponents, not (x == c)]
@@ -88,16 +90,19 @@ mkCocoaContainer w = class
         state := destroyState state
         
     initComp app = request
-        appRef := Just app
-        ref <- initContainer w
-        state := Active ref
-        containerSetSize ref (<-getSize)
-        containerSetBackgroundColor ref color alpha
-        containerSetPosition ref (<-getPosition)
-        forall c <- myComponents do
-            c_ref <- c.initComp app
-            containerAddComponent ref c_ref
-        result ref
+        if isInactive state then
+            appRef := Just app
+            ref <- initContainer w
+            state := Active ref
+            containerSetSize ref (<-getSize)
+            containerSetBackgroundColor ref color alpha
+            containerSetPosition ref (<-getPosition)
+            forall c <- myComponents do
+                s <- c.initComp app
+                if isActive s then
+                     Active c_ref = s
+                     containerAddComponent ref c_ref
+        result state
     
     getState = request
         result state

@@ -70,18 +70,19 @@ mkCocoaButton w = class
         state := destroyState state
 
     initComp app = request
-        ref <- initButton w
-        state := Active ref        
-        newSize <- buttonSetTitle ref title
-        if sizeHasBeenSet then
-            setSizeImpl (<-buttonSetSize ref (<- getSize))
-        else
-            setSizeImpl newSize
-        buttonSetPosition ref (<- getPosition)
-        if not derAdded then
-            addResponderImpl der
-            derAdded := True
-        result ref
+        if isInactive state then
+            ref <- initButton w
+            state := Active ref        
+            newSize <- buttonSetTitle ref title
+            if sizeHasBeenSet then
+                setSizeImpl (<-buttonSetSize ref (<- getSize))
+            else
+                setSizeImpl newSize
+            buttonSetPosition ref (<- getPosition)
+            if not derAdded then
+                addResponderImpl der
+                derAdded := True
+        result state
     
     getState = request
         result state

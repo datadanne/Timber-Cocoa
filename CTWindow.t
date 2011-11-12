@@ -109,7 +109,7 @@ mkCocoaWindow w = class
             (ref,id) <- initCocoaWindow w
             state    := Active ref
             windowId := id
-            container_ref <- rootContainer.initComp app
+            (Active container_ref) <- rootContainer.initComp app
             rootContainer.setName "RootContainer"
             if not defaultResponderAdded then
                 addResponderImpl defaultResponder

@@ -42,12 +42,13 @@ mkCocoaTextField w = class
         state := destroyState state
 
     initComp app = request
-        ref <- initTextField w
-        state := Active ref
-        textFieldSetText ref text
-        textFieldSetPosition ref (<- getPosition)
-        setSizeImpl (<- textFieldSetSize ref (<- getSize))
-        result ref
+        if isInactive state then
+            ref <- initTextField w
+            state := Active ref
+            textFieldSetText ref text
+            textFieldSetPosition ref (<- getPosition)
+            setSizeImpl (<- textFieldSetSize ref (<- getSize))
+        result state
                 
     this = TextField{id=self;..}
 

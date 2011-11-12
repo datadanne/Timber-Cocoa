@@ -34,13 +34,13 @@ root w = class
         button.setTitle "Click me!"
         button.setSize ({width=110;height=21})
         button.setPosition ({x=40; y=100})
-        button.addResponder (new eventHandler isMouseClicked label.setText "Button clicked ")
+        button.setClickResponder (new clickHandler label)
 
         label.setText "This is a label"
-        label.setSize ({width=100; height=36})
+        label.setSize ({width=130; height=36})
         label.setPosition ({x=40; y=100})
         label.setTextColor ({r=80; b=140; g=90})
-        -- label.setBackground ({}) red
+        label.setBackgroundColor white
         label.addResponder (new eventHandler isMouseMoved env.stdout.write "Mouse moved ")
 
         leftContainer.addComponent button
@@ -51,6 +51,13 @@ root w = class
 
     result action
         osx.startApplication start      
+
+clickHandler label = class
+    clickCount := 0
+    clickPerformed = action             
+        clickCount := clickCount + 1
+        label.setText $ "Button click #" ++ show clickCount
+    result clickPerformed
 
 isMouseClicked (MouseEvent (MouseClicked _)) = True
 isMouseClicked _ = False

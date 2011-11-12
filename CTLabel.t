@@ -2,7 +2,7 @@ module CTLabel where
             
 import COCOA
 
-struct Label < Component, HasText where
+struct Label < Component, HasText, HasBackgroundColor where
     setTextColor :: Color -> Request ()
     getTextColor :: Request Color
 
@@ -46,7 +46,16 @@ mkCocoaLabel w = class
     
     getTextColor = request
         result textColor
-        
+    
+    color := {r=255; g=255; b=255}    
+    getBackgroundColor = request
+        result color 
+    setBackgroundColor c = request
+        if isActive state then
+            Active ref = state
+            labelSetBackgroundColor ref c
+        color := c
+       
     destroyComp = request
         state := destroyState state
     
@@ -60,6 +69,7 @@ mkCocoaLabel w = class
             labelSetPosition ref (<- getPosition)
             labelSetSize ref (<- getSize)
             labelSetTextColor ref textColor
+            labelSetBackgroundColor ref color
             result ref
         
     this = Label{id=self;..}
@@ -68,8 +78,9 @@ mkCocoaLabel w = class
 
 private
 
-extern initLabel         :: World -> Request CocoaRef
-extern labelSetText      :: CocoaRef -> String -> Request ()
-extern labelSetPosition  :: CocoaRef -> Position -> Request ()    
-extern labelSetSize      :: CocoaRef -> Size -> Request ()       
-extern labelSetTextColor :: CocoaRef -> Color -> Request ()
+extern initLabel                :: World -> Request CocoaRef
+extern labelSetText             :: CocoaRef -> String -> Request ()
+extern labelSetPosition         :: CocoaRef -> Position -> Request ()    
+extern labelSetSize             :: CocoaRef -> Size -> Request ()       
+extern labelSetTextColor        :: CocoaRef -> Color -> Request ()
+extern labelSetBackgroundColor  :: CocoaRef -> Color -> Request ()

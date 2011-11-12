@@ -6,6 +6,7 @@ import CTDropDown
 
 root :: RootType
 root w = class
+    env = new posix w
     osx = new cocoa w
     w1 = new mkCocoaWindow w
     dropD = new mkCocoaDropDown w
@@ -18,14 +19,18 @@ root w = class
                                               
         dropD.setOptions ["first", "second", "third"]
         dropD.setPosition ({x=100;y=100})
-        dropD.setSelectionResponder (new defaultSelectionResponder)
+        dropD.setSelectionResponder (new defaultSelectionResponder env.stdout.write)
         w1.addComponent dropD
         
         app.addWindow w1
+        
+        after (sec 5) send action
+            dropD.setOptions ["some", "new", "options"]
     
     result action
         osx.startApplication start
 
-defaultSelectionResponder = class
+defaultSelectionResponder writer = class
     selectionChanged str = action
+        writer $ str ++ " selected\n"
     result RespondsToSelectionEvents {..}

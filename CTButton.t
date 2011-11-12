@@ -44,7 +44,7 @@ mkCocoaButton w = class
         if not derAdded then
             addResponderImpl der
             derAdded := True
-        addResponderImpl der
+        addResponderImpl r
             
     setResponders rs = request
         setRespondersImpl (der:rs)

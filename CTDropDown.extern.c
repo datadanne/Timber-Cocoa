@@ -33,6 +33,16 @@ TUP0 dropDownAddOption_CTDropDown(Int cocoaRef, LIST str, Int dummy) {
     });
 }
 
+TUP0 dropDownRemoveOptions_CTDropDown(Int cocoaRef, Int dummy) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	    NSPopUpButton *thisDropDown = (NSPopUpButton*) cocoaRef;
+	    [thisDropDown removeAllItems];
+	    [pool drain];
+    });
+    
+}
+
 LIST dropDownGetSelectedOption_CTDropDown(Int cocoaRef, Int dummy) {
     __block LIST s;
     dispatch_sync(dispatch_get_main_queue(), ^{

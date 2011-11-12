@@ -9,6 +9,7 @@ mkCocoaContainer :: World -> Class Container
 mkCocoaContainer w = class
     myComponents := []    
     color        := {r=255; g=255; b=255}
+    alpha        := 1.0
     appRef       := Nothing
     state        := Inactive
 
@@ -33,11 +34,13 @@ mkCocoaContainer w = class
             result list ++ [c] -- order is important here for reactions to mouse events
         result concat cs
 
-    setBackgroundColor c = request
+    setBackgroundColor c = setBackgroundColorWithAlpha c 1.0
+    setBackgroundColorWithAlpha c a = request
         if isActive state then
             Active ref = state
-            containerSetBackgroundColor ref c
+            containerSetBackgroundColor ref c a
         color := c
+        alpha := a
 
     getBackgroundColor = request
         result color
@@ -89,7 +92,7 @@ mkCocoaContainer w = class
         ref <- initContainer w
         state := Active ref
         containerSetSize ref (<-getSize)
-        containerSetBackgroundColor ref color
+        containerSetBackgroundColor ref color alpha
         containerSetPosition ref (<-getPosition)
         forall c <- myComponents do
             c_ref <- c.initComp app
@@ -145,7 +148,7 @@ wrapper s = class
 
 extern initContainer                :: World -> Request CocoaRef
 extern destroyContainer             :: CocoaRef -> Request ()
-extern containerSetBackgroundColor  :: CocoaRef -> Color -> Request ()
+extern containerSetBackgroundColor  :: CocoaRef -> Color -> Float -> Request ()
 extern containerSetSize             :: CocoaRef -> Size -> Request ()
 extern containerSetPosition         :: CocoaRef -> Position -> Request ()
 extern containerAddComponent        :: CocoaRef -> CocoaRef -> Request ()

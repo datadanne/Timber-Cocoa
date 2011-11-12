@@ -67,16 +67,15 @@ TUP0 labelSetPosition_CTLabel(Int cocoaRef, Position_CocoaDef pos, Int dummy) {
     });
 }                                            
 
-TUP0 labelSetBackgroundColor_CTLabel(Int cocoaRef, Color_CocoaDef color, Int dummy) {
+TUP0 labelSetBackgroundColor_CTLabel(Int cocoaRef, Color_CocoaDef color, Float a, Int dummy) {
     float r = color->r_CocoaDef/255.0;
     float g = color->g_CocoaDef/255.0;
     float b = color->b_CocoaDef/255.0;
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];	
         NSTextField *thisLabel = (NSTextField*) cocoaRef;
-        NSColor *color = [NSColor colorWithCalibratedRed:r green:g blue:b alpha:1.0];
+        NSColor *color = [NSColor colorWithCalibratedRed:r green:g blue:b alpha:a];
         [thisLabel setBackgroundColor: color];
-        printf("backgroundColor set for label!\n");
         [thisLabel setNeedsDisplay];
         [pool drain]; 
     });

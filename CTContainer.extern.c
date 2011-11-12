@@ -20,14 +20,14 @@ TUP0 destroyContainer_CTContainer(Int cocoaRef, Int dummy) {
         [pool drain];
     });
 }
-TUP0 containerSetBackgroundColor_CTContainer(Int containerRef, Color_CocoaDef color, Int dummy) {    
+TUP0 containerSetBackgroundColor_CTContainer(Int containerRef, Color_CocoaDef color, Float alpha, Int dummy) {    
     int r = color->r_CocoaDef;
     int g = color->g_CocoaDef;
     int b = color->b_CocoaDef;
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         CocoaView *thisView = (CocoaView*) containerRef;
-        [thisView setBackgroundColor:r:g:b];
+        [thisView setBackgroundColor:r:g:b:alpha];
         [pool drain];
     });
 } 

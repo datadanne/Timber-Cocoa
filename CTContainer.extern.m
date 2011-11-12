@@ -4,8 +4,9 @@
     int r;
     int g;
     int b;
+    float alpha;
 }
--(void) setBackgroundColor:(int) ra:(int) ga:(int) ba;
+-(void) setBackgroundColor:(int) ra:(int) ga:(int) ba:(float) newAlpha;
 @end
 
 @implementation CocoaView
@@ -17,6 +18,7 @@
         r = 100; 
         g = 100;
         b = 100;
+        alpha = 1.0;
     }
     return self;
 }
@@ -34,13 +36,14 @@
 - (void)drawRect:(NSRect)dirtyRect {
     // Fill in background Color
     CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
-    CGContextSetRGBFillColor(context, r/255.0, g/255.0, b/255.0, 1.0);
+    CGContextSetRGBFillColor(context, r/255.0, g/255.0, b/255.0, alpha);
     CGContextFillRect(context, NSRectToCGRect(dirtyRect));
 }
--(void) setBackgroundColor:(int) ra:(int) ga:(int) ba {
+-(void) setBackgroundColor:(int) ra:(int) ga:(int) ba :(float) newAlpha{
     r = ra;
     g = ga;
     b = ba;
+    alpha = newAlpha;
     [self setNeedsDisplay:YES];
 }
 @end

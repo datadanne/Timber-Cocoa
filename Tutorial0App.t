@@ -12,6 +12,12 @@ root w = class
     	w1.setBackgroundColor ({r=200;g=200;b=100})
     	w1.setTitle "Tutorial"
     	app.addWindow w1
+    	
+    	after sec 3 send action
+    	    w1.destroyWindow
+    	
+    	after sec 5 send action
+    	    app.addWindow w1
 
     result action
         osx.startApplication start

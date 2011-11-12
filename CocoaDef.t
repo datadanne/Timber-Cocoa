@@ -140,6 +140,7 @@ struct IsResizable where
 struct HasBackgroundColor where
     setBackgroundColor :: Color -> Request ()
     getBackgroundColor :: Request Color
+    setBackgroundColorWithAlpha :: Color -> Float -> Request ()
 
 struct HasTitle where
     setTitle :: String -> Request ()

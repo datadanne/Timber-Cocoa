@@ -11,6 +11,8 @@ mkCocoaLabel w = class
     state := Inactive
     textColor := {r=0;g=0;b=0}
     text := "Default Label"
+    color := {r=255; g=255; b=255}    
+    alpha := 1.0
 
     BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl..} = new basicComponent False Nothing "Label"
 
@@ -47,14 +49,16 @@ mkCocoaLabel w = class
     getTextColor = request
         result textColor
     
-    color := {r=255; g=255; b=255}    
     getBackgroundColor = request
-        result color 
-    setBackgroundColor c = request
+        result color
+        
+    setBackgroundColor c = setBackgroundColorWithAlpha c 1.0    
+    setBackgroundColorWithAlpha c a = request
         if isActive state then
             Active ref = state
-            labelSetBackgroundColor ref c
+            labelSetBackgroundColor ref c a
         color := c
+        alpha := a
        
     destroyComp = request
         state := destroyState state
@@ -69,7 +73,7 @@ mkCocoaLabel w = class
             labelSetPosition ref (<- getPosition)
             labelSetSize ref (<- getSize)
             labelSetTextColor ref textColor
-            labelSetBackgroundColor ref color
+            labelSetBackgroundColor ref color alpha
             result ref
         
     this = Label{id=self;..}
@@ -83,4 +87,4 @@ extern labelSetText             :: CocoaRef -> String -> Request ()
 extern labelSetPosition         :: CocoaRef -> Position -> Request ()    
 extern labelSetSize             :: CocoaRef -> Size -> Request ()       
 extern labelSetTextColor        :: CocoaRef -> Color -> Request ()
-extern labelSetBackgroundColor  :: CocoaRef -> Color -> Request ()
+extern labelSetBackgroundColor  :: CocoaRef -> Color -> Float -> Request ()

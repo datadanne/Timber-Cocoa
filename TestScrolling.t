@@ -8,16 +8,15 @@ import CTTextField
 root w = class
     env = new posix w
     osx = new cocoa w
-
-    w1 = new mkCocoaWindow w
-    textArea = new mkCocoaTextArea w
+    w1  = new mkCocoaWindow w
     textField = new mkCocoaTextField w
-    
+    textArea  = new mkCocoaTextArea w
+
     start app = action  
         w1.setPosition ({x=100;y=100})   
         w1.setSize ({width=400;height=400})
-        w1.setTitle "TestScrolling"    
-        w1.setBackgroundColor ({r=100;b=0;g=130})                                  
+        w1.setBackgroundColor web_gray
+        w1.setTitle "TestScrolling"   
 
         textField.setPosition ({x=100;y=50})
         textField.setSize ({width=100;height=50})

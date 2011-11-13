@@ -8,29 +8,27 @@ root :: RootType
 root w = class
     env = new posix w
     osx = new cocoa w
-    w1 = new mkCocoaWindow w
+    w1  = new mkCocoaWindow w
     dropD = new mkCocoaDropDown w
 
-    start app = action                         
+    start app = action
         w1.setPosition ({x=100;y=100})
-        w1.setSize ({width=400;height=300})
+        w1.setSize ({width=400;height=400}) 
+        w1.setBackgroundColor web_gray
         w1.setTitle "TestDropDown"
-        w1.setBackgroundColor green
                                               
         dropD.setOptions ["first", "second", "third"]
         dropD.setPosition ({x=100;y=100})
-        dropD.setSelectionResponder (new defaultSelectionResponder env.stdout.write)
+        dropD.setSelectionResponder 
+            (new defaultSelectionResponder env.stdout.write)
         w1.addComponent dropD
         
         app.addWindow w1
-        
-        after (sec 5) send action
-            dropD.setOptions ["some", "new", "options"]
     
     result action
         osx.startApplication start
 
 defaultSelectionResponder writer = class
     selectionChanged str = action
-        writer $ str ++ " selected\n"
+        writer (str ++ " item selected\n")
     result RespondsToSelectionEvents {..}

@@ -1,110 +1,140 @@
 module Tetris where
 
-import POSIX
 import COCOA
 import CTButton
 import CTLabel
 import RandomGenerator
 
 data TileValue = EmptyTile | RedTile | OrangeTile | BlueTile | OutOfBoundsTile
-
 gameGridWidth = 10
 gameGridHeight = 20
 
-root w = class
-    env = new posix w
-    osx = new cocoa w
-    
-    gameWindow = new mkCocoaWindow w
-    gameGrid = new tetrisGrid gameGridWidth gameGridHeight env w
-    gu = new gridUpdater gameGrid env
-    
-    startButton = new mkCocoaButton w
-    scoreLabel = new mkCocoaLabel w
-    
-    -- Responder for keyboard events
-    keyboardResponder event modifiers = request
-        case event of
-            (KeyEvent (KeyPressed theKey)) ->
-                case (theKey) of
-                    A -> gu.movePiece (-1) 0
-                         gameGrid.update
-                    S -> gu.movePiece 0 1
-                         gameGrid.update
-                    D -> gu.movePiece 1 0
-                         gameGrid.update
-                    Space -> gu.rotate
-                             gameGrid.update
-                    _ -> 
-            _ ->
-        result NotConsumed
-
-    started := False
-    newGameResponder = action
-        if (not started) then
-            started := True
-            send gameLoop env
-            send action gameWindow.addResponder ({respondToInputEvent=keyboardResponder}) 
-        
-    gameLoop env = action
-        if (not (<- gu.checkGameOver)) then
-            gu.movePiece 0 1
-            gu.clearFilledLines scoreCallback
-            gameGrid.update
-            after (millisec 500) send gameLoop env
-
+gameIgniter window writeScore writeHighScore w = class
+    running      := False
     linesCleared := 0
-    scoreCallback lines = action
-        linesCleared := linesCleared + lines
-        scoreLabel.setText ("Lines cleared: " ++ (show linesCleared))
-    
-    applicationDidFinishLaunching app = action
-        app.addWindow gameWindow
-        
-    result action
-        gameGrid.setPosition ({x=30;y=20})
+    highScore    := 0
 
+    grid = new tetrisGrid gameGridWidth gameGridHeight w
+    gu   = new gridUpdater grid updateScore
+    
+    initialized := False
+    init = request
+        if not initialized then
+            initialized := True
+            grid.setPosition ({x=30;y=20})
+            window.addComponent grid
+        result startNewGame
+
+    startNewGame = action
+        if not running then
+            running := True
+            send loop
+            send action window.addResponder gu
+        else
+            running := False
+            linesCleared := 0
+            gu.reset
+            send action window.setResponders []
+            after (millisec 500) send startNewGame
+            
+    loop = action
+        gameOver <- gu.checkGameOver
+        if (not gameOver && running) then
+            gu.movePiece 0 1
+            gu.clearFilledLines
+            grid.update
+            after (millisec 500) send loop
+        elsif not running then
+            writeScore "Restarting ..."
+        else
+            writeScore "Game Over!"  
+            
+    updateScore lines = action
+        linesCleared := linesCleared + lines
+        writeScore ("Lines cleared: " ++ (show linesCleared))
+
+        if linesCleared > highScore then
+            highScore := linesCleared
+            writeHighScore  ("Highscore: " ++ (show highScore))
+            
+    result init
+
+root w = class
+    osx = new cocoa w
+    scoreLabel  = new mkCocoaLabel w
+    highscoreLabel = new mkCocoaLabel w
+    startButton = new mkCocoaButton w
+    gameWindow  = new mkCocoaWindow w
+    initGame    = new gameIgniter gameWindow scoreLabel.setText highscoreLabel.setText w
+
+    startedApp app = action
+        app.addWindow gameWindow
+
+    result action
+        gameWindow.setSize ({width=400;height=500})
+        gameWindow.setBackgroundColor ({r=100;g=100;b=100})
+        gameWindow.setPosition ({x=100;y=100})
+
+        startNewGameResponder <- initGame
         startButton.setPosition ({x=270;y=20})
         startButton.setTitle "New Game"
         startButton.setIsFocusable False
-        startButton.setClickResponder newGameResponder
-        scoreLabel.setPosition ({x=270;y=50})
+        startButton.setClickResponder startNewGameResponder
+        gameWindow.addComponent startButton
+
+        scoreLabel.setPosition ({x=270;y=100})
         scoreLabel.setSize ({width=200;height=30})
         scoreLabel.setText "Game not started"
         scoreLabel.setTextColor ({r=250;g=250;b=250})
         gameWindow.addComponent scoreLabel
-        gameWindow.setSize ({width=400;height=500})
-        gameWindow.setBackgroundColor ({r=100;g=100;b=100})
-        gameWindow.setPosition ({x=100;y=100})
-        gameWindow.addComponent startButton
-        gameWindow.addComponent gameGrid
 
-        osx.startApplication applicationDidFinishLaunching
+        highscoreLabel.setPosition ({x=270;y=70})
+        highscoreLabel.setSize ({width=250;height=20})
+        highscoreLabel.setText "Highscore: 0 lines"
+        highscoreLabel.setTextColor ({r=150;g=250;b=150})
+        gameWindow.addComponent highscoreLabel
 
+        osx.startApplication startedApp
 
-struct GridUpdater < HasPosition where
+struct GridUpdater < HasPosition, RespondsToInputEvents where
     movePiece :: Int -> Int -> Request Bool
     rotate :: Request ()
-    clearFilledLines :: (Int -> Action) -> Request ()
+    clearFilledLines :: Request ()
     checkGameOver :: Request Bool
-    
-gridUpdater gameGrid env = class
-    movePiece x y = request result False
-    clearFilledLines = request
-    checkGameOver = request result False
-    
-    getPosition = request result ({x=0;y=0})
-    setPosition s = request
+    reset :: Request ()
 
+-- Responder for keyboard events
+keyboardResponder grid updater = class
+    respondToEvent event modifiers = request
+        if not (<- updater.checkGameOver) then
+            case event of
+                (KeyEvent (KeyPressed theKey)) ->
+                    case (theKey) of
+                        A -> updater.movePiece (-1) 0
+                        S -> updater.movePiece 0 1
+                        D -> updater.movePiece 1 0
+                        Space -> updater.rotate
+                        _ -> 
+                    if elem theKey [A,S,D,Space] then grid.update
+                _ ->
+        result NotConsumed
+    result respondToEvent
+
+gridUpdater gameGrid write = class
     randomizer = new baseGen 31415926
-    position := {x=0;y=0}
     gameOver := False    
+    position := {x=0;y=0}
+    color    := RedTile
+    shape    := array []
     
-    shape :: Array Int
-    shape := array []
     
-    color :: TileValue
-    color := RedTile
+    respondToInputEvent = new keyboardResponder gameGrid this
+
+    reset = request
+        gameOver := False
+        gameGrid.clear
+        createNextPiece
+        gameGrid.update
 
     checkGameOver = request
         result gameOver
@@ -113,12 +143,9 @@ gridUpdater gameGrid env = class
         (x:xs) = currentPiece
         currentPiece := xs ++ [x]
         (startX,startY,newShape) = (head currentPiece)
-
         setPieceValues EmptyTile
-
         collides <- testCollision newShape 0 0
         if (not collides) then
-        --    raise 5
             shape := newShape
         setPieceValues color
 
@@ -135,7 +162,6 @@ gridUpdater gameGrid env = class
         elsif (addX == 0 && addY == 1) then
             if (position.y < 0) then
                 -- Game Over!
-                env.stdout.write "GAME OVER"
                 gameOver := True
             else
                 -- Sideway collision is ok but we now hit something while descending! Create a new piece.
@@ -161,7 +187,7 @@ gridUpdater gameGrid env = class
 
     blocksInRow     := 0
     linesClearedNow := 0
-    clearFilledLines cb = request
+    clearFilledLines = request
         linesClearedNow := 0
         setPieceValues EmptyTile
         forall row <- [1..gameGridHeight] do
@@ -185,7 +211,7 @@ gridUpdater gameGrid env = class
                                 _ ->
                                     gameGrid.setValueAt col (row-r) above
         setPieceValues color
-        send cb linesClearedNow
+        send write linesClearedNow
 
     nextPiece := squarePiece
     currentPiece := []
@@ -194,19 +220,23 @@ gridUpdater gameGrid env = class
         (startX,startY, newShape) = (head currentPiece)
         shape := newShape
         position := {x=startX;y=startY}
-        color := case ((<- randomizer.next) `mod` 3 +1) of
+        color := <- randomizeColor 
+        nextPiece := <- randomizePiece
+
+    randomizeColor = do
+        result case ((<- randomizer.next) `mod` 3 +1) of
                     3 -> BlueTile
                     2 -> OrangeTile
                     _ -> RedTile
-
-        nextPiece := case ((<- randomizer.next) `mod` 6 + 1) of
+    randomizePiece = do
+        result case ((<- randomizer.next) `mod` 6 + 1) of
                         1 -> squarePiece
                         2 -> zigPiece
                         3 -> zagPiece
                         4 -> cornerPiece1
                         5 -> cornerPiece2
                         _ -> linePiece
-    
+                        
     setPieceValues val = do
         forall tx <- [0..4] do
             forall ty <- [0..4] do
@@ -219,7 +249,8 @@ gridUpdater gameGrid env = class
     getPosition = request
         result position
         
-    result GridUpdater {..}
+    this = GridUpdater {..}
+    result this
     
 struct GameGrid < Container where
     setColorAt :: Int -> Int -> (Int,Int,Int) -> Request Bool
@@ -228,16 +259,10 @@ struct GameGrid < Container where
     clear :: Request ()
     update :: Request ()
     
-tetrisGrid width height env w = class
-    -- Grid of tiles. Each tile has (X,Y,TileValue,Container)
+tetrisGrid width height w = class
+    -- Grid of tiles where each tile is a (X,Y,TileValue,Container) tuple.
     grid :: [(Int, Int, TileValue, Container)]
     grid := []
-    
-    setColorAt x y v = request result False
-    setValueAt x y v = request result False
-    getValueAt x y = request result EmptyTile
-    clear = request
-    update = request
 
     backgroundColor = ({r=20;g=30;b=30})
     
@@ -334,73 +359,73 @@ zig0    = (4,(-1), array [0,0,0,0,0,
                           0,0,1,0,0, 
                           0,0,0,0,0])
                           
-zig1    = (2,(-2), array [0,0,0,0,0, 
+zig1    = (4,(-2), array [0,0,0,0,0, 
                           0,0,0,0,0, 
                           0,1,2,0,0, 
                           0,0,1,1,0, 
                           0,0,0,0,0])       
                           
-zag0    = (2,(-1), array [0,0,0,0,0, 
+zag0    = (4,(-1), array [0,0,0,0,0, 
                           0,1,0,0,0, 
                           0,1,2,0,0, 
                           0,0,1,0,0, 
                           0,0,0,0,0])
                           
-zag1    = (2,(-2), array [0,0,0,0,0, 
+zag1    = (4,(-2), array [0,0,0,0,0, 
                           0,0,0,0,0, 
                           0,0,2,1,0, 
                           0,1,1,0,0, 
                           0,0,0,0,0])
                           
-corner1 = (2,(-1), array [0,0,0,0,0, 
+corner1 = (4,(-1), array [0,0,0,0,0, 
                           0,0,1,0,0, 
                           0,0,2,0,0, 
                           0,0,1,1,0, 
                           0,0,0,0,0])
 
-corner2 = (2,(-2), array [0,0,0,0,0, 
+corner2 = (4,(-2), array [0,0,0,0,0, 
                           0,0,0,0,0, 
                           0,1,2,1,0, 
                           0,1,0,0,0, 
                           0,0,0,0,0])
                           
-corner3 = (2,(-1), array [0,0,0,0,0, 
+corner3 = (4,(-1), array [0,0,0,0,0, 
                           0,1,1,0,0, 
                           0,0,2,0,0, 
                           0,0,1,0,0, 
                           0,0,0,0,0])
                           
-corner4 = (2,(-1), array [0,0,0,0,0, 
+corner4 = (4,(-1), array [0,0,0,0,0, 
                           0,0,0,1,0, 
                           0,1,2,1,0, 
                           0,0,0,0,0, 
                           0,0,0,0,0])
 
-corner21 = (2,(-1), array [0,0,0,0,0, 
+corner21 = (4,(-1), array [0,0,0,0,0, 
                           0,0,1,0,0, 
                           0,0,2,0,0, 
                           0,1,1,0,0, 
                           0,0,0,0,0])
 
-corner22 = (2,(-1), array [0,0,0,0,0, 
+corner22 = (4,(-1), array [0,0,0,0,0, 
                           0,1,0,0,0, 
                           0,1,2,1,0, 
                           0,0,0,0,0, 
                           0,0,0,0,0])
                           
-corner23 = (2,(-1), array [0,0,0,0,0, 
+corner23 = (4,(-1), array [0,0,0,0,0, 
                            0,0,1,1,0, 
                            0,0,2,0,0, 
                            0,0,1,0,0, 
                            0,0,0,0,0])
                           
-corner24 = (2,(-2), array [0,0,0,0,0, 
+corner24 = (4,(-2), array [0,0,0,0,0, 
                            0,0,0,0,0, 
                            0,1,2,1,0, 
                            0,0,0,1,0, 
                            0,0,0,0,0])
                           
-linePiece0 = (3,(-2), array [0,0,0,0,0, 
+linePiece0 = (4,(-2), array [0,0,0,0,0, 
                            0,0,0,0,0, 
                            0,1,2,1,1, 
                            0,0,0,0,0, 

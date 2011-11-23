@@ -1,3 +1,9 @@
+{-
+
+Keys: A,S,D or Left,Down,Right arrows and Space.
+    
+-}
+
 module Tetris where
 
 import COCOA
@@ -25,6 +31,7 @@ root w = class
         gameWindow.setSize ({width=400;height=500})
         gameWindow.setBackgroundColor ({r=100;g=100;b=100})
         gameWindow.setPosition ({x=100;y=100})
+        gameWindow.setTitle "Tetris"
         startButton.setPosition ({x=270;y=20})
         startButton.setTitle "New Game"
         startButton.setIsFocusable False
@@ -37,7 +44,7 @@ root w = class
         gameWindow.addComponent scoreLabel
         highscoreLabel.setPosition ({x=270;y=70})
         highscoreLabel.setSize ({width=250;height=20})
-        highscoreLabel.setText "Highscore: 0 lines"
+        highscoreLabel.setText "High score: 0 lines"
         highscoreLabel.setTextColor ({r=150;g=250;b=150})
         gameWindow.addComponent highscoreLabel
         osx.startApplication startedApp
@@ -88,7 +95,7 @@ gameIgniter window writeScore writeHighScore w = class
 
         if linesCleared > highScore then
             highScore := linesCleared
-            writeHighScore  ("Highscore: " ++ (show highScore))
+            writeHighScore  ("High score: " ++ (show highScore))
 
     result init
 
@@ -237,11 +244,14 @@ keyboardResponder grid updater = class
                 (KeyEvent (KeyPressed theKey)) ->
                     case (theKey) of
                         A -> updater.movePiece (-1) 0
+                        LeftArrow -> updater.movePiece (-1) 0
                         S -> updater.movePiece 0 1
-                        D -> updater.movePiece 1 0
+                        DownArrow -> updater.movePiece 0 1
+                        D -> updater.movePiece 3 0
+                        RightArrow -> updater.movePiece 1 0
                         Space -> updater.rotate
                         _ -> 
-                    if elem theKey [A,S,D,Space] then grid.update
+                    if elem theKey [A,LeftArrow,S,DownArrow,D,RightArrow,Space] then grid.update
                 _ ->
         result NotConsumed
     result respondToEvent

@@ -6,16 +6,49 @@ import CTLabel
 import RandomGenerator
 
 data TileValue = EmptyTile | RedTile | OrangeTile | BlueTile | OutOfBoundsTile
-gameGridWidth = 10
+gameGridWidth  = 10
 gameGridHeight = 20
 
+root w = class
+    osx            = new cocoa w
+    gameWindow     = new mkCocoaWindow w
+    startButton    = new mkCocoaButton w
+    highscoreLabel = new mkCocoaLabel w
+    scoreLabel     = new mkCocoaLabel w
+    initGame       = new gameIgniter gameWindow scoreLabel.setText highscoreLabel.setText w
+
+    startedApp app = action
+        app.addWindow gameWindow
+
+    result action
+        startNewGameResponder <- initGame
+        gameWindow.setSize ({width=400;height=500})
+        gameWindow.setBackgroundColor ({r=100;g=100;b=100})
+        gameWindow.setPosition ({x=100;y=100})
+        startButton.setPosition ({x=270;y=20})
+        startButton.setTitle "New Game"
+        startButton.setIsFocusable False
+        startButton.setClickResponder startNewGameResponder
+        gameWindow.addComponent startButton
+        scoreLabel.setPosition ({x=270;y=100})
+        scoreLabel.setSize ({width=200;height=30})
+        scoreLabel.setText "Game not started"
+        scoreLabel.setTextColor ({r=250;g=250;b=250})
+        gameWindow.addComponent scoreLabel
+        highscoreLabel.setPosition ({x=270;y=70})
+        highscoreLabel.setSize ({width=250;height=20})
+        highscoreLabel.setText "Highscore: 0 lines"
+        highscoreLabel.setTextColor ({r=150;g=250;b=150})
+        gameWindow.addComponent highscoreLabel
+        osx.startApplication startedApp
+        
 gameIgniter window writeScore writeHighScore w = class
     running      := False
     linesCleared := 0
     highScore    := 0
 
     grid = new tetrisGrid gameGridWidth gameGridHeight w
-    gu   = new gridUpdater grid updateScore
+    bc   = new blockController grid updateScore
     
     initialized := False
     init = request
@@ -29,19 +62,19 @@ gameIgniter window writeScore writeHighScore w = class
         if not running then
             running := True
             send loop
-            send action window.addResponder gu
+            send action window.addResponder bc
         else
             running := False
             linesCleared := 0
-            gu.reset
+            bc.reset
             send action window.setResponders []
             after (millisec 500) send startNewGame
             
     loop = action
-        gameOver <- gu.checkGameOver
+        gameOver <- bc.checkGameOver
         if (not gameOver && running) then
-            gu.movePiece 0 1
-            gu.clearFilledLines
+            bc.movePiece 0 1
+            bc.clearFilledLines
             grid.update
             after (millisec 500) send loop
         elsif not running then
@@ -56,77 +89,22 @@ gameIgniter window writeScore writeHighScore w = class
         if linesCleared > highScore then
             highScore := linesCleared
             writeHighScore  ("Highscore: " ++ (show highScore))
-            
+
     result init
 
-root w = class
-    osx = new cocoa w
-    scoreLabel  = new mkCocoaLabel w
-    highscoreLabel = new mkCocoaLabel w
-    startButton = new mkCocoaButton w
-    gameWindow  = new mkCocoaWindow w
-    initGame    = new gameIgniter gameWindow scoreLabel.setText highscoreLabel.setText w
-
-    startedApp app = action
-        app.addWindow gameWindow
-
-    result action
-        gameWindow.setSize ({width=400;height=500})
-        gameWindow.setBackgroundColor ({r=100;g=100;b=100})
-        gameWindow.setPosition ({x=100;y=100})
-
-        startNewGameResponder <- initGame
-        startButton.setPosition ({x=270;y=20})
-        startButton.setTitle "New Game"
-        startButton.setIsFocusable False
-        startButton.setClickResponder startNewGameResponder
-        gameWindow.addComponent startButton
-
-        scoreLabel.setPosition ({x=270;y=100})
-        scoreLabel.setSize ({width=200;height=30})
-        scoreLabel.setText "Game not started"
-        scoreLabel.setTextColor ({r=250;g=250;b=250})
-        gameWindow.addComponent scoreLabel
-
-        highscoreLabel.setPosition ({x=270;y=70})
-        highscoreLabel.setSize ({width=250;height=20})
-        highscoreLabel.setText "Highscore: 0 lines"
-        highscoreLabel.setTextColor ({r=150;g=250;b=150})
-        gameWindow.addComponent highscoreLabel
-
-        osx.startApplication startedApp
-
-struct GridUpdater < HasPosition, RespondsToInputEvents where
+struct BlockController < HasPosition, RespondsToInputEvents where
     movePiece :: Int -> Int -> Request Bool
     rotate :: Request ()
     clearFilledLines :: Request ()
     checkGameOver :: Request Bool
     reset :: Request ()
 
--- Responder for keyboard events
-keyboardResponder grid updater = class
-    respondToEvent event modifiers = request
-        if not (<- updater.checkGameOver) then
-            case event of
-                (KeyEvent (KeyPressed theKey)) ->
-                    case (theKey) of
-                        A -> updater.movePiece (-1) 0
-                        S -> updater.movePiece 0 1
-                        D -> updater.movePiece 1 0
-                        Space -> updater.rotate
-                        _ -> 
-                    if elem theKey [A,S,D,Space] then grid.update
-                _ ->
-        result NotConsumed
-    result respondToEvent
-
-gridUpdater gameGrid write = class
+blockController gameGrid write = class
     randomizer = new baseGen 31415926
     gameOver := False    
     position := {x=0;y=0}
     color    := RedTile
     shape    := array []
-    
     
     respondToInputEvent = new keyboardResponder gameGrid this
 
@@ -249,8 +227,24 @@ gridUpdater gameGrid write = class
     getPosition = request
         result position
         
-    this = GridUpdater {..}
+    this = BlockController {..}
     result this
+
+keyboardResponder grid updater = class
+    respondToEvent event modifiers = request
+        if not (<- updater.checkGameOver) then
+            case event of
+                (KeyEvent (KeyPressed theKey)) ->
+                    case (theKey) of
+                        A -> updater.movePiece (-1) 0
+                        S -> updater.movePiece 0 1
+                        D -> updater.movePiece 1 0
+                        Space -> updater.rotate
+                        _ -> 
+                    if elem theKey [A,S,D,Space] then grid.update
+                _ ->
+        result NotConsumed
+    result respondToEvent
     
 struct GameGrid < Container where
     setColorAt :: Int -> Int -> (Int,Int,Int) -> Request Bool
@@ -263,7 +257,6 @@ tetrisGrid width height w = class
     -- Grid of tiles where each tile is a (X,Y,TileValue,Container) tuple.
     grid :: [(Int, Int, TileValue, Container)]
     grid := []
-
     backgroundColor = ({r=20;g=30;b=30})
     
     update = request
@@ -285,7 +278,6 @@ tetrisGrid width height w = class
         grid := newGrid
         result False
 
-    -- Remove a tile and replace it with a tile with the new value.
     newGrid := []     
     setValueAt x y val = request
         newGrid := []
@@ -294,7 +286,6 @@ tetrisGrid width height w = class
                 newGrid := (tileX,tileY,val,container) : newGrid
             else
                 newGrid := (tileX,tileY,oldVal,container) : newGrid
-
         grid := newGrid
         result False
 
@@ -315,6 +306,7 @@ tetrisGrid width height w = class
     initGrid app = request
         tileSize = 20
         base.setSize ({width=1+(tileSize+1)*width;height=1+(tileSize+1)*height})
+        base.setBackgroundColor({r=150;g=150;b=150})
         ref <- base.initComp app
         
         forall row <- [1..height] do
@@ -325,20 +317,15 @@ tetrisGrid width height w = class
                tile.setPosition ({x=(col-1)*(tileSize+1)+1;y=(row-1)*(tileSize+1)+1})
                grid := (col,row, EmptyTile, tile) : grid
                base.addComponent tile
-        base.setBackgroundColor({r=150;g=150;b=150})
         result ref
-        
 
-    -- Fill out rest of interface using base container --
     base = new mkCocoaContainer w
     Container {..} = base
-               
     result GameGrid {initComp=initGrid;..}
     
 {- 
-    Tetris shapes!
-    
-    Structure is: (offsetX, offsetY, shape)
+    Tetris shapes! 
+    Format is: (offsetX, offsetY, shape)
 -}
 squarePiece = [square]                         
 linePiece = [linePiece0, linePiece90]

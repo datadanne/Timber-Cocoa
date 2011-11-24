@@ -6,7 +6,6 @@ import CTLabel
 import CTTextArea
 import Tutorial4ColorPicker 
 
-
 root w = class
     osx = new cocoa w
     w1 = new mkCocoaWindow w
@@ -82,7 +81,7 @@ root w = class
         leftContainer.setBackgroundColor color
 
     addColorPicker app = do        
-        rgbLabel.setText "R: 100; G=100; B=200"
+        rgbLabel.setText "R=100; G=100; B=200"
         rgbLabel.setSize ({width=150; height=36})
         rgbLabel.setPosition ({x=40; y=40})
         rightContainer.addComponent rgbLabel

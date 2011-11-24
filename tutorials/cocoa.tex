@@ -1,0 +1,149 @@
+\documentclass[a4paper]{article}
+\usepackage[parfill]{parskip} 
+\usepackage[T1]{fontenc}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{graphicx,float,wrapfig}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{subfig}
+\usepackage[left=2.5cm,top=3.5cm,right=2.5cm,bottom=3cm]{geometry}
+
+\definecolor{MyDarkGreen}{rgb}{0.0,0.4,0.0}
+\lstset{
+        basicstyle=\small\ttfamily,
+        keywordstyle=[1]\color{Red}\bf,
+        keywordstyle=[2]\color{Purple},
+        keywordstyle=[3]\color{Blue}\underbar,
+        identifierstyle=,
+        commentstyle=\usefont{T1}{pcr}{m}{sl}\color{MyDarkGreen}\small,
+        stringstyle=\color{Purple},
+        showstringspaces=false,
+        tabsize=4,
+        frame = ,
+        morekeywords={result, action, do, request, class, new, module,import,where,let,case,if,then,else,elsif,forall},
+        morekeywords=[2]{},
+        morekeywords=[3]{},
+        morecomment=[l][\color{Blue}]{...}
+        }
+
+\newcommand{\timbercode}[2]
+  {\begin{itemize}\item[]\lstinputlisting[caption=#2,label=#1]{#1.t}\end{itemize}}
+
+\begin{document}
+\title{\vspace*{3cm} Timber Interface to the Cocoa Library: Tutorials}
+\author {Daniel \"{O}hrlund, Victor Danell, Andrey Kruglyak}
+\date{\today}
+\maketitle
+\thispagestyle{empty}
+% \pagestyle{myheadings}
+
+\newpage
+
+\section*{Tutorial 0: The Cocoa App}
+This tutorial will teach you how to create a Cocoa application in Timber and how to create and display a window. We will start by looking into how we can interact with the Cocoa environment to launch an application.
+
+First of all, an object of the class \textit{cocoa} must be instantiated. Through the interface of this object we can create a Mac OS X Cocoa application by invoking the method \textit{startApplication}.
+
+When you call \textit{startApplication}, the Cocoa environment will create an application (App) for you. Once the App is ready, the method of type \textit{(App -> Action)} passed to \textit{startApplication} will be invoked with the App as a parameter. This App object is the only interface to your newly created Cocoa application. Here is how it looks in code:
+
+\timbercode{tutorial0part0}{}
+
+With a Cocoa application up and running, it is now time to learn more about GUI objects. One thing that all GUI objects have in common is the notion of state. At any given time, every object is in one of these three states:
+\begin{itemize}
+\item\textit{Inactive} - the initial state of any GUI object, when it has not yet been added to an App;
+\item\textit{Active} - the state of a GUI object currently active in an App;
+\item\textit{Destroyed} - the state of an object that has been destroyed and cannot be used again.
+\end{itemize}
+
+There are two categories of GUI objects: windows and components. Since a component cannot be displayed without being contained within a window, we will look at windows first. Displaying a window consists of two steps, both of which are quite straightforward: the first step is to create a window and the second step is to add it to an application.
+
+To instantiate a Timber object representing a Cocoa window we write
+\timbercode{tutorial0part1}{}
+where w is a World reference. This gives us an interface through which we can modify the properties of the window. When the window is ready to be added to your application, you can use the \textit{addWindow} method of the App object. Invoking this method will create a window in Cocoa and pair it with your Timber object, so that it can still be modified from Timber. It is also at this time of initialization that the window object will have its state set to \textit{Active}. The final code for this tutorial looks as follows:
+\newpage
+\timbercode{tutorial0part3}{}
+
+\section*{Tutorial 1: Component hierarchies and event handlers}
+In Tutorial 0 we learned how to create a GUI object and in this tutorial, we will learn how to create multiple components and add them to a component hierarchy. We will also look at how an application can respond to events via handlers installed on components. But first, component hierarchies.
+
+When programming a GUI, it is usually possible to add components to other components. For instance, a button might be added to a container, which in turn belongs to a window. We also support such hierarchical structures.
+
+We have implemented two components that may contain other components, windows and containers. A CocoaWindow actually uses a \textit{root container} to store added components, which covers the whole window area except window decorations. This is transparent to the programmer as the interface of a window allows you to add and remove components directly.
+
+A container is a special component that can contain zero or more other components. It also has its own coordinate system, it has a size, a position and a background color. In the example below, we will show you how to create two containers: one that contains a button and one that contains a label. Both of these containers will be added to the same window where they will be placed side by side.
+
+We will start by creating two containers and setting up some properties, after which we create a button and a label:
+
+\timbercode{tutorial1part0}{}
+
+We will now add the button to the left container, a label the label to the right container and add both containers to our window. The window is then added to the App:
+\timbercode{tutorial1part1}{}
+
+But what if you want to handle the events that occur when someone clicks the button? We will show you how to install a click responder on the button that will change the label's text when the button is clicked.
+
+We will start with defining a new class for the event handler:
+\timbercode{tutorial1part2}{}
+
+As you can see in the code above, the resulting action will on each invocation update the text of the label given as a parameter.
+
+The next thing we need to do is to instantiate a new object of this class and install it on the button:
+\timbercode{tutorial1part3}{}
+
+This should be it! Try running your program and click a couple of times on the button.
+
+\section*{Tutorial 2: Re-sizing windows (and more event responders)}
+In this tutorial we will introduce two new things: resizing events and text areas that supports scrolling. We will start by adding a text area to our window:
+\timbercode{tutorial2part0}{}
+
+The next step will be to install an event responder on the window that changes the size of the text area when the window is resized, so that the ratio between the size of the window and the text area is kept constant. This is done by defining a new window event responder class:
+\timbercode{tutorial2part1}{}
+
+As in the previous tutorial, this class takes the interface of a text area that the responder will control as a parameter. Once this class has been defined, all we have to do is install an instance of this class as a window responder:
+\timbercode{tutorial2part2}{}
+The second parameter \textit{False} specifies that we do not override window close events, i.e. once the responder has executed \textit{onWindowCloseRequest}, the window will be closed.
+
+Try running the program and re-size the window!
+
+\section*{Tutorial 3: Key events and the focus hierarchy}
+An important concept when talking about key events is that of focus. In every window, there is exactly one component which has focus, and when a window receives a key event it will be passed to the \textit{respondToInputEvent} method of that component. Whether or not a particular component instance can be focused depends on the return value of its \textit{getIsFocusable} method. An empty window or a window containing no components that can be in focus, will assign focus to its root container.
+
+There are three ways to change focus in a window: by pressing the Tab key, directly calling the \textit{setFocus} method on the window with a component as a parameter, and by clicking on a component which can have focus but currently does not. In the case of the Tab key being pressed, the focus change can be prevented if the component currently in focus consumes the event. If the event is not consumed, focus will go to the next component in the focus hierarchy, which is a list of all focusable components in a window.
+
+Each window created with \textit{mkCocoaWindow} has its own default responder installed, which is responsible for keeping track of and changing focus. Whenever the left mouse button is clicked or the Tab key is pressed, the responder will update the focus hierarchy and figure out which component should receive focus next. To see how this works, run Tutorial2Resizing or TestFocusHierarchy and press Tab a few times.
+
+Although this default behavior is often what we want, overriding it when needed is easy. The default focus responder begins by asking the component currently in focus if it wishes to consume the event, and continues only if it does not. This means all we have to do to modify the response to a Tab key press, is to install a custom responder, in which the \textit{respondToInputEvent} method returns True whenever it wishes to stay in focus.
+
+As an example of this second scenario, we will now modify text area in Tutorial2 to consume the tab event, thereby preventing it from losing focus when Tab is pressed. All we need to do to achieve this is write a custom responder which consumes KeyEvents, and install it on the text area. The custom responder may look like this (in this case, the responder will also update a label passed to it as a parameter):
+
+\timbercode{tutorial3part0}{}
+
+To install our custom responder, we call the \textit{addResponder} method on a component of our choice. Here is how it looks when installing it on our text area:
+\timbercode{tutorial3part1}{}
+
+\section*{Tutorial 4: Multiple windows}
+In this tutorial we will see how multiple windows can communicate with each other once they have been activated. Continuing on the project from the previous tutorials, we will now add a second button, which opens a new window with a color palette (made of multiple tiles). Each of these tiles will, when clicked, change the text of a label in the original window to the RGB code of their respective color and change the background color of the left container. If \textit{Shift} is held down, mouse move events will also update the label text and the background color.
+
+We create a second window instance and add it to the App by calling the App's method \textit{addWindow} again. The other components are created in a manner similar to previous tutorials:
+\timbercode{tutorial4part0}{}
+
+The only thing which stands out here is the instantiation of our \textit{mkColorPicker}. This object will, once initialized, contain the color tiles. Its definition is found in the \textit{Tutorial4ColorPicker} module (see Appendix). Upon creation of the color picker grid, each tile is assigned a position, which in turn determines the background color of the tile. An input responder is also added to each tile so that when it's clicked on or when the mouse is moved over it with \textit{Shift} pressed, a callback is invoked with the new background color as a parameter.
+
+\section*{Tutorial 5: Customizing behavior of a component}
+In this last tutorial we will customize the behavior of a component, namely a label. We will define a new class that modifies a Class Label, so that on each update to its text it will invoke the specified callback method:
+\timbercode{tutorial5part0}{}
+
+As seen in the code above, we first create an ordinary Label with the given class (\textit{mkLabel}) and then define two new methods: \textit{setText} and \textit{appendText}. Both these methods wrap their equivalents on the regular label but also perform the given callback.
+
+The interface returned by this new class will also be of type Label, and will be composed of all the methods from the original Label apart from \textit{setText} and \textit{appendText} (named \textit{setTextImpl} and \textit{appendTextImpl} in the code example), which are replaced with our new implementations of \textit{setText} and \textit{appendText}. These are all the changes needed for the customized behavior we want!
+
+To see this new customized component in action we will replace the label that shows the click count and the label that shows the tab block count with callback labels. After that, we will add a third label to display callbacks from the two counting labels.
+
+\timbercode{tutorial5part1}{}
+
+Now, each time the text changes on tabCountLabel or label, callbackLabel will have its text set to ``CB:''  followed by the text sent to the callback. Try running the program and trigger some callbacks by either clicking the button or pressing the tab key while the text area is focused!
+\newpage
+\section*{Appendix - Tutorial4ColorPicker}
+\timbercode{appendixColorPicker}{}
+\end{document}
+
+

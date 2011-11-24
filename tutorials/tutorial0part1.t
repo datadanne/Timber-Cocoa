@@ -1,0 +1,1 @@
+myWindow = new mkCocoaWindow w

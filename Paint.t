@@ -6,34 +6,39 @@ Hold Shift to draw, Ctrl to erase.
 
 module Paint where
 
+import POSIX
 import COCOA
     
 struct PaintResponder < RespondsToInputEvents where
     setColor :: Color -> Action
 
-paintHandler :: Container -> Class Container -> Class PaintResponder
-paintHandler w1 mkContainer = class
+paintHandler :: Container -> Class Container -> (String -> Request Int) -> Class PaintResponder
+paintHandler w1 mkContainer write = class
     pixelList := []
-    backgroundColor := red
+    color := red
 
     setColor c = action
-        backgroundColor := c
+        color := c
 
     respondToInputEvent (MouseEvent (MouseMoved pos)) modifiers = request
         if (elem Shift modifiers) then
             blackBox = new mkContainer
             blackBox.setSize ({width=7;height=7})
-            blackBox.setBackgroundColor backgroundColor
+            blackBox.setBackgroundColor color
             blackBox.setPosition pos
-            pixelList := blackBox : pixelList
+            pixelList := (Just blackBox) : pixelList
             w1.addComponent blackBox
         elsif (elem Control modifiers) then
-            forall pixel <- pixelList do
-                pixelPos <- pixel.getPosition
+            newList <- forall pixel <- [ p | p <- pixelList, isJust p] do
+                pixelPos <- (fromJust pixel).getPosition
                 xDiff = abs (pixelPos.x - pos.x)
                 yDiff = abs (pixelPos.y - pos.y)
                 if ((xDiff < 10) && yDiff < 10) then
-                    w1.removeComponent pixel
+                    w1.removeComponent (fromJust pixel)
+                    result Nothing
+                else
+                    result pixel
+            pixelList := newList
         result NotConsumed
         
     respondToInputEvent _ _ = request
@@ -42,12 +47,16 @@ paintHandler w1 mkContainer = class
     result PaintResponder {..}
 
 root w = class
+    env = new posix w
     osx = new cocoa w
     w1 = new mkCocoaWindow w :: CocoaWindow
     currentBrushColor = new mkCocoaContainer w :: Container
-    bg = new mkCocoaContainer w :: Container
+    bg = new class
+        Container{getAllChildren=temp;..} = new mkCocoaContainer w
+        getAllChildren = request result []
+        result Container{..}
 
-    painter = new paintHandler bg (mkCocoaContainer w)
+    painter = new paintHandler bg (mkCocoaContainer w) (env.stdout.write)
     
     setColor c = action
         painter.setColor c
@@ -80,9 +89,6 @@ root w = class
 mkColorPicker :: World -> (Color -> Action) -> Class CocoaWindow
 mkColorPicker w callback = class
     
-    red := 128
-    tiles := []
-    
     CocoaWindow{initWindow=initWindowImpl;..} = new mkCocoaWindow w
     
     initWindow app = request
@@ -94,24 +100,7 @@ mkColorPicker w callback = class
             onWindowCloseRequest = request
             result RespondsToWindowEvents{..}) True 
         initGrid
-        addResponder (new class
-            respondToInputEvent (KeyEvent (KeyPressed UpArrow)) _ = request
-                incRed
-                result NotConsumed
-            respondToInputEvent (KeyEvent (KeyPressed DownArrow)) _ = request
-                decRed
-                result NotConsumed
-            respondToInputEvent _ _ = request
-                result NotConsumed
-            result RespondsToInputEvents{..})
         initWindowImpl app
-    
-    reinitGrid = do
-        oldtiles = tiles
-        tiles := []
-        initGrid
-        forall tile <- oldtiles do
-            removeComponent tile
     
     initGrid = do
         tileSize = 12
@@ -120,11 +109,10 @@ mkColorPicker w callback = class
                 tile = new mkCocoaContainer w
                 tile.setSize ({width=tileSize;height=tileSize})
                 tile.setPosition ({x=tileSize*x;y=tileSize*y})
-                tileColor = ({r=red;g=16*x;b=16*y})
+                tileColor = ({r=128;g=16*x;b=16*y})
                 tile.setBackgroundColor tileColor
                 tile.addResponder ({respondToInputEvent=invokeCallback tileColor})
                 addComponent tile
-                tiles := tile:tiles
     
     invokeCallback color (MouseEvent (MouseClicked _)) _  = request
         send callback color
@@ -134,10 +122,5 @@ mkColorPicker w callback = class
         result Consumed
     invokeCallback _ _ _ = request 
         result Consumed
-    
-    incRed = action
-        if red<256 then red := red+16; reinitGrid
-    decRed = action
-        if red>0 then red := red-16; reinitGrid
     
     result CocoaWindow{..}

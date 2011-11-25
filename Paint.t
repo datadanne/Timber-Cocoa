@@ -51,11 +51,11 @@ root w = class
     osx = new cocoa w
     w1 = new mkCocoaWindow w :: CocoaWindow
     currentBrushColor = new mkCocoaContainer w :: Container
-    bg = new mkCocoaContainer w 
-    {- bg = new class
+    bg = new class
         Container{getAllChildren=temp;..} = new mkCocoaContainer w
+        -- this improves performance
         getAllChildren = request result []
-        result Container{..} -}
+        result Container{..}
 
     painter = new paintHandler bg (mkCocoaContainer w) (env.stdout.write)
     

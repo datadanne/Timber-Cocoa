@@ -1,2 +1,0 @@
-cp -n TestTemplate.extern.POSIX.cfg Test$1.extern.POSIX.cfg
-cp -n TestTemplate.t Test$1.t

@@ -1,6 +1,7 @@
 module Tutorial0App where
 
 import COCOA
+import POSIX
 
 root w = class
     osx = new cocoa w
@@ -10,7 +11,7 @@ root w = class
         w1.setPosition ({x=100;y=100})
         w1.setSize ({width=400;height=400}) 
         w1.setBackgroundColor web_gray
-        w1.setTitle "Tutorial"
+        w1.setTitle "Tutorial"            
         app.addWindow w1
 
     result action

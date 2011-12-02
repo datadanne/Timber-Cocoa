@@ -181,23 +181,39 @@ data KeyEventType   = KeyReleased CocoaKey | KeyPressed CocoaKey
 data MouseEventType = MouseMoved Position | MouseReleased Position | MousePressed Position |
                       MouseClicked Position | MouseWheelScroll Position Float Float 
 
-data CocoaKey = A | S | D | F | H | G | Z | X | C | V | Dummy1 | 
-                B | Q | W | E | R | Y | T | Num1 | Num2 | Num3 | Num4 | 
-                Num6 | Num5 | Equal | Num9 | Num7 | Minus | Num8 | Num0 | RightBracket |
-                O | U | LeftBracket | I | P | Return | L | J | Quote | 
-                K | Semicolon | Backslash | Comma  | Slash | N | M |
-                Period | Tab | Space | Grave | Delete | Dummy2 | Escape | 
-                Dummy3 | Command | Shift | CapsLock | Option | Control | 
-                RightShift | RightOption | RightControl | Function | F17 |
-                KeypadDecimal | Dummy4 | KeypadMultiply | Dummy5 | KeypadPlus | 
-                Dummy6 | KeypadClear | VolumeUp | VolumeDown | Mute | KeypadDivide |
-                KeypadEnter | Dummy7 | KeypadMinus | F18 | F19 | KeypadEquals | Keypad0 |
-                Keypad1 | Keypad2 | Keypad3 | Keypad4 | Keypad5 | Keypad6 | Keypad7 |
-                F20 | Keypad8 | Keypad9 | Dummy8 | Dummy9 | Dummy10 | F5 | F6 | 
-                F7 | F3 | F8 | F9 | Dummy11 | F11 | Dummy12 | F13 | F16 | F14 | Dummy13 |
-                F10 | Dummy14 | F12 | Dummy15 | F15 | Help |Home | PageUp |
-                ForwardDelete | F4 | End | F2 | PageDown | F1 |
-                LeftArrow | RightArrow | DownArrow | UpArrow
+-- Mapping for Swedish-Pro keyboard layout
+data CocoaKey = A | S | D | F | H | G | Z | X | C | V | Section | B | Q | W | 
+                E | R | Y | T | Num1 | Num2 | Num3 | Num4 | Num6 | Num5 | 
+                Grave | Num9 | Num7 | Plus | Num8 | Num0 | Umlaut | O | U | 
+                A_Ring | I | P | Enter | L | J | A_Umlaut | K | O_Umlaut | 
+                Apostrophe | Comma  | Hyphen | N | M | Period | Tab | Space | 
+                LessThan | Backspace | Dummy1 | Escape | RightCommand | Command | 
+                Shift | CapsLock | Option | Control | RightShift | RightOption | 
+                RightControl | Function | Dummy2 | KeypadDecimal | Dummy3 | 
+                KeypadMultiply | Dummy4 | KeypadPlus | Dummy5 | KeypadClear | 
+                Dummy6 | Dummy7 | Dummy8 | KeypadDivide | KeypadEnter | Dummy9 | 
+                KeypadMinus | Dummy10 | Dummy11 | KeypadEquals | Keypad0 | 
+                Keypad1 | Keypad2 | Keypad3 | Keypad4 | Keypad5 | Keypad6 | 
+                Keypad7 | Dummy12 | Keypad8 | Keypad9 | Dummy13 | Dummy14 | 
+                Dummy15 | F5 | F6 | F7 | F3 | F8 | F9 | Dummy16 | F11 | 
+                Dummy17 | F13 | F16 | F14 | Dummy18 |F10 | Dummy19 | F12 | 
+                Dummy20 | F15 | Dummy21 |Home | PageUp | Delete | F4 | End | 
+                F2 | PageDown | F1 | LeftArrow | RightArrow | DownArrow | UpArrow
+
+deriving instance showKey :: Show CocoaKey
+
+type Modifiers = [CocoaKey]
+
+isModifier :: CocoaKey -> Bool
+isModifier Shift = True 
+isModifier Control = True
+isModifier Option = True 
+isModifier Command = True 
+isModifier RightShift = True 
+isModifier RightControl = True 
+isModifier RightOption = True 
+isModifier RightCommand = True 
+isModifier _ = False
 
 getMousePosition :: MouseEventType -> Position
 getMousePosition (MousePressed p)         = p 
@@ -225,8 +241,6 @@ clickInsideBox mousePos boxPos boxSize =
 inInterval :: Int -> Int -> Int -> Bool
 inInterval x startPos width = 
     (x >= startPos && x <= (startPos+width))
-
-type Modifiers = [CocoaKey]
 
 -- abstract types
 WindowID   :: *

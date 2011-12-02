@@ -3,6 +3,7 @@ test:
 	timberc --make TestDropDown
 	timberc --make TestFocusHierarchy
 	timberc --make TestScrolling
+	timberc --make TestKeyboardLayout
 	timberc --make Tutorial0App
 	timberc --make Tutorial1CompHierarchy
 	timberc --make Tutorial2Resizing
@@ -15,6 +16,7 @@ test-s:
 	timberc -s --make TestDropDown
 	timberc -s --make TestFocusHierarchy
 	timberc -s --make TestScrolling
+	timberc -s --make TestKeyboardLayout
 	timberc -s --make Tutorial0App
 	timberc -s --make Tutorial1CompHierarchy
 	timberc -s --make Tutorial2Resizing

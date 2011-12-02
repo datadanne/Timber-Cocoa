@@ -37,11 +37,28 @@ bool dispatchEventToTimber(NSEvent* event) {
 		
 		DEBUG("Event is to be sent for window nr %d", [event windowNumber]);
 		
-	} else if ([event type] == NSKeyUp || [event type] == NSFlagsChanged) {
+	} else if ([event type] == NSKeyDown || [event type] == NSFlagsChanged) {
         unsigned short code = [event keyCode];
-        _KeyReleased_CocoaDef released;
         if (code > 126)
             return false;
+		_KeyPressed_CocoaDef pressed;        
+	    NEW (_KeyPressed_CocoaDef, pressed, WORDS(sizeof(struct _KeyPressed_CocoaDef)));
+	    pressed->GCINFO = __GC___KeyPressed_CocoaDef;
+	    pressed->Tag = 1;
+        pressed->a = (CocoaKey_CocoaDef)(POLY)(int)code;
+        
+	    DEBUG("KEY CODE %d\n", [event keyCode]);
+        
+	    NEW (InputEvent_CocoaDef, receivedEvent, WORDS(sizeof(struct _KeyEvent_CocoaDef)));
+	    ((_KeyEvent_CocoaDef)receivedEvent)->GCINFO = __GC___KeyEvent_CocoaDef;
+	    ((_KeyEvent_CocoaDef)receivedEvent)->Tag = 0;
+        ((_KeyEvent_CocoaDef)receivedEvent)->a = (KeyEventType_CocoaDef)pressed;
+        
+	} else if ([event type] == NSKeyUp) {
+        unsigned short code = [event keyCode];
+        if (code > 126)
+            return false;
+        _KeyReleased_CocoaDef released;
         NEW (_KeyReleased_CocoaDef, released, WORDS(sizeof(struct _KeyReleased_CocoaDef)));
         released->GCINFO = __GC___KeyReleased_CocoaDef;
         released->Tag = 0;
@@ -53,24 +70,6 @@ bool dispatchEventToTimber(NSEvent* event) {
         ((_KeyEvent_CocoaDef)receivedEvent)->GCINFO = __GC___KeyEvent_CocoaDef;
         ((_KeyEvent_CocoaDef)receivedEvent)->Tag = 0;
         ((_KeyEvent_CocoaDef)receivedEvent)->a = (KeyEventType_CocoaDef)released;
-
-	} else if ([event type] == NSKeyDown || [event type] == NSFlagsChanged) {
-        unsigned short code = [event keyCode];
-		_KeyPressed_CocoaDef pressed;
-        printf("Key down: %d\n",(int)code);
-        if (code > 126)
-            return false;
-	    NEW (_KeyPressed_CocoaDef, pressed, WORDS(sizeof(struct _KeyPressed_CocoaDef)));
-	    pressed->GCINFO = __GC___KeyPressed_CocoaDef;
-	    pressed->Tag = 1;
-        pressed->a = (CocoaKey_CocoaDef)(POLY)(int)code;
-        
-	    DEBUG("KEY CODE %d\n", [event keyCode]);
-
-	    NEW (InputEvent_CocoaDef, receivedEvent, WORDS(sizeof(struct _KeyEvent_CocoaDef)));
-	    ((_KeyEvent_CocoaDef)receivedEvent)->GCINFO = __GC___KeyEvent_CocoaDef;
-	    ((_KeyEvent_CocoaDef)receivedEvent)->Tag = 0;
-        ((_KeyEvent_CocoaDef)receivedEvent)->a = (KeyEventType_CocoaDef)pressed;
 
 	} else if ([event type] == NSMouseMoved) {
 	    Position_CocoaDef pos;

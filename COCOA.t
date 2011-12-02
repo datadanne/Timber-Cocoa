@@ -19,12 +19,7 @@ cocoaApplication = class
         name = case k of 
             (KeyPressed  n) -> n
             (KeyReleased n) -> n
-        case name of 
-            Tab -> updateList name
-            Shift -> updateList name
-            Control -> updateList name
-            Command -> updateList name
-            _ -> 
+        if isModifier name then updateList name
         sendInputToWindow (KeyEvent k) windowId
         {- Let key events pass through so that they appear in text fields etc. -}
         result NotConsumed

@@ -181,22 +181,23 @@ data KeyEventType   = KeyReleased CocoaKey | KeyPressed CocoaKey
 data MouseEventType = MouseMoved Position | MouseReleased Position | MousePressed Position |
                       MouseClicked Position | MouseWheelScroll Position Float Float 
 
-data CocoaKey = UpArrow | DownArrow | RightArrow | LeftArrow |
-                F1 | PageDown | F2 | End | F4 | ForwardDelete |
-                PageUp | Home | Help | F15 | Dummy15 | F12 | Dummy14 | F10 |
-                Dummy13 | F14 | F16 | F13 | Dummy12 | F11 | Dummy11 | F9 | F8 | F3 | F7 |
-                F6 | F5 | Dummy10 | Dummy9 | Dummy8 | Keypad9 | Keypad8 | F20 |
-                Keypad7 | Keypad6 | Keypad5 | Keypad4 | Keypad3 | Keypad2 | Keypad1 |
-                Keypad0 | KeypadEquals | F19 | F18 | KeypadMinus | Dummy7 | KeypadEnter |
-                KeypadDivide | Mute | VolumeDown | VolumeUp | KeypadClear | Dummy6 |
-                KeypadPlus | Dummy5 | KeypadMultiply | Dummy4 | KeypadDecimal |
-                F17 | Function | RightControl | RightOption | RightShift |  
-                Control | Option | CapsLock | Shift | Command | Dummy3 | Escape | Dummy2 | 
-                Delete | Grave | Space | Tab | Period | M | N | Slash | Comma | Backslash | 
-                Semicolon | K | Quote | J | L | Return | P | I | LeftBracket | U | O |
-                RightBracket | Num0 | Num8 | Minus | Num7 | Num9 | Equal | Num5 | Num6 |
-                NUm4 | Num3 | Num2 | Num1 | T | Y | R | E | W | Q | B | Dummy1 |
-                V | C | X | Z | G | H | F | D | S | A
+data CocoaKey = A | S | D | F | H | G | Z | X | C | V | Dummy1 | 
+                B | Q | W | E | R | Y | T | Num1 | Num2 | Num3 | Num4 | 
+                Num6 | Num5 | Equal | Num9 | Num7 | Minus | Num8 | Num0 | RightBracket |
+                O | U | LeftBracket | I | P | Return | L | J | Quote | 
+                K | Semicolon | Backslash | Comma  | Slash | N | M |
+                Period | Tab | Space | Grave | Delete | Dummy2 | Escape | 
+                Dummy3 | Command | Shift | CapsLock | Option | Control | 
+                RightShift | RightOption | RightControl | Function | F17 |
+                KeypadDecimal | Dummy4 | KeypadMultiply | Dummy5 | KeypadPlus | 
+                Dummy6 | KeypadClear | VolumeUp | VolumeDown | Mute | KeypadDivide |
+                KeypadEnter | Dummy7 | KeypadMinus | F18 | F19 | KeypadEquals | Keypad0 |
+                Keypad1 | Keypad2 | Keypad3 | Keypad4 | Keypad5 | Keypad6 | Keypad7 |
+                F20 | Keypad8 | Keypad9 | Dummy8 | Dummy9 | Dummy10 | F5 | F6 | 
+                F7 | F3 | F8 | F9 | Dummy11 | F11 | Dummy12 | F13 | F16 | F14 | Dummy13 |
+                F10 | Dummy14 | F12 | Dummy15 | F15 | Help |Home | PageUp |
+                ForwardDelete | F4 | End | F2 | PageDown | F1 |
+                LeftArrow | RightArrow | DownArrow | UpArrow
 
 getMousePosition :: MouseEventType -> Position
 getMousePosition (MousePressed p)         = p 

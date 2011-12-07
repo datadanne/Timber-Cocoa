@@ -227,11 +227,15 @@ TUP0 windowSetFocus_CTWindow(Int cocoaRef, Int cmpRef, Int dummy) {
 
 TUP0 windowSetSize_CTWindow (Int cocoaRef, Size_CocoaDef size, Int dummy) {
     int width = size->width_CocoaDef;
-    int height = size->height_CocoaDef;
+    int height = size->height_CocoaDef+22;
 	dispatch_async(dispatch_get_main_queue(), ^{
 	    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	    CocoaWindow *thisWindow = (CocoaWindow*) cocoaRef;
-	    [thisWindow setContentSize: NSMakeSize(width, height)];
+        NSRect frame = [thisWindow frame];
+        frame.origin.y -= (height - frame.size.height); 
+        frame.size.height = height;
+        frame.size.width = width;
+        [thisWindow setFrame: frame display: YES];
 		[pool drain];
     });
 }

@@ -41,6 +41,7 @@ mkCocoaWindow w = class
         if isActive state then 
             Active ref = state
             windowSetSize ref size
+        resize size
         setSizeImpl size
 
     -- the position of the window may change, but the position of root container is (0,0)
@@ -77,7 +78,7 @@ mkCocoaWindow w = class
         set resp
     windowResizing size = request
         resize size 
-        containerSize = {width=size.width;height=(size.height-23)}
+        containerSize = {width=size.width;height=(size.height-22)}
         setSizeImpl containerSize
     windowClosing = request
         close

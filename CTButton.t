@@ -114,6 +114,10 @@ defaultButtonInputResponder btn = class
             result Consumed
         else
             result NotConsumed  
+
+    respondToInputEvent (KeyEvent (KeyPressed Space)) _ = request
+        send btn.clickPerformed
+        result Consumed
             
     respondToInputEvent _ _ = request 
         result NotConsumed

@@ -1,7 +1,6 @@
 module Tutorial0App where
 
 import COCOA
-import POSIX
 
 root w = class
     osx = new cocoa w

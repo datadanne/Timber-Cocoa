@@ -8,11 +8,11 @@ struct App < AppImpl where
 
 struct AppImpl where
     {- a consumed event should not be handled by Cocoa -}
-    sendInputEvent         :: InputEvent -> WindowID -> Request Consumed 
+    sendInputEvent         :: InputEvent -> WindowID -> Request Consumed
     {- this event is always handled by Cocoa -}
     sendWindowResize       :: Size -> WindowID -> Request ()
-    {- True: close window, False: ignore close request -}
-    sendWindowCloseRequest :: WindowID -> Request Bool
+    {- True iff the window should be closed automatically -}
+    sendWindowCloseRequest :: WindowID -> Request Bool 
 
 struct CocoaWindow < RespondsToInputEvents, HasSize, HasBackgroundColor, 
     ContainsComponents, HasTitle, HasResponders, IsResizable where 
@@ -20,7 +20,6 @@ struct CocoaWindow < RespondsToInputEvents, HasSize, HasBackgroundColor,
     initWindow     :: App -> Request ()
     {- True: override window close events, False: don't override  -}
     setWindowResponder :: RespondsToWindowEvents -> Bool -> Request ()
-    {- True: close window, False: ignore close request -}
     windowClosing  :: Request Bool
     windowResizing :: Size -> Request ()
     destroyWindow  :: Request ()

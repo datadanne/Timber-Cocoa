@@ -8,6 +8,7 @@
 \usepackage{listings}
 \usepackage{caption}
 \usepackage{subfig}
+\usepackage{hyperref}
 \usepackage{url}
 \usepackage[left=2.5cm,top=3.5cm,right=2.5cm,bottom=3cm]{geometry}
 
@@ -23,7 +24,7 @@
         showstringspaces=false,
         tabsize=4,
         frame = ,
-        morekeywords={result, action, do, data, extern, request, class, new, module,import,where,let,case,if,then,else,elsif,forall, struct},
+        morekeywords={result, action, do, data, extern, request, class, new, module,import,where,let,case,if,then,else,elsif,forall, struct, private},
         morekeywords=[2]{},
         morekeywords=[3]{},
         morecomment=[l][\color{Blue}]{...}
@@ -31,6 +32,8 @@
 
 \newcommand{\timbercode}[2]
   {\begin{itemize}\item[]\lstinputlisting[caption=#2,label=#1]{#1.t}\end{itemize}}
+\newcommand{\ccode}[2]
+  {\begin{itemize}\item[]\lstinputlisting[caption=#2,label=#1]{#1.c}\end{itemize}}
 
 \makeatletter
 \renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
@@ -234,7 +237,7 @@ The events that we currently support are: MouseClicked, MouseMoved, MouseWheelSc
 
 As discussed earlier, after these events have been captured, they must be dispatched via the App reference. This reference will be kept valid at all times for Cocoa by installing a \textit{rootScanner} in the Timber's rtsPOSIX. Installing the rootScanner is done with a sequence of method invocations as follows:
 
-\timbercode{rootScanner}{}
+\ccode{rootScanner}{}
 
 First the mutex named rts (defined in rts.h of rtsPOSIX) will be locked to prevent concurrent modification of data, then we add the rootScanner, and also makes sure to set the status bit rootsDirty to one. This means that if the GC has already started a collection cycle and is going through its roots, the iteration must be repeated since we have added a rootScanner during the execution. At last, we release the mutex as we no longer want to modify any data protected by it.
 
@@ -242,7 +245,7 @@ The installed root scanner will be invoked by the GC during each collection cycl
 
 When injecting messages into Timber's message queue, is is necessary to set the baseline for the message, which is done by these two calls:
 
-\timbercode{rootScanner2}{}
+\ccode{rootScanner2}{}
 
 \subsubsection{Event dispatching}
 Both window and input events are delivered to the App object using a synchronous method (a request), from which they are sent to the corresponding window object through another request. The window object will deliver the events to an object of an anonymous class via an \textit{action} (different objects are used for window and input events) that will, if there exists an installed responder, pass along the events to it through a request. The important thing to note here is that the events are sent to the anonymous object through an action, which prevents the event handler method from having a long execution time (as that would slow down event handling in the application). To ensure that we dispatch the events in the correct order, we use an action with a handshake (i.e., without \textit{send}); this delegation chain is shown in picture Figure \ref{fig:eventchain}.
@@ -311,23 +314,13 @@ The overall structure with weekly project meetings and performing most of the wo
 
 The only big decision we feel we would change, had we taken this course all over again, is not to read it at a reduced rate (we worked for a year at 25\% of time on top of other courses, instead of during half a year at 50\% of time). Even though doing the project over a full year has allowed us to think twice before making decisions, working for this long has resulted in way too much time spent on catching up on things we did earlier, since the work load from other courses made it so that there often had to be multiple days between work sessions.
 
-\newpage
-\section{Appendix - CocoaDef.t}
-\timbercode{cocoaDef}{}
+\renewcommand*{\refname}{}
+\section{Bibliography} 
 \begin{thebibliography}{9}
 \bibitem{timberLang} \url{http://www.timber-lang.org/}
 \bibitem{cocoaLib} \url{http://developer.apple.com/technologies/mac/cocoa.html}
-\bibitem{kero1}
- Martin Kero, Johan Nordlander, and Per Lindgren
- \emph{A Correct and Useful Incremental Copying Garbage Collector. In IEEE International Symposium on Memory Management (ISMM)},
- Montreal, QB, 
- 2007.
-\bibitem{kero2} 
-  Martin Kero,
-   \emph{Garbage Collection for Reactive Real-Time Systems}, 
-  Doctoral thesis, Luleå University of Technology, 
-  October 2010
-
+\bibitem{kero1} Martin Kero, Johan Nordlander, and Per Lindgren \emph{A Correct and Useful Incremental Copying Garbage Collector. In IEEE International Symposium on Memory Management (ISMM)}, Montreal, QB,  2007.
+\bibitem{kero2} Martin Kero, \emph{Garbage Collection for Reactive Real-Time Systems}, Doctoral thesis, Lule{\aa} University of Technology, October 2010.
 \bibitem{objcRuntime} \url{http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Introduction/Introduction.html}
 \bibitem{cocoaGuidelines} \url{http://developer.apple.com/library/mac/#documentation/UserExperience/Conceptual/AppleHIGuidelines/Intro/Intro.html}
 \bibitem{cocoaMemory} \url{http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmRules.html}
@@ -337,6 +330,10 @@ The only big decision we feel we would change, had we taken this course all over
 \bibitem{arcIOS} \url{http://developer.apple.com/library/ios/#releasenotes/General/WhatsNewIniPhoneOS/Articles/iOS5.html#/apple_ref/doc/uid/TP30915195-SW1}
 \bibitem{javaFinalize}\url{http://docs.oracle.com/javase/1.4.2/docs/api/java/lang/Object.html}
 \end{thebibliography}
+
+\newpage
+\section{Appendix -- CocoaDef.t}
+\timbercode{cocoaDef}{}
 \end{document}
 
 

@@ -23,7 +23,7 @@ paintHandler w1 mkContainer write = class
     respondToInputEvent (MouseEvent (MouseMoved pos)) modifiers = request
         if (elem Shift modifiers) then
             blackBox = new mkContainer
-            blackBox.setSize ({width=7;height=7})
+            blackBox.setSize ({width=7,height=7})
             blackBox.setBackgroundColor color
             blackBox.setPosition pos
             pixelList := (Just blackBox) : pixelList
@@ -52,7 +52,7 @@ root w = class
     w1 = new mkCocoaWindow w :: CocoaWindow
     currentBrushColor = new mkCocoaContainer w :: Container
     bg = new class
-        Container{getAllChildren=temp;..} = new mkCocoaContainer w
+        Container{getAllChildren=temp,..} = new mkCocoaContainer w
         -- this improves performance
         getAllChildren = request result []
         result Container{..}
@@ -69,17 +69,17 @@ root w = class
         app.addWindow w1
         app.addWindow colorWindow
         colorWindow.setTitle "Colors"
-        colorWindow.setPosition ({x=701;y=100})
+        colorWindow.setPosition ({x=701,y=100})
         colorWindow.setVisible True
         bg.addResponder painter
     
     result action
-        currentBrushColor.setSize({width=600;height=30})
+        currentBrushColor.setSize({width=600,height=30})
         currentBrushColor.setBackgroundColor red
-        bg.setSize ({width=600;height=600})
-        bg.setPosition ({x=0;y=0})
-        w1.setSize ({width=600;height=600})
-        w1.setPosition ({x=100;y=100})
+        bg.setSize ({width=600,height=600})
+        bg.setPosition ({x=0,y=0})
+        w1.setSize ({width=600,height=600})
+        w1.setPosition ({x=100,y=100})
         w1.setResizable False
         w1.setTitle "Paint"
         bg.addComponent currentBrushColor
@@ -90,10 +90,10 @@ root w = class
 mkColorPicker :: World -> (Color -> Action) -> Class CocoaWindow
 mkColorPicker w callback = class
     
-    CocoaWindow{initWindow=initWindowImpl;..} = new mkCocoaWindow w
+    CocoaWindow{initWindow=initWindowImpl,..} = new mkCocoaWindow w
     
     initWindow app = request
-        setSize ({width=215;height=215})
+        setSize ({width=215,height=215})
         setVisible False
         setResizable False
         setWindowResponder (new class
@@ -108,9 +108,9 @@ mkColorPicker w callback = class
         forall x <- [1..16] do
             forall y <- [1..16] do
                 tile = new mkCocoaContainer w
-                tile.setSize ({width=tileSize;height=tileSize})
-                tile.setPosition ({x=tileSize*x;y=tileSize*y})
-                tileColor = ({r=128;g=16*x;b=16*y})
+                tile.setSize ({width=tileSize,height=tileSize})
+                tile.setPosition ({x=tileSize*x,y=tileSize*y})
+                tileColor = ({r=128,g=16*x,b=16*y})
                 tile.setBackgroundColor tileColor
                 tile.addResponder ({respondToInputEvent=invokeCallback tileColor})
                 addComponent tile

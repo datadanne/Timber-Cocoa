@@ -11,8 +11,8 @@ root w = class
     w1 = new mkCocoaWindow w
     
     start app = action
-        w1.setPosition ({x=100;y=100})
-        w1.setSize ({width=400;height=400}) 
+        w1.setPosition ({x=100,y=100})
+        w1.setSize ({width=400,height=400}) 
         w1.setBackgroundColor web_gray
         w1.setTitle "Tutorial"        
         createComponentHierarchy -- Tutorial 1
@@ -28,23 +28,23 @@ root w = class
     rightContainer = new mkCocoaContainer w
  
     createComponentHierarchy = do
-        leftContainer.setSize ({width=200; height=200})
-        leftContainer.setBackgroundColor ({r=100;g=100;b=200})
-        leftContainer.setPosition ({x=0;y=0})
+        leftContainer.setSize ({width=200, height=200})
+        leftContainer.setBackgroundColor ({r=100,g=100,b=200})
+        leftContainer.setPosition ({x=0,y=0})
 
-        rightContainer.setSize ({width=200; height=200})
-        rightContainer.setBackgroundColor ({r=100;g=200;b=100})
-        rightContainer.setPosition ({x=200; y=0})    
+        rightContainer.setSize ({width=200, height=200})
+        rightContainer.setBackgroundColor ({r=100,g=200,b=100})
+        rightContainer.setPosition ({x=200, y=0})    
 
         button.setTitle "Click me!"
-        button.setSize ({width=110;height=21})
-        button.setPosition ({x=40; y=100})
+        button.setSize ({width=110,height=21})
+        button.setPosition ({x=40, y=100})
         button.setClickResponder (new buttonHandler label)
         leftContainer.addComponent button
 
         label.setText "Click counter"
-        label.setSize ({width=150; height=36})
-        label.setPosition ({x=40; y=100})
+        label.setSize ({width=150, height=36})
+        label.setPosition ({x=40, y=100})
         rightContainer.addComponent label
 
         w1.addComponent leftContainer
@@ -54,9 +54,9 @@ root w = class
     ta = new mkCocoaTextArea w
 
     addTextArea = do
-        ta.setSize ({width=300; height=80})
-        ta.setPosition ({x=50; y=250})  
-        ta.setDocumentSize ({width=400;height=800})
+        ta.setSize ({width=300, height=80})
+        ta.setPosition ({x=50, y=250})  
+        ta.setDocumentSize ({width=400,height=800})
         w1.setWindowResponder (new windowResponder ta) False
         w1.addComponent ta
 
@@ -65,8 +65,8 @@ root w = class
 
     replaceTabResponder = do
         tabCountLabel.setText "Tab counter"
-        tabCountLabel.setSize ({width=150; height=36})
-        tabCountLabel.setPosition ({x=40; y=70})
+        tabCountLabel.setSize ({width=150, height=36})
+        tabCountLabel.setPosition ({x=40, y=70})
         ta.addResponder (new myTabResponder tabCountLabel)
         rightContainer.addComponent tabCountLabel
 
@@ -80,19 +80,19 @@ root w = class
         leftContainer.setBackgroundColor color
 
     addColorPicker app = do        
-        rgbLabel.setText "R=100; G=100; B=200"
-        rgbLabel.setSize ({width=150; height=36})
-        rgbLabel.setPosition ({x=40; y=40})
+        rgbLabel.setText "R=100, G=100, B=200"
+        rgbLabel.setSize ({width=150, height=36})
+        rgbLabel.setPosition ({x=40, y=40})
         rightContainer.addComponent rgbLabel
          
         colorButton.setTitle "Open ColorPicker"
-        colorButton.setSize ({width=150;height=21})
-        colorButton.setPosition ({x=40; y=75})
+        colorButton.setSize ({width=150,height=21})
+        colorButton.setPosition ({x=40, y=75})
         colorButton.setClickResponder 
             (new mkColorToggle colorWindow colorButton)
         leftContainer.addComponent colorButton
 
-        colorWindow.setPosition ({x=500;y=100})
+        colorWindow.setPosition ({x=500,y=100})
         app.addWindow colorWindow
 
     result action
@@ -111,9 +111,9 @@ windowResponder :: TextArea -> Class RespondsToWindowEvents
 windowResponder textarea = class
     onWindowResize size = request
         newWidth = floor ((fromInt size.width) * 0.8)
-        newTaSize = {width=newWidth; height=80}        
+        newTaSize = {width=newWidth, height=80}        
         newX = floor ((fromInt size.width) * 0.1)
-        newTaPosition = {x=newX; y=250}
+        newTaPosition = {x=newX, y=250}
         textarea.setSize newTaSize
         textarea.setPosition newTaPosition    
     onWindowCloseRequest = request

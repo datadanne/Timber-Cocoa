@@ -11,7 +11,7 @@ mkCocoaTextArea w = class
         result state
         
     dts = new defaultTextScrollResponder this
-    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl;setResponders=setRespondersImpl..} = 
+    BaseComponent {setPosition=setPositionImpl,setSize=setSizeImpl,setResponders=setRespondersImpl..} = 
         new basicComponent True Nothing "TextArea"
 
     setPosition p = request
@@ -29,7 +29,7 @@ mkCocoaTextArea w = class
     setResponders rs = request
         setRespondersImpl (dts:rs)
 
-    documentSize := {width=1000; height=10000}
+    documentSize := {width=1000, height=10000}
     getDocumentSize = request
         result documentSize
     
@@ -69,7 +69,7 @@ mkCocoaTextArea w = class
             addResponder dts
         result state
         
-    this = TextArea{id=self;..}
+    this = TextArea{id=self,..}
 
     result this
 

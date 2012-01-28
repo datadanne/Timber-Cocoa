@@ -15,14 +15,14 @@ mkCocoaDropDown :: World -> Class DropDown
 mkCocoaDropDown w = class
 
     state        := Inactive
-    size         := {width=108; height=17}
+    size         := {width=108, height=17}
     title        := "DropDown"    
 
     der = new defaultDropdownInputResponder refreshMyOptionAndPerformCallback        
     derAdded := False
     
-    BaseComponent {setPosition=setPositionImpl;setSize=dummy1;getSize=dummy2;setResponders=setRespondersImpl;
-        addResponder=addResponderImpl;..} = 
+    BaseComponent {setPosition=setPositionImpl,setSize=dummy1,getSize=dummy2,setResponders=setRespondersImpl,
+        addResponder=addResponderImpl,..} = 
         new basicComponent True Nothing "DropDown"
     
     setPosition p = request
@@ -103,7 +103,7 @@ mkCocoaDropDown w = class
                 derAdded := True
         result state
 
-    this = DropDown{id=self;..}
+    this = DropDown{id=self,..}
 
     result this
 

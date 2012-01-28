@@ -9,8 +9,8 @@ root w = class
     env = new posix w
     
     start app = action
-        w1.setPosition ({x=100;y=100})
-        w1.setSize ({width=400;height=400}) 
+        w1.setPosition ({x=100,y=100})
+        w1.setSize ({width=400,height=400}) 
         w1.setBackgroundColor web_gray
         w1.setTitle "TestKeyboardLayout"
         w1.addResponder (new class

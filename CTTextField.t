@@ -12,7 +12,7 @@ mkCocoaTextField w = class
     getState = request
         result state
 
-    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl..} = new basicComponent True Nothing "TextField"
+    BaseComponent {setPosition=setPositionImpl,setSize=setSizeImpl..} = new basicComponent True Nothing "TextField"
     setPosition p = request
         if isActive state then
             Active ref = state
@@ -50,7 +50,7 @@ mkCocoaTextField w = class
             setSizeImpl (<- textFieldSetSize ref (<- getSize))
         result state
                 
-    this = TextField{id=self;..}
+    this = TextField{id=self,..}
 
     result this
 

@@ -15,8 +15,8 @@ mkCocoaWindow w = class
     defaultResponder = new defaultInputResponder this rootContainer
     defaultResponderAdded := False
     
-    DefaultEventResponder {setResponders=setRespondersImpl;addResponder=addResponderImpl;
-        respondToInputEvent=respondToInputEventImpl;..} = new basicHasResponders 
+    DefaultEventResponder {setResponders=setRespondersImpl,addResponder=addResponderImpl,
+        respondToInputEvent=respondToInputEventImpl,..} = new basicHasResponders 
     
     respondToInputEvent e m = request
         respond e m
@@ -36,7 +36,7 @@ mkCocoaWindow w = class
     setResponders rs = request
         setRespondersImpl (defaultResponder:rs)
     
-    Container {setPosition=dummy1;getPosition=dummy2;setSize=setSizeImpl;..} = rootContainer
+    Container {setPosition=dummy1,getPosition=dummy2,setSize=setSizeImpl,..} = rootContainer
     setSize size = request
         if isActive state then 
             Active ref = state
@@ -45,7 +45,7 @@ mkCocoaWindow w = class
         setSizeImpl size
 
     -- the position of the window may change, but the position of root container is (0,0)
-    position := {x=0;y=0}
+    position := {x=0,y=0}
     getPosition = request
         result position
     setPosition pos = request
@@ -78,7 +78,7 @@ mkCocoaWindow w = class
         set resp
     windowResizing size = request
         resize size 
-        containerSize = {width=size.width;height=(size.height-22)}
+        containerSize = {width=size.width,height=(size.height-22)}
         setSizeImpl containerSize
     windowClosing = request
         close
@@ -247,7 +247,7 @@ defaultInputResponder window rootContainer = class
     findMouseFocus event modifiers cmp = do
         originBottomLeft  = getMousePosition event
         windowSize        <- window.getSize
-        eventPosition     = ({x=originBottomLeft.x; y=windowSize.height-originBottomLeft.y})
+        eventPosition     = ({x=originBottomLeft.x, y=windowSize.height-originBottomLeft.y})
         parentPosition    <- getParentPosition cmp
         relativePosition  = getRelativePosition parentPosition eventPosition
 
@@ -281,10 +281,10 @@ getParentPosition cmp = do
     if (isJust parent) then
         result <- (fromJust parent).getPosition
     else
-        result ({x=0;y=0})
+        result ({x=0,y=0})
 
 getRelativePosition from to =
-    {x=to.x-from.x; y=to.y-from.y}
+    {x=to.x-from.x, y=to.y-from.y}
 
 instance eqCocoaKey :: Eq CocoaKey where
   (==) = compareKeys

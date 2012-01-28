@@ -8,12 +8,12 @@ import CocoaDef
 mkCocoaContainer :: World -> Class Container
 mkCocoaContainer w = class
     myComponents := []    
-    color        := {r=255; g=255; b=255}
+    color        := {r=255, g=255, b=255}
     alpha        := 1.0
     appRef       := Nothing
     state        := Inactive
 
-    BaseComponent {getAllChildren=dummy; setPosition = setPositionImpl; setSize = setSizeImpl; ..} = 
+    BaseComponent {getAllChildren=dummy, setPosition = setPositionImpl, setSize = setSizeImpl, ..} = 
         new basicComponent False Nothing "Container"
 
     setPosition p = request
@@ -107,7 +107,7 @@ mkCocoaContainer w = class
     getState = request
         result state
 
-    this = Container {id = self; ..}  
+    this = Container {id = self, ..}  
 
     result this
 
@@ -137,8 +137,8 @@ basicComponent f p n = class
     (getParent,setParentImpl)       = new wrapper p
     setParent p = request setParentImpl (Just p)
     (getIsFocusable,setIsFocusable) = new wrapper f
-    (getPosition,setPosition)       = new wrapper ({x=0; y=0})
-    (getSize,setSize)               = new wrapper ({width=100; height=100})    
+    (getPosition,setPosition)       = new wrapper ({x=0, y=0})
+    (getSize,setSize)               = new wrapper ({width=100, height=100})    
     getAllChildren                  = request result []
     result BaseComponent {..}
 

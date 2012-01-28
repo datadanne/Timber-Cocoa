@@ -5,10 +5,10 @@ import COCOA
 mkColorPicker :: World -> (Color -> Action) -> Class CocoaWindow
 mkColorPicker w callback = class
 
-    CocoaWindow{initWindow=initWindowImpl;..} = new mkCocoaWindow w
+    CocoaWindow{initWindow=initWindowImpl,..} = new mkCocoaWindow w
     
     initWindow app = request
-        setSize ({width=215;height=215})
+        setSize ({width=215,height=215})
         setVisible False
         setResizable False
         setWindowResponder (new class
@@ -23,9 +23,9 @@ mkColorPicker w callback = class
         forall x <- [1..16] do
             forall y <- [1..16] do
                 tile = new mkCocoaContainer w
-                tile.setSize ({width=tileSize;height=tileSize})
-                tile.setPosition ({x=tileSize*x;y=tileSize*y})
-                tileColor = ({r=128;g=16*x;b=16*y})
+                tile.setSize ({width=tileSize,height=tileSize})
+                tile.setPosition ({x=tileSize*x,y=tileSize*y})
+                tileColor = ({r=128,g=16*x,b=16*y})
                 tile.setBackgroundColor tileColor
                 tile.addResponder ({respondToInputEvent=invokeCallback tileColor})
                 addComponent tile    

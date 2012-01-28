@@ -14,7 +14,7 @@ mkCocoaLabel w = class
     color := white    
     alpha := 0.0
 
-    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl..} = new basicComponent False Nothing "Label"
+    BaseComponent {setPosition=setPositionImpl,setSize=setSizeImpl..} = new basicComponent False Nothing "Label"
 
     setPosition p = request  
         if isActive state then
@@ -77,7 +77,7 @@ mkCocoaLabel w = class
             labelSetBackgroundColor ref color alpha
         result state
         
-    this = Label{id=self;..}
+    this = Label{id=self,..}
 
     result this  
 

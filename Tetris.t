@@ -28,24 +28,24 @@ root w = class
 
     result action
         startNewGameResponder <- initGame
-        gameWindow.setSize ({width=400;height=500})
-        gameWindow.setBackgroundColor ({r=100;g=100;b=100})
-        gameWindow.setPosition ({x=100;y=100})
+        gameWindow.setSize ({width=400,height=500})
+        gameWindow.setBackgroundColor ({r=100,g=100,b=100})
+        gameWindow.setPosition ({x=100,y=100})
         gameWindow.setTitle "Tetris"
-        startButton.setPosition ({x=270;y=20})
+        startButton.setPosition ({x=270,y=20})
         startButton.setTitle "New Game"
         startButton.setIsFocusable False
         startButton.setClickResponder startNewGameResponder
         gameWindow.addComponent startButton
-        scoreLabel.setPosition ({x=270;y=100})
-        scoreLabel.setSize ({width=200;height=30})
+        scoreLabel.setPosition ({x=270,y=100})
+        scoreLabel.setSize ({width=200,height=30})
         scoreLabel.setText "Game not started"
-        scoreLabel.setTextColor ({r=250;g=250;b=250})
+        scoreLabel.setTextColor ({r=250,g=250,b=250})
         gameWindow.addComponent scoreLabel
-        highscoreLabel.setPosition ({x=270;y=70})
-        highscoreLabel.setSize ({width=250;height=20})
+        highscoreLabel.setPosition ({x=270,y=70})
+        highscoreLabel.setSize ({width=250,height=20})
         highscoreLabel.setText "High score: 0 lines"
-        highscoreLabel.setTextColor ({r=150;g=250;b=150})
+        highscoreLabel.setTextColor ({r=150,g=250,b=150})
         gameWindow.addComponent highscoreLabel
         osx.startApplication startedApp
         
@@ -61,7 +61,7 @@ gameIgniter window writeScore writeHighScore w = class
     init = request
         if not initialized then
             initialized := True
-            grid.setPosition ({x=30;y=20})
+            grid.setPosition ({x=30,y=20})
             window.addComponent grid
         result startNewGame
 
@@ -109,7 +109,7 @@ struct BlockController < HasPosition, RespondsToInputEvents where
 blockController gameGrid write = class
     randomizer = new baseGen 31415926
     gameOver := False    
-    position := {x=0;y=0}
+    position := {x=0,y=0}
     color    := RedTile
     shape    := array []
     
@@ -143,7 +143,7 @@ blockController gameGrid write = class
         setPieceValues EmptyTile
         collides <- testCollision shape addX addY
         if (not collides) then
-            position := {x=position.x+addX;y=position.y+addY}
+            position := {x=position.x+addX,y=position.y+addY}
         elsif (addX == 0 && addY == 1) then
             if (position.y < 0) then
                 -- Game Over!
@@ -204,7 +204,7 @@ blockController gameGrid write = class
         currentPiece := nextPiece
         (startX,startY, newShape) = (head currentPiece)
         shape := newShape
-        position := {x=startX;y=startY}
+        position := {x=startX,y=startY}
         color := <- randomizeColor 
         nextPiece := <- randomizePiece
 
@@ -267,16 +267,16 @@ tetrisGrid width height w = class
     -- Grid of tiles where each tile is a (X,Y,TileValue,Container) tuple.
     grid :: [(Int, Int, TileValue, Container)]
     grid := []
-    backgroundColor = ({r=20;g=30;b=30})
+    backgroundColor = ({r=20,g=30,b=30})
     
     update = request
         forall (tx,ty,val,container) <- grid do
             case (val) of
-                RedTile -> container.setBackgroundColor ({r=249;g=126;b=100})
-                OrangeTile -> container.setBackgroundColor ({r=249;g=232;b=100})
-                BlueTile -> container.setBackgroundColor ({r=74;g=106;b=154})
+                RedTile -> container.setBackgroundColor ({r=249,g=126,b=100})
+                OrangeTile -> container.setBackgroundColor ({r=249,g=232,b=100})
+                BlueTile -> container.setBackgroundColor ({r=74,g=106,b=154})
                 EmptyTile -> container.setBackgroundColor backgroundColor
-                _ -> container.setBackgroundColor ({r=255;g=255;b=255})
+                _ -> container.setBackgroundColor ({r=255,g=255,b=255})
 
     setColorAt x y newColor = request
         newGrid := []
@@ -315,23 +315,23 @@ tetrisGrid width height w = class
                 
     initGrid app = request
         tileSize = 20
-        base.setSize ({width=1+(tileSize+1)*width;height=1+(tileSize+1)*height})
-        base.setBackgroundColor({r=150;g=150;b=150})
+        base.setSize ({width=1+(tileSize+1)*width,height=1+(tileSize+1)*height})
+        base.setBackgroundColor({r=150,g=150,b=150})
         ref <- base.initComp app
         
         forall row <- [1..height] do
             forall col <- [1..width] do
                tile = new mkCocoaContainer w
-               tile.setSize ({width=tileSize;height=tileSize})
+               tile.setSize ({width=tileSize,height=tileSize})
                tile.setBackgroundColor backgroundColor
-               tile.setPosition ({x=(col-1)*(tileSize+1)+1;y=(row-1)*(tileSize+1)+1})
+               tile.setPosition ({x=(col-1)*(tileSize+1)+1,y=(row-1)*(tileSize+1)+1})
                grid := (col,row, EmptyTile, tile) : grid
                base.addComponent tile
         result ref
 
     base = new mkCocoaContainer w
     Container {..} = base
-    result GameGrid {initComp=initGrid;..}
+    result GameGrid {initComp=initGrid,..}
     
 {- 
     Tetris shapes! 

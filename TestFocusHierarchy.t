@@ -14,15 +14,15 @@ root w = class
     c2  = new mkCocoaContainer w
 
     start app = action
-        w1.setPosition ({x=100;y=100})
-        w1.setSize ({width=490;height=460}) 
+        w1.setPosition ({x=100,y=100})
+        w1.setSize ({width=490,height=460}) 
         w1.setBackgroundColor web_gray
         w1.setTitle "TestFocusHierarchy"   
         forall ((xcord,ycord),i) <- zip positions [1 .. length positions] do
             button = new mkCocoaButton w
             button.setName ("Button" ++ (show i))
             button.setTitle ("Button" ++ (show i))
-            button.setPosition ({x=xcord;y=ycord})
+            button.setPosition ({x=xcord,y=ycord})
             w1.addComponent button   
         app.addWindow w1       
 

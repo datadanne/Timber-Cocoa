@@ -118,28 +118,28 @@ instance showColor :: Show Color where
              " B: " ++ (show c.b)
 
 -- Apple colors
-black   = {r=0;   g=0;   b=0  }
-blue    = {r=44;  g=38;  b=249}
-brown   = {r=169; g=121; b=72 }
-cyan    = {r=2;   g=254; b=254}
-green   = {r=0;   g=252; b=56 }
-magenta = {r=255; g=48;  b=250}
-orange  = {r=254; g=146; b=40 }
-purple  = {r=148; g=23;  b=143}
-red     = {r=255; g=27;  b=24 }
-yellow  = {r=252; g=253; b=63 }
-white   = {r=255; g=255; b=255}
+black   = {r=0,   g=0,   b=0  }
+blue    = {r=44,  g=38,  b=249}
+brown   = {r=169, g=121, b=72 }
+cyan    = {r=2,   g=254, b=254}
+green   = {r=0,   g=252, b=56 }
+magenta = {r=255, g=48,  b=250}
+orange  = {r=254, g=146, b=40 }
+purple  = {r=148, g=23,  b=143}
+red     = {r=255, g=27,  b=24 }
+yellow  = {r=252, g=253, b=63 }
+white   = {r=255, g=255, b=255}
 
 -- Web colors
-web_black   = {r=0;   g=0;   b=0  }
-web_red     = {r=255; g=0;   b=0  }
-web_green   = {r=0;   g=255; b=0  }
-web_blue    = {r=0;   g=0;   b=255}
-web_yellow  = {r=255; g=255; b=0  }
-web_cyan    = {r=0;   g=255; b=255}
-web_magenta = {r=255; g=0;   b=255}
-web_gray    = {r=192; g=192; b=192}
-web_white   = {r=255; g=255; b=255}
+web_black   = {r=0,   g=0,   b=0  }
+web_red     = {r=255, g=0,   b=0  }
+web_green   = {r=0,   g=255, b=0  }
+web_blue    = {r=0,   g=0,   b=255}
+web_yellow  = {r=255, g=255, b=0  }
+web_cyan    = {r=0,   g=255, b=255}
+web_magenta = {r=255, g=0,   b=255}
+web_gray    = {r=192, g=192, b=192}
+web_white   = {r=255, g=255, b=255}
                                               
 struct HasPosition where
     setPosition :: Position -> Request ()

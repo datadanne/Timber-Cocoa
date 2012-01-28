@@ -22,8 +22,8 @@ mkCocoaButton w = class
     der = new defaultButtonInputResponder this
     derAdded := False
     
-    BaseComponent {setPosition=setPositionImpl;setSize=setSizeImpl;setResponders=setRespondersImpl;
-        addResponder=addResponderImpl;..} =
+    BaseComponent {setPosition=setPositionImpl,setSize=setSizeImpl,setResponders=setRespondersImpl,
+        addResponder=addResponderImpl,..} =
         new basicComponent True Nothing "BUTTON"
 
     setPosition p = request
@@ -87,7 +87,7 @@ mkCocoaButton w = class
     getState = request
         result state
 
-    this = Button {id = self;..}
+    this = Button {id = self,..}
 
     result this
 
@@ -105,8 +105,8 @@ defaultButtonInputResponder btn = class
 
         -- vertical invisible border: 7 under, 4 above
         -- horizontal invisible border: 7 right, 6 left
-        clickSize = {width=btnSize.width-13; height=btnSize.height-11}
-        clickPos  = {x=btnPos.x+6; y=btnPos.y+4}
+        clickSize = {width=btnSize.width-13, height=btnSize.height-11}
+        clickPos  = {x=btnPos.x+6, y=btnPos.y+4}
     
         if clickInsideBox pos clickPos clickSize then
             -- the event was inside the clickable area

@@ -18,7 +18,7 @@ root w = class
         w1.setSize ({width=490,height=460}) 
         w1.setBackgroundColor web_gray
         w1.setTitle "TestFocusHierarchy"   
-        forall ((xcord,ycord),i) <- zip positions [1 .. length positions] do
+        forall ((xcord,ycord),i) <- zip positions [1.. length positions] do
             button = new mkCocoaButton w
             button.setName ("Button" ++ (show i))
             button.setTitle ("Button" ++ (show i))

@@ -13,7 +13,7 @@ mkCocoaContainer w = class
     appRef       := Nothing
     state        := Inactive
 
-    BaseComponent {getAllChildren=dummy, setPosition = setPositionImpl, setSize = setSizeImpl, ..} = 
+    BaseComponent {getAllChildren=dummy, setPosition = setPositionImpl, setSize = setSizeImpl,..} = 
         new basicComponent False Nothing "Container"
 
     setPosition p = request
@@ -107,7 +107,7 @@ mkCocoaContainer w = class
     getState = request
         result state
 
-    this = Container {id = self, ..}  
+    this = Container {id = self,..}  
 
     result this
 

@@ -85,7 +85,7 @@ gameIgniter window writeScore writeHighScore w = class
             grid.update
             after (millisec 500) send loop
         elsif not running then
-            writeScore "Restarting ..."
+            writeScore "Restarting..."
         else
             writeScore "Game Over!"  
             
@@ -187,7 +187,7 @@ blockController gameGrid write = class
                 if (blocksInRow == gameGridWidth) then
                     linesClearedNow := linesClearedNow + 1
                     forall col <- [1..gameGridWidth] do
-                        forall r <- [0 .. (row-2)] do
+                        forall r <- [0.. (row-2)] do
                             above <- gameGrid.getValueAt col (row-r-1)
                             
                             case above of   

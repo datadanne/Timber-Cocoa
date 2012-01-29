@@ -11,7 +11,7 @@ mkCocoaTextArea w = class
         result state
         
     dts = new defaultTextScrollResponder this
-    BaseComponent {setPosition=setPositionImpl,setSize=setSizeImpl,setResponders=setRespondersImpl..} = 
+    BaseComponent {setPosition=setPositionImpl,setSize=setSizeImpl,setResponders=setRespondersImpl,..} = 
         new basicComponent True Nothing "TextArea"
 
     setPosition p = request

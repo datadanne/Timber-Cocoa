@@ -52,7 +52,7 @@ root w = class
     w1 = new mkCocoaWindow w :: CocoaWindow
     currentBrushColor = new mkCocoaContainer w :: Container
     bg = new class
-        Container{getAllChildren=temp,..} = new mkCocoaContainer w
+        Container{getAllChildren=dummy,..} = new mkCocoaContainer w
         -- this improves performance
         getAllChildren = request result []
         result Container{..}

@@ -151,7 +151,7 @@ mkColorToggle window button = class
     result action
         window.setVisible toggle
         button.setTitle 
-            (if toggle then "Open ColorPicker" else "Close ColorPicker")
+            (if toggle then "Close ColorPicker" else "Open ColorPicker")
         toggle := not toggle
     
 -- Tutorial 5: Customized label, each text change triggers an action

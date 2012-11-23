@@ -1,4 +1,5 @@
 #include "CTDropDown.extern.h"
+#include "rts.h"
 
 @interface DropDownClickHandler : NSObject {
     float x;
@@ -23,6 +24,7 @@
     return self;
 }   
 -(void) dropDownClicked: (id) sender {
+    enterLocalPtrScope();
     Thread current_thread = CURRENT();
 	TIMERGET(current_thread->msg->baseline);
 
@@ -51,6 +53,8 @@
     ((_MouseEvent_CocoaDef)receivedEvent)->a = (MouseEventType_CocoaDef)clicked;    
     app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef->sendInputEvent_CocoaDef(
         app->l_App_CocoaDef_AppImpl_CocoaDef_CocoaDef, (InputEvent_CocoaDef)receivedEvent, windowId, 0);
+    
+    leaveLocalPtrScope();
 }  
 - (void) setCoordsX: (float) xarg andY: (float) yarg {
     x = xarg;

@@ -16,6 +16,7 @@ paintHandler :: Container -> Class Container -> (String -> Request Int) -> Class
 paintHandler w1 mkContainer write = class
     pixelList := []
     color := red
+    mousePressed := False
 
     setColor c = action
         color := c
@@ -40,7 +41,7 @@ paintHandler w1 mkContainer write = class
                     result pixel
             pixelList := newList
         result NotConsumed
-        
+
     respondToInputEvent _ _ = request
         result NotConsumed
         
